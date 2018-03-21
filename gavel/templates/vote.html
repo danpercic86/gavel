@@ -30,8 +30,13 @@
   <div class="info">
     <form action="/vote" method="post">
       <p class="center">Which one is better?</p>
-      <input type="submit" name="action" value="{{ prev.name | safe }}" id="vote-previous" class="button-left">
-      <input type="submit" name="action" value="{{ next.name | safe }}" id="vote-current" class="button-right">
+      <label for="vote-previous" class="label-team">{{ prev.name | safe }}</label>
+      <input type="radio" name="action" value="Previous" id="vote-previous" class="button-left input-team">
+      <label for="vote-current" class="label-team">{{ next.name | safe }}</label>
+      <input type="radio" name="action" value="Current" id="vote-current" class="button-right input-team">
+
+      <input type="submit" value="Vote" class="button-vote">
+
       <input type="submit" name="action" value="Skip" id="vote-skip" class="button-full button-gap">
       <input type="hidden" name="prev_id" value="{{ prev.id }}">
       <input type="hidden" name="next_id" value="{{ next.id }}">
