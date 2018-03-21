@@ -307,3 +307,57 @@ input[type=submit].neutral {
     text-align: center;
   }
 }
+
+
+
+/*** New theme ***/
+
+.banner-tight {
+  display: inline-block;
+
+}
+.banner-tight h1{
+  font-size: 12px;
+  padding: 6px 12px;
+}
+
+#vote-header{
+  display:none;
+}
+#vote-skip {
+  background-color: #f1f1f1;
+  height: 40px;
+  font-size: 10px;
+  width: auto;
+  padding: 5px 20px;
+  margin-top: 2em;
+  margin-left:auto;
+  margin-right:0;
+  display: block;
+}
+.input-team {
+  display: none;
+}
+.label-team{
+  width: 49%;
+  margin:0;
+  text-align:center;
+  display: inline-block;
+  border: 1px solid #e1e1e1;
+  line-height: 100px;
+  font-size: 18px;
+  white-space: nowrap;
+  padding: 10px;
+  font-weight: bold;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.label-team.active{
+  background-color: green;
+  color:#fff;
+}
+.button-vote{
+  display: none;
+  width: 100%;
+  margin-top: 2em;
+}
