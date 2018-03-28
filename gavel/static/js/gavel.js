@@ -6,4 +6,10 @@ $(document).ready(function(){
         $(this).addClass('active');
         $('.button-vote').show();
     });
+
+    // implement tabs
+    $('#myTab a').on('click', function (e) {
+        e.preventDefault()
+        $(this).tab('show');
+    })
 });
