@@ -344,6 +344,9 @@ input[type=submit].neutral {
   padding: .5rem;
   vertical-align: middle;
 }
+.table thead th {
+  vertical-align: top;
+}
 .table td {
   background: #ffffff;
 }
