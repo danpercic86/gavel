@@ -81,10 +81,10 @@ $(document).ready(function(){
                 diff = diff - (m * 60);
                 var s = diff;
 
-                if (m > timePerProject) {
+                if (m >= timePerProject) {
                     $(container).parent('div').addClass('alert-blink');
 
-                    if (m > maxTimePerProject) {
+                    if (m >= maxTimePerProject) {
                         $('body').addClass('alert-blink');
                     }
                 }
