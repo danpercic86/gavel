@@ -7,6 +7,7 @@ from flask import (
     redirect,
     render_template,
     request,
+    session,
     url_for,
 )
 import urllib.parse
@@ -39,6 +40,7 @@ def admin():
     setting_closed = Setting.value_of(SETTING_CLOSED) == SETTING_TRUE
     return render_template(
         'admin.html',
+        is_admin=True,
         annotators=annotators,
         counts=counts,
         item_counts=item_counts,
@@ -191,6 +193,7 @@ def item_detail(item_id):
             skipped = Annotator.query.filter(Annotator.ignore.contains(item))
         return render_template(
             'admin_item.html',
+            is_admin=True,
             item=item,
             assigned=assigned,
             skipped=skipped
@@ -214,6 +217,7 @@ def annotator_detail(annotator_id):
         return render_template(
             'admin_annotator.html',
             annotator=annotator,
+            is_admin=True,
             login_link=annotator_link(annotator),
             seen=seen,
             skipped=skipped

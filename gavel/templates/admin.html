@@ -1,7 +1,7 @@
 {% extends "layout.html" %}
 {% block title %}Admin{% endblock %}
 {% block content %}
-
+<div class="container-fluid">
 <div class="py-2 text-center">
   <strong>Gavel</strong> - project expo judging system
 </div>
@@ -256,8 +256,7 @@
     </div>
   </div>
 </div>
-
-
+</div>
 {% endblock %}
 {% block end %}
 <script src="{{ url_for('static', filename='js/vendor/tablesort.min.js') }}"></script>
