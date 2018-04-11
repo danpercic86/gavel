@@ -234,18 +234,27 @@
           <thead class="thead-dark">
           <tr>
             <th scope="col">Setting</th>
-            <th  scope="col">Value</th>
             <th  scope="col">Edit</th>
           </tr>
           </thead>
           <tbody>
           <tr class="{{ 'disabled' if setting_closed else '' }}">
             <td>Voting status</td>
-            <td>{{ 'Closed' if setting_closed else 'Open' }}</td>
             <td class="compact">
               <form action="/admin/setting" method="post">
-                <input type="submit" name="action" value="{{ 'Open' if setting_closed else 'Close' }}" class="btn {{ 'btn-success' if setting_closed else 'btn-danger' }}">
-                <input type="hidden" name="key" value="closed">
+                <input type="submit" name="voting-status" value="{{ 'Open' if setting_closed else 'Close' }}" class="btn {{ 'btn-success' if setting_closed else 'btn-danger' }}">
+                <input type="hidden" name="action" value="update-voting-status">
+                <input type="hidden" name="_csrf_token" value="{{ csrf_token() }}">
+              </form>
+            </td>
+          </tr>
+          <tr class="{{ 'disabled' if setting_closed else '' }}">
+            <td>Time per project</td>
+            <td class="compact">
+              <form action="/admin/setting" method="post">
+                <input type="input" name="time-per-project" value="{{ time_per_project }}"/>
+                <input type="submit" value="Update" class="btn btn-success">
+                <input type="hidden" name="action" value="time-per-project">
                 <input type="hidden" name="_csrf_token" value="{{ csrf_token() }}">
               </form>
             </td>

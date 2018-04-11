@@ -48,6 +48,7 @@ def admin():
         items=items,
         votes=len(decisions),
         setting_closed=setting_closed,
+        time_per_project=Setting.value_of('TIME_PER_PROJECT')
     )
 
 @app.route('/admin/item', methods=['POST'])
@@ -168,10 +169,12 @@ def annotator():
 @app.route('/admin/setting', methods=['POST'])
 @utils.requires_auth
 def setting():
-    key = request.form['key']
-    if key == 'closed':
-        action = request.form['action']
-        new_value = SETTING_TRUE if action == 'Close' else SETTING_FALSE
+    action = request.form['action']
+    if action == 'update-time-per-project':
+        Setting.set('TIME_PER_PROJECT', request.form['time-per-project'])
+        db.session.commit()
+    if action == 'update-voting-status':
+        new_value = SETTING_TRUE if request.form['voting-status'] == 'Close' else SETTING_FALSE
         Setting.set(SETTING_CLOSED, new_value)
         db.session.commit()
     return redirect(url_for('admin'))
