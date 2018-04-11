@@ -8,3 +8,4 @@ email_from: '' # needs to be set to something even though email is disabled
 email_user: ''
 email_password: ''
 send_stats: false # disabled for development
+api_key: 89iuw4gtuyjfbsiukjbw4uiskjbdfius

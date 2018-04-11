@@ -1,7 +1,10 @@
 from gavel import app
 from gavel.models import *
+from gavel.constants import *
+import gavel.settings as settings
 import gavel.utils as utils
-from flask import Response
+import json
+from flask import ( Response, request)
 
 @app.route('/api/items.csv')
 @utils.requires_auth
@@ -43,3 +46,22 @@ def decisions_dump():
         str(d.time)
     ] for d in decisions]
     return Response(utils.data_to_csv_string(data), mimetype='text/csv')
+
+@app.route('/api/submissions.json')
+def item_json_dump():
+
+    if not request.args['key'] == settings.API_KEY:
+        return Response(json.dumps({'error' : 'Invalid api key.'}), mimetype='application/json')
+
+    items = Item.query.order_by(desc(Item.mu)).all()
+    data = []
+    data += [{
+        'description'   : item.description.strip(),
+        'id'            : item.id,
+        'mu'            : str(item.mu).strip(),
+        'sigma Squared' : str(item.sigma_sq).strip(),
+        'location'      : item.location.strip(),
+        'active'        : item.active,
+        'name'          : item.name.strip()
+    } for item in items]
+    return Response(json.dumps(data), mimetype='application/json')

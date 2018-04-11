@@ -79,3 +79,4 @@ EMAIL_CC =      _list(c.get('email_cc',        'EMAIL_CC',                 defau
 EMAIL_SUBJECT =       c.get('email_subject',                               default=constants.DEFAULT_EMAIL_SUBJECT)
 EMAIL_BODY =          c.get('email_body',                                  default=constants.DEFAULT_EMAIL_BODY)
 SEND_STATS =    _bool(c.get('send_stats',      'SEND_STATS',               default=True))
+API_KEY =             c.get('api_key',         'API_KEY',                  default=constants.DEFAULT_API_KEY)
