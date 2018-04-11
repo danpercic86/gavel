@@ -70,9 +70,24 @@ def index():
                 content=utils.render_markdown(settings.WAIT_MESSAGE)
             )
         elif annotator.prev is None:
-            return render_template('begin.html', item=annotator.next,items=items,seen=seen)
+            return render_template('begin.html',
+            item=annotator.next,
+            items=items,
+            seen=seen,
+            time_per_project=Setting.value_of('TIME_PER_PROJECT'),
+            max_time_per_project=Setting.value_of('MAX_TIME_PER_PROJECT'),
+            jury_end=Setting.value_of('JURY_END_DATETIME')
+            )
         else:
-            return render_template('vote.html', prev=annotator.prev, next=annotator.next,items=items,seen=seen)
+            return render_template('vote.html',
+            prev=annotator.prev,
+            next=annotator.next,
+            items=items,
+            seen=seen,
+            time_per_project=Setting.value_of('TIME_PER_PROJECT'),
+            max_time_per_project=Setting.value_of('MAX_TIME_PER_PROJECT'),
+            jury_end_datetime=Setting.value_of('JURY_END_DATETIME')
+            )
 
 @app.route('/vote', methods=['POST'])
 @requires_open(redirect_to='index')

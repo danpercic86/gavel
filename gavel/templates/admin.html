@@ -248,13 +248,35 @@
               </form>
             </td>
           </tr>
-          <tr class="{{ 'disabled' if setting_closed else '' }}">
+          <tr>
             <td>Time per project</td>
             <td class="compact">
               <form action="/admin/setting" method="post">
                 <input type="input" name="time-per-project" value="{{ time_per_project }}"/>
                 <input type="submit" value="Update" class="btn btn-success">
-                <input type="hidden" name="action" value="time-per-project">
+                <input type="hidden" name="action" value="update-time-per-project">
+                <input type="hidden" name="_csrf_token" value="{{ csrf_token() }}">
+              </form>
+            </td>
+          </tr>
+          <tr>
+            <td>Max time per project / general alert starts</td>
+            <td class="compact">
+              <form action="/admin/setting" method="post">
+                <input type="input" name="max-time-per-project" value="{{ max_time_per_project }}"/>
+                <input type="submit" value="Update" class="btn btn-success">
+                <input type="hidden" name="action" value="update-max-time-per-project">
+                <input type="hidden" name="_csrf_token" value="{{ csrf_token() }}">
+              </form>
+            </td>
+          </tr>
+          <tr>
+            <td>Jury end datetime - Remmeber to substract -2 hours for EEST timezone</td>
+            <td class="compact">
+              <form action="/admin/setting" method="post">
+                <input type="input" name="jury-end-datetime" value="{{ jury_end }}"/>
+                <input type="submit" value="Update" class="btn btn-success">
+                <input type="hidden" name="action" value="update-jury-end">
                 <input type="hidden" name="_csrf_token" value="{{ csrf_token() }}">
               </form>
             </td>

@@ -93,6 +93,9 @@
 </div>
 <script type="text/javascript">
   var currentProject = '{{ next.id }}';
+  var timePerProject = '{{ time_per_project }}';
+  var maxTimePerProject = '{{ max_time_per_project }}';
+  var endJuryTime = new Date(Date.UTC({{ jury_end_datetime }}));
 </script>
 {% endblock %}
 

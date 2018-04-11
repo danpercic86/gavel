@@ -48,7 +48,9 @@ def admin():
         items=items,
         votes=len(decisions),
         setting_closed=setting_closed,
-        time_per_project=Setting.value_of('TIME_PER_PROJECT')
+        time_per_project=Setting.value_of('TIME_PER_PROJECT'),
+        max_time_per_project=Setting.value_of('MAX_TIME_PER_PROJECT'),
+        jury_end=Setting.value_of('JURY_END_DATETIME')
     )
 
 @app.route('/admin/item', methods=['POST'])
@@ -172,6 +174,12 @@ def setting():
     action = request.form['action']
     if action == 'update-time-per-project':
         Setting.set('TIME_PER_PROJECT', request.form['time-per-project'])
+        db.session.commit()
+    if action == 'update-max-time-per-project':
+        Setting.set('MAX_TIME_PER_PROJECT', request.form['max-time-per-project'])
+        db.session.commit()
+    if action == 'update-jury-end':
+        Setting.set('JURY_END_DATETIME', request.form['jury-end-datetime'])
         db.session.commit()
     if action == 'update-voting-status':
         new_value = SETTING_TRUE if request.form['voting-status'] == 'Close' else SETTING_FALSE

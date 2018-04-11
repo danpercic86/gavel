@@ -9,9 +9,7 @@ $(document).ready(function(){
 
 
     if($('body').hasClass('judge-view')) {
-        var timePerProject = 5;
-        var maxTimePerProject = 10;
-        var endJuryTime = new Date(Date.UTC(2018, 4, 11, 23, 0, 0));
+
 
         // manage team selection and unlock vote button
         $('.label-team').click(function () {
@@ -115,7 +113,7 @@ $(document).ready(function(){
                 diff = diff - (m * 60);
                 var s = diff;
 
-                $('#time-left').html(h + " h : " + s + " m");
+                $('#time-left').html(h + " h : " + m + " m");
             }
 
             setInterval(calculateTimeLeft, 1000);
