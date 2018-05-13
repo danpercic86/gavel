@@ -188,11 +188,10 @@ def setting():
         Setting.set(SETTING_CLOSED, new_value)
         db.session.commit()
     if action == 'import-teams':
-        // get api
         response = urllib.request.urlopen(IMPORT_URL).read()
         data = json.loads(response)
 
-        for item in data
+        for item in data:
             _item = Item(item.name, item.location, item.description, item._id)
             db.session.add(_item)
 
