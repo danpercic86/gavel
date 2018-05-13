@@ -9,10 +9,11 @@ if __name__ == '__main__':
     import os
 
     extra_files = []
-    if os.environ.get('DEBUG', False):
+    if os.environ.get('DEBUG', True):
         app.debug = True
         extra_files.append('./config.yaml')
-
+        app.jinja_env.auto_reload = True
+        app.config['TEMPLATES_AUTO_RELOAD'] = True
     app.run(
         host='0.0.0.0',
         port=PORT,
