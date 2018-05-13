@@ -194,8 +194,9 @@ def setting():
         data = json.loads(response.read())
 
         for item in data:
+            print('identifier' + item['_id'])
             exitingItem = Item.by_identifier(item['_id'])
-            if not exitingItem:
+            if exitingItem is None:
                 if 'name' in item and 'location' in item:
                     description = '...'
                     if 'description' in item and item['description'] is not None:
