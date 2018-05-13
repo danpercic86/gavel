@@ -48,7 +48,7 @@ instructions before continuing.
 '''.strip()
 
 DEFAULT_CLOSED_MESSAGE = '''
-The judging system is currently closed. Judging starts at 12:00 and ends at 15:00.
+The judging system is currently closed. Judging starts at 12:00 and ends at 15:45.
 '''.strip()
 
 DEFAULT_DISABLED_MESSAGE = '''
