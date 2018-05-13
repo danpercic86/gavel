@@ -62,6 +62,7 @@ def item_json_dump():
         'sigma Squared' : str(item.sigma_sq).strip(),
         'location'      : item.location.strip(),
         'active'        : item.active,
-        'name'          : item.name.strip()
+        'name'          : item.name.strip(),
+        'teamId'          : item.identifier.strip()
     } for item in items]
     return Response(json.dumps(data), mimetype='application/json')
