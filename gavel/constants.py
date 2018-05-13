@@ -48,7 +48,7 @@ instructions before continuing.
 '''.strip()
 
 DEFAULT_CLOSED_MESSAGE = '''
-The judging system is currently closed. Reload the page to try again.
+The judging system is currently closed. Judging starts at 12:00 and ends at 15:00.
 '''.strip()
 
 DEFAULT_DISABLED_MESSAGE = '''
@@ -66,3 +66,5 @@ If you've looked at all the projects already, then you're done.
 '''.strip()
 
 DEFAULT_API_KEY = '89iuw4gtuyjfbsiukjbw4uiskjbdfius'
+
+IMPORT_URL = 'http://banatit.ro/wp-json/api/v1/bit-events/get/3700/jMZ8EpfvZ5C5mByD8GY0EIyWG3NMCILavzw8FujD44Cb7YSRg7aHrFmwlsWf2cugHUOjo/'

@@ -80,3 +80,5 @@ EMAIL_SUBJECT =       c.get('email_subject',                               defau
 EMAIL_BODY =          c.get('email_body',                                  default=constants.DEFAULT_EMAIL_BODY)
 SEND_STATS =    _bool(c.get('send_stats',      'SEND_STATS',               default=True))
 API_KEY =             c.get('api_key',         'API_KEY',                  default=constants.DEFAULT_API_KEY)
+IMPORT_URL  =         c.get('import_url',       'IMPORT_URL',            default=constants.IMPORT_URL)
+

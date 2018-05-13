@@ -281,6 +281,16 @@
               </form>
             </td>
           </tr>
+          <tr>
+            <td>Import teams</td>
+            <td class="compact">
+              <form action="/admin/setting" method="post">
+                <input type="submit" value="Import" class="btn btn-success">
+                <input type="hidden" name="action" value="import-teams">
+                <input type="hidden" name="_csrf_token" value="{{ csrf_token() }}">
+              </form>
+            </td>
+          </tr>
           </tbody>
         </table>
       </div>
