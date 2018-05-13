@@ -190,18 +190,20 @@ def setting():
         Setting.set(SETTING_CLOSED, new_value)
         db.session.commit()
     if action == 'import-teams':
-        Item.query.delete()
         response = urllib.request.urlopen(IMPORT_URL)
         data = json.loads(response.read())
+
         for item in data:
-            if 'name' in item and 'location' in item:
-                description = '...'
-                if 'description' in item and item['description'] is not None:
-                    description = item['description']
-                _item = Item(item['name'], item['location'], description, item['_id'])
-                print('created')
-                print(_item)
-                db.session.add(_item)
+            exitingItem = Item.by_identifier(item['_id'])
+                if not item:
+                    if 'name' in item and 'location' in item:
+                        description = '...'
+                        if 'description' in item and item['description'] is not None:
+                            description = item['description']
+                        _item = Item(item['name'], item['location'], description, item['_id'])
+                        print('created')
+                        print(_item)
+                        db.session.add(_item)
         db.session.commit()
     return redirect(url_for('admin'))
 

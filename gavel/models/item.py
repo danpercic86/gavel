@@ -37,3 +37,12 @@ class Item(db.Model):
         except NoResultFound:
             item = None
         return item
+    @classmethod
+    def by_identifier(cls, identifier):
+            if identifier is None:
+                return None
+            try:
+                item = cls.query.filter(cls.identifier == identifier).one()
+            except NoResultFound:
+                item = None
+            return item
