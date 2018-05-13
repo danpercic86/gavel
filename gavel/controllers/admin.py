@@ -1,3 +1,5 @@
+from sqlalchemy.dialects.mssql import IMAGE
+
 from gavel import app
 from gavel.models import *
 from gavel.constants import *
@@ -188,13 +190,19 @@ def setting():
         Setting.set(SETTING_CLOSED, new_value)
         db.session.commit()
     if action == 'import-teams':
-        response = urllib.request.urlopen(IMPORT_URL).read()
-        data = json.loads(response)
-
+        Item.query.delete()
+        response = urllib.request.urlopen(IMPORT_URL)
+        data = json.loads(response.read())
         for item in data:
-            _item = Item(item.name, item.location, item.description, item._id)
-            db.session.add(_item)
-
+            if 'name' in item and 'location' in item:
+                description = '...'
+                if 'description' in item and item['description'] is not None:
+                    description = item['description']
+                _item = Item(item['name'], item['location'], description, item['_id'])
+                print('created')
+                print(_item)
+                db.session.add(_item)
+        db.session.commit()
     return redirect(url_for('admin'))
 
 @app.route('/admin/item/<item_id>/')
