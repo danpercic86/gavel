@@ -67,4 +67,4 @@ If you've looked at all the projects already, then you're done.
 
 DEFAULT_API_KEY = '89iuw4gtuyjfbsiukjbw4uiskjbdfius'
 
-IMPORT_URL = 'http://banatit.ro/wp-json/api/v1/bit-events/get/3700/jMZ8EpfvZ5C5mByD8GY0EIyWG3NMCILavzw8FujD44Cb7YSRg7aHrFmwlsWf2cugHUOjo/'
+IMPORT_URL = 'http://now.hacktm.ro/api/teams'
