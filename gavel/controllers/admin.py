@@ -1,3 +1,4 @@
+import requests
 from sqlalchemy.dialects.mssql import IMAGE
 
 from gavel import app
@@ -190,12 +191,13 @@ def setting():
         Setting.set(SETTING_CLOSED, new_value)
         db.session.commit()
     if action == 'import-teams':
-        response = urllib.request.urlopen(IMPORT_URL)
-        data = json.loads(response.read())
+        response = requests.get(IMPORT_URL)
+        data = json.loads(response.content.decode('utf-8'))
 
         for item in data:
+            print('identifier' + item['_id'])
             exitingItem = Item.by_identifier(item['_id'])
-            if not exitingItem:
+            if exitingItem is None:
                 if 'name' in item and 'location' in item:
                     description = '...'
                     if 'description' in item and item['description'] is not None:
