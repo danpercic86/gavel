@@ -195,15 +195,15 @@ def setting():
 
         for item in data:
             exitingItem = Item.by_identifier(item['_id'])
-                if not item:
-                    if 'name' in item and 'location' in item:
-                        description = '...'
-                        if 'description' in item and item['description'] is not None:
-                            description = item['description']
-                        _item = Item(item['name'], item['location'], description, item['_id'])
-                        print('created')
-                        print(_item)
-                        db.session.add(_item)
+            if not exitingItem:
+                if 'name' in item and 'location' in item:
+                    description = '...'
+                    if 'description' in item and item['description'] is not None:
+                        description = item['description']
+                    _item = Item(item['name'], item['location'], description, item['_id'])
+                    print('created')
+                    print(_item)
+                    db.session.add(_item)
         db.session.commit()
     return redirect(url_for('admin'))
 
