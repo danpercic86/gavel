@@ -26,4 +26,4 @@ webassets==0.12.1
 Werkzeug==0.12.1
 xlrd==1.0.0
 kombu==4.2.1
-pyscopg2==2.7.3.2
+pyscopg2==2.7.5
