@@ -1,0 +1,77 @@
+version: '2.1'
+
+x-gavel-base: &gavel_base
+  image: gavel
+  build: .
+  restart: always
+  volumes:
+    - ./config.yaml:/app/config.yaml
+  env_file:
+    - gavel_config.env
+  labels:
+    com.centurylinklabs.watchtower.enable: true
+
+x-gavel-env: &gavel_env
+  BASE_URL: https://${GAVEL_DOMAIN:?must set the GAVEL_DOMAIN environment variable}/
+  REDIS_URL: redis://redis/0
+  DATABASE_URL: postgresql://gavel:${DB_PASSWORD:?must set the DB_PASSWORD environment variable}@db/gavel
+
+services:
+  gavel:
+    <<: *gavel_base
+    environment:
+      <<: *gavel_env
+      VIRTUAL_HOST: ${GAVEL_DOMAIN:?must set the GAVEL_DOMAIN environment variable}
+      LETSENCRYPT_HOST: ${GAVEL_DOMAIN:?must set the GAVEL_DOMAIN environment variable}
+      LETSENCRYPT_EMAIL: mail@yourdomain.tld
+    networks:
+      - gavel-net
+      - web-net
+    depends_on:
+      - db
+      - redis
+
+  celery-worker:
+    <<: *gavel_base
+    environment:
+      <<: *gavel_env      
+    networks:
+      - gavel-net
+    depends_on:
+      - gavel
+    command: celery -A gavel:celery worker
+
+  db:
+    image: postgres
+    restart: always
+    environment:
+      POSTGRES_USER: gavel
+      POSTGRES_PASSWORD: ${DB_PASSWORD:?must set the DB_PASSWORD environment variable}
+    volumes:
+      - ./db:/var/lib/postgresql/data
+    networks:
+      - gavel-net
+    labels:
+      com.centurylinklabs.watchtower.enable: true
+
+  redis:
+    image: redis
+    restart: always
+    networks:
+      - gavel-net
+    labels:
+      com.centurylinklabs.watchtower.enable: true
+  
+  watchtower:
+    image: v2tec/watchtower
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      - /root/.docker/config.json:/config.json
+    command: --interval 30 --label-enable
+
+
+networks:
+  gavel-net:
+  web-net:
+    external:
+      name: web-net
