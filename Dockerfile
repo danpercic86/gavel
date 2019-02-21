@@ -45,6 +45,6 @@ RUN set -ex \
 
 EXPOSE 80
 ENV PORT=80
-CMD ["gunicorn", "-b", ":80", "-w", "3", "gavel:app"]
+CMD ["sh", "-c", "python initialize.py && gunicorn -b :${PORT} -w 3 gavel:app"]
 
 COPY . .
