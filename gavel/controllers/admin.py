@@ -191,12 +191,12 @@ def setting():
         Setting.set(SETTING_CLOSED, new_value)
         db.session.commit()
     if action == 'delete-skips':
-        db.session.execute(ignore_table.delete())
+        db.session.execute("DELETE FROM ignore")
         db.session.commit()
     if action == 'wipe-data':
         Decision.query.delete()
-        ignore_table.delete()
-        view_table.delete()
+        db.session.execute("DELETE FROM ignore")
+        db.session.execute("DELETE FROM view")
         db.session.commit()
         Annotator.query.delete()
         db.session.commit()
