@@ -292,6 +292,16 @@
             </td>
           </tr>
           <tr>
+            <td>Delete All Skips</td>
+            <td class="compact">
+              <form action="/admin/setting" method="post">
+                <input type="submit" value="Delete Skips" class="btn btn-danger">
+                <input type="hidden" name="action" value="delete-skips">
+                <input type="hidden" name="_csrf_token" value="{{ csrf_token() }}">
+              </form>
+            </td>
+          </tr>
+          <tr>
             <td>Wipe Data</td>
             <td class="compact">
               <form action="/admin/setting" method="post">

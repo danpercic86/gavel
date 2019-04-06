@@ -191,7 +191,12 @@ def setting():
         Setting.set(SETTING_CLOSED, new_value)
         db.session.commit()
     if action == 'wipe-data':
+        ignore_table.delete()
+        db.session.commit()
+    if action == 'wipe-data':
         Decision.query.delete()
+        ignore_table.delete()
+        view_table.delete()
         Annotator.query.delete()
         Item.query.delete()
         db.session.commit()
