@@ -190,7 +190,7 @@ def setting():
         new_value = SETTING_TRUE if request.form['voting-status'] == 'Close' else SETTING_FALSE
         Setting.set(SETTING_CLOSED, new_value)
         db.session.commit()
-    if action == 'wipe-data':
+    if action == 'delete-skips':
         ignore_table.delete()
         db.session.commit()
     if action == 'wipe-data':
