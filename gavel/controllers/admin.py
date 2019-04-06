@@ -191,7 +191,8 @@ def setting():
         Setting.set(SETTING_CLOSED, new_value)
         db.session.commit()
     if action == 'delete-skips':
-        ignore_table.delete()
+        x = ignore_table.delete()
+        print('Deleted '+x+" skips")
         db.session.commit()
     if action == 'wipe-data':
         Decision.query.delete()
