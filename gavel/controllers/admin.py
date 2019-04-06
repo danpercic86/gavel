@@ -1,6 +1,6 @@
 import requests
 from sqlalchemy.dialects.mssql import IMAGE
-
+from django.utils.html import strip_tags
 from gavel import app
 from gavel.models import *
 from gavel.constants import *
@@ -213,8 +213,8 @@ def setting():
                 if 'name' in item and 'location' in item:
                     description = '...'
                     if 'description' in item and item['description'] is not None:
-                        description = item['description']
-                    _item = Item(item['name'], item['location'], description, item['_id'])
+                        description = strip_tags(item['description'])
+                    _item = Item(strip_tags(item['name']), strip_tags(item['location']), description, item['_id'])
                     print('created')
                     print(_item)
                     db.session.add(_item)
