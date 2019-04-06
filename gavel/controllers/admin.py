@@ -191,9 +191,9 @@ def setting():
         Setting.set(SETTING_CLOSED, new_value)
         db.session.commit()
     if action == 'wipe-data':
-        Decision.query().delete()
-        Annotator.query().delete()
-        Item.query().delete()
+        Decision.query.delete()
+        Annotator.query.delete()
+        Item.query.delete()
         db.session.commit()
     if action == 'import-teams':
         response = requests.get(IMPORT_URL)
