@@ -7,7 +7,7 @@
 
         <button class="btn btn-outline-primary btn-block collapsed btn-custom" data-toggle="collapse" data-target="#collapseOne" aria-expanded="false" aria-controls="collapseOne">
           <span class="prepend">Previous</span>
-      <span class="value">{{ prev.name | safe }}</span>
+      <span class="value">{{ prev.name  }}</span>
           <span class="append">&#9776;</span>
       </button>
 
@@ -30,7 +30,7 @@
 
         <button class="btn btn-outline-primary btn-block collapsed btn-custom" data-toggle="collapse" data-target="#collapseTwo" aria-expanded="false" aria-controls="collapseTwo">
           <span class="prepend">Current</span>
-          <span class="value">{{ next.name | safe }}</span>
+          <span class="value">{{ next.name  }}</span>
           <span class="append">&#9776;</span>
         </button>
 
@@ -51,9 +51,9 @@
   <div class="info">
     <form action="/vote" method="post">
       <p class="center">Which one is better?</p>
-      <label for="vote-previous" class="label-team">{{ prev.name | safe }}</label>
+      <label for="vote-previous" class="label-team">{{ prev.name }}</label>
       <input type="radio" name="action" value="Previous" id="vote-previous" class="button-left input-team">
-      <label for="vote-current" class="label-team">{{ next.name | safe }}</label>
+      <label for="vote-current" class="label-team">{{ next.name }}</label>
       <input type="radio" name="action" value="Current" id="vote-current" class="button-right input-team">
       <div class="pt-3">
       <input type="submit" value="Vote" class="btn btn-success btn-block button-vote">
@@ -85,7 +85,7 @@
 </div>
 <div class="overlay">
   <div class="info">
-    <h2>Go to <strong>table no. {{ next.location | safe }}</strong> and click start when you are ready to asses the project.</h2>
+    <h2>Go to <strong>table no. {{ next.location }}</strong> and click start when you are ready to asses the project.</h2>
   </div>
   <div class="bottom">
     <button id="start" class="btn btn-primary btn-block btn-overlay" data-role="vote-start" data-current-team="{{ next.id }}">Start</button>
