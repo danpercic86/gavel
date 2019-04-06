@@ -197,7 +197,9 @@ def setting():
         Decision.query.delete()
         ignore_table.delete()
         view_table.delete()
+        db.session.commit()
         Annotator.query.delete()
+        db.session.commit()
         Item.query.delete()
         db.session.commit()
     if action == 'import-teams':
