@@ -40,7 +40,7 @@ $(document).ready(function(){
             }
         });
 
-
+        currentProject
         if (getCookie('projectCounter', 'id') == currentProject) {
             $('.overlay').hide();
             updateTimer(getCookie('projectCounter', 'timeStart'), '#time-spent');
