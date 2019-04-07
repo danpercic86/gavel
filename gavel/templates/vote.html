@@ -94,7 +94,7 @@
   var currentProject = '{{ next.id }}';
   var timePerProject = '{{ time_per_project }}';
   var maxTimePerProject = '{{ max_time_per_project }}';
-  var endJuryTime = new Date({{ jury_end_datetime }});
+  var endJuryTime = new Date('{{ jury_end_datetime }}');
 
   console.log(currentProject,timePerProject,maxTimePerProject,endJuryTime);
 </script>
