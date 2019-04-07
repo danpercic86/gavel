@@ -40,7 +40,6 @@ $(document).ready(function(){
             }
         });
 
-        currentProject
         if (getCookie('projectCounter', 'id') == currentProject) {
             $('.overlay').hide();
             updateTimer(getCookie('projectCounter', 'timeStart'), '#time-spent');
@@ -105,6 +104,7 @@ $(document).ready(function(){
                 newStamp = newDate.getTime();
                 var diff = Math.round((endJuryTime - newStamp) / 1000);
 
+                console.log(diff);
                 var d = Math.floor(diff / (24 * 60 * 60));
                 diff = diff - (d * 24 * 60 * 60);
                 var h = Math.floor(diff / (60 * 60));
