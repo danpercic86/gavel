@@ -11,6 +11,7 @@ class Item(db.Model):
     id = db.Column(db.Integer, primary_key=True, nullable=False)
     name = db.Column(db.Text, nullable=False)
     location = db.Column(db.Text, nullable=False)
+    identifier = db.Column(db.Text, nullable=False)
     description = db.Column(db.Text, nullable=False)
     active = db.Column(db.Boolean, default=True, nullable=False)
     viewed = db.relationship('Annotator', secondary=view_table)
@@ -19,10 +20,11 @@ class Item(db.Model):
     mu = db.Column(db.Float)
     sigma_sq = db.Column(db.Float)
 
-    def __init__(self, name, location, description):
+    def __init__(self, name, location, description, identifier):
         self.name = name
         self.location = location
         self.description = description
+        self.identifier = identifier
         self.mu = crowd_bt.MU_PRIOR
         self.sigma_sq = crowd_bt.SIGMA_SQ_PRIOR
 
@@ -35,3 +37,12 @@ class Item(db.Model):
         except NoResultFound:
             item = None
         return item
+    @classmethod
+    def by_identifier(cls, identifier):
+            if identifier is None:
+                return None
+            try:
+                item = cls.query.filter(cls.identifier == identifier).one()
+            except NoResultFound:
+                item = None
+            return item

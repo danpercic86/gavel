@@ -42,12 +42,15 @@ def requires_active_annotator(redirect_to):
 @app.route('/')
 def index():
     annotator = get_current_annotator()
+
     if annotator is None:
         return render_template(
             'logged_out.html',
             content=utils.render_markdown(settings.LOGGED_OUT_MESSAGE)
         )
     else:
+        items = Item.query.order_by(Item.id).all()
+        seen = Item.query.filter(Item.viewed.contains(annotator)).all()
         if Setting.value_of(SETTING_CLOSED) == SETTING_TRUE:
             return render_template(
                 'closed.html',
@@ -67,14 +70,30 @@ def index():
                 content=utils.render_markdown(settings.WAIT_MESSAGE)
             )
         elif annotator.prev is None:
-            return render_template('begin.html', item=annotator.next)
+            return render_template('begin.html',
+            item=annotator.next,
+            items=items,
+            seen=seen,
+            time_per_project=Setting.value_of('TIME_PER_PROJECT'),
+            max_time_per_project=Setting.value_of('MAX_TIME_PER_PROJECT'),
+            jury_end=Setting.value_of('JURY_END_DATETIME')
+            )
         else:
-            return render_template('vote.html', prev=annotator.prev, next=annotator.next)
+            return render_template('vote.html',
+            prev=annotator.prev,
+            next=annotator.next,
+            items=items,
+            seen=seen,
+            time_per_project=Setting.value_of('TIME_PER_PROJECT'),
+            max_time_per_project=Setting.value_of('MAX_TIME_PER_PROJECT'),
+            jury_end_datetime=Setting.value_of('JURY_END_DATETIME')
+            )
 
 @app.route('/vote', methods=['POST'])
 @requires_open(redirect_to='index')
 @requires_active_annotator(redirect_to='index')
 def vote():
+
     annotator = get_current_annotator()
     if annotator.prev.id == int(request.form['prev_id']) and annotator.next.id == int(request.form['next_id']):
         if request.form['action'] == 'Skip':
@@ -134,6 +153,14 @@ def welcome():
     return render_template(
         'welcome.html',
         content=utils.render_markdown(settings.WELCOME_MESSAGE)
+    )
+
+@app.route('/map/')
+@requires_open(redirect_to='index')
+@requires_active_annotator(redirect_to='index')
+def map():
+    return render_template(
+        'map.html'
     )
 
 @app.route('/welcome/done', methods=['POST'])

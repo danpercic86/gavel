@@ -166,3 +166,6 @@ email_body: null
 # event to this list (https://github.com/anishathalye/gavel/wiki/Users), at the
 # very least.
 send_stats: null
+
+# api key
+api_key: null
