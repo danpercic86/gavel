@@ -11,7 +11,7 @@ SETTING_FALSE = 'false'
 # Defaults
 # these can be overridden via the config file
 DEFAULT_WELCOME_MESSAGE = '''
-Welcome to HackTM.
+Welcome to UniHack.
 
 **Please read this important message carefully before continuing.**
 
@@ -31,7 +31,7 @@ Gavel makes it really simple for you to submit votes, but please think hard
 before you vote. **Once you make a decision, you can't take it back.**
 '''.strip()
 
-DEFAULT_EMAIL_SUBJECT = 'Welcome to Gavel!'
+DEFAULT_EMAIL_SUBJECT = 'Welcome to the UniHack judging system!'
 
 DEFAULT_EMAIL_BODY = '''
 Hi {name},
@@ -65,6 +65,6 @@ Wait for a little bit and reload the page to try again.
 If you've looked at all the projects already, then you're done.
 '''.strip()
 
-DEFAULT_API_KEY = '89iuw4gtuyjfbsiukjbw4uiskjbdfius'
+DEFAULT_API_KEY = '89iuw4gtuyjfbsiukbkwhejbhu4b5'
 
 IMPORT_URL = 'http://now.hacktm.ro/api/teams'

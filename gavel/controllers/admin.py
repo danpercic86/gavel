@@ -67,7 +67,7 @@ def item():
         if data:
             # validate data
             for index, row in enumerate(data):
-                if len(row) != 3:
+                if len(row) != 4:
                     return utils.user_error('Bad data: row %d has %d elements (expecting 3)' % (index + 1, len(row)))
             for row in data:
                 _item = Item(*row)
