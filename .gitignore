@@ -4,3 +4,5 @@ gavel_config.env
 *.pyc
 env/
 .vagrant/
+.idea/
+*.iml

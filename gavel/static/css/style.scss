@@ -11,6 +11,7 @@ html,
 body {
   margin: 0;
   padding: 0;
+
 }
 
 html {
@@ -23,6 +24,11 @@ html {
 body {
   color: $text-color;
   background-color: $light;
+}
+
+body.judge-view {
+  background: #111026;
+  color: #fff;
 }
 
 div {
@@ -41,7 +47,6 @@ h6 {
   padding-top: 0.5rem;
   padding-bottom: 0.5rem;
   font-family: $heading-font;
-  font-weight: bold;
 }
 
 p {
@@ -73,27 +78,9 @@ strong {
   font-weight: bold;
 }
 
-table,
-tr,
-td,
-th {
-  border: 0.1rem solid black;
-}
 
-table {
-  border-collapse: collapse;
-  width: 100%;
-}
 
-td {
-  padding: 0 0.25rem;
-}
 
-th {
-  background: $light-grey;
-  font-weight: bold;
-  white-space: nowrap;
-}
 
 th.sort-header {
   cursor: pointer;
@@ -160,8 +147,20 @@ hr {
 }
 
 .info {
+  padding-top: 2rem;
   padding-left: 1rem;
   padding-right: 1rem;
+  p {
+    font-size: 18px;
+  }
+  strong {
+    background: #FDB632;
+    padding: 1px 6px;
+    color: #111026;
+    font-weight: 200;
+    -webkit-box-decoration-break: clone;
+    box-decoration-break: clone;
+  }
 }
 
 .compact {
@@ -174,10 +173,9 @@ hr {
 
 .banner {
   text-align: center;
-  text-transform: uppercase;
   margin-bottom: 0.5rem;
   color: $light;
-  background-color: $dark;
+
 }
 
 .banner-tight {
@@ -198,41 +196,10 @@ hr {
   background-color: $error-color;
 }
 
-#previous-header {
-  background-color: $previous-color;
-}
 
-#previous-body {
-  background-color: mix($previous-color, white, 25%);
-}
 
-#current-header {
-  background-color: $current-color;
-}
 
-#current-body {
-  background-color: mix($current-color, white, 25%);
-}
 
-#vote-header {
-  background-color: $vote-color;
-}
-
-input[type=submit] {
-  color: $light;
-  background-color: $dark;
-  border: 1px solid $dark;
-  font-size: 1.2rem;
-  text-transform: uppercase;
-  text-align: center;
-  height: 3rem;
-  -webkit-border-radius: 0; // fix rounded buttons on iOS
-  td & {
-    border: none;
-    width: 100%;
-    height: 100%;
-  }
-}
 
 .button-left {
   float: left;
@@ -258,15 +225,6 @@ input[type=submit] {
 
 #vote-current {
   background-color: $current-color;
-}
-
-#vote-skip {
-  background-color: $vote-skip-color;
-  color: $dark;
-}
-
-#vote-done {
-  background-color: $vote-done-color;
 }
 
 input[type=submit].positive {
@@ -301,9 +259,177 @@ input[type=submit].neutral {
 
 #footer {
   margin-top: 2rem;
-  border-top: 1px solid $light-grey;
   p {
     font-size: 0.75rem;
     text-align: center;
   }
+}
+
+
+
+/*** New theme ***/
+
+.banner-tight {
+  display: inline-block;
+
+}
+.banner-tight h1{
+  font-size: 12px;
+  padding: 6px 12px;
+}
+.rotate90 {
+  padding:0;
+  margin:0;
+  /* Safari */
+  -webkit-transform: rotate(90deg);
+
+  /* Firefox */
+  -moz-transform: rotate(90deg);
+
+  /* IE */
+  -ms-transform: rotate(90deg);
+
+  /* Opera */
+  -o-transform: rotate(90deg);
+
+  /* Internet Explorer */
+  filter: progid:DXImageTransform.Microsoft.BasicImage(rotation=3);
+
+}
+.input-team {
+  display: none;
+}
+.label-team{
+  width:45vw; /* 20% of the viewport width */
+  height: 45vw;
+  margin:0;
+  display: table-cell;
+  vertical-align: middle;
+  text-align:center;
+  border: 1px solid rgba(256,256,256,0.5);
+  font-size: 18px;
+  padding: 10px;
+  font-weight: bold;
+
+  border-radius: .25rem;
+}
+.label-team.active{
+  background-color: #28a745;
+  border-color: #28a745;
+  color:#fff;
+}
+.label-team.active:after{
+  display: block;
+  content: '\2713';
+  font-size: 30px;
+}
+.button-vote{
+  display: none;
+  width: 100%;
+  margin-top: 2em;
+}
+
+.table td, .table th {
+  padding: .5rem;
+  vertical-align: middle;
+}
+.table thead th {
+  vertical-align: top;
+}
+.table td {
+  background: #ffffff;
+}
+
+#content{
+  padding-top: 1rem;
+}
+.card{
+  background: transparent;
+  border-radius: 0;
+  border: 0;
+}
+.card-body {
+  padding: 0;
+}
+
+.card-header{
+  border-radius: 0;
+  border-bottom: 0;
+  padding: 0 1rem;
+}
+.versus {
+  padding: 10px;
+}
+.vs{
+text-align: center;
+}
+.overlay {
+  background: #111026;
+  position: fixed;
+  overflow: hidden;
+  width: 100%; /* Full width (cover the whole page) */
+  height: 100%; /* Full height (cover the whole page) */
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index:100;
+}
+.bottom{
+  position: absolute;
+  bottom: 1rem;
+  width: 100%;
+  padding: 1rem;
+}
+.progress-bar{
+  color: #111026;
+  position: fixed;
+
+  bottom: 0;
+  width: 100%;
+}
+.progress-bar div{
+  background: #FDB632;
+}
+
+.alert-blink{
+  -webkit-animation: RED-BLINK 1s infinite;  /* Safari 4+ */
+  -moz-animation: RED-BLINK 1s infinite;  /* Fx 5+ */
+  -o-animation: RED-BLINK 1s infinite;  /* Opera 12+ */
+  animation: RED-BLINK 1s infinite;  /* IE 10+, Fx 29+ */
+  color: #fff;
+  background: rgb(256, 0, 0) !important;
+}
+
+@-webkit-keyframes RED-BLINK {
+  0%, 49% {
+    background-color: rgba(256, 0, 0, 0.7);
+
+  }
+  50%, 100% {
+    background-color: rgba(256, 0, 0, 1);
+  }
+}
+
+.btn-custom{
+  padding:0;
+  .prepend{
+    padding: .375rem .75rem;
+    float: left;
+    background: #007bff;
+    color: #fff;
+    line-height: 1.5;
+  }
+  .value{
+    padding: .375rem .75rem;
+    float: left;
+    font-weight: bold;
+    color: #fff;
+  }
+  .append{
+    padding: .375rem .75rem;
+    color: #fff;
+    float:right;
+  }
+
 }

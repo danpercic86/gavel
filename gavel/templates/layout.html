@@ -1,37 +1,82 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <!-- Stylesheets -->
-    <link rel=stylesheet type=text/css href="{{ url_for('static', filename='css/vendor/normalize.css') }}">
-    {% assets "scss_all" %}
+<head>
+  <!-- Stylesheets -->
+  <link rel=stylesheet type=text/css href="{{ url_for('static', filename='css/vendor/normalize.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/vendor/bootstrap.min.css') }}"
+        integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+
+  {% assets "scss_all" %}
     <link rel=stylesheet type=text/css href="{{ ASSET_URL }}">
-    {% endassets %}
+  {% endassets %}
 
-    <!-- Favicon -->
-    <link rel="shortcut icon" href="{{ url_for('static', filename='favicon.ico') }}">
+  <!-- Favicon -->
+  <link rel="shortcut icon" href="{{ url_for('static', filename='favicon.ico') }}">
 
-    <!-- Fonts -->
-    <link href="//fonts.googleapis.com/css?family=Montserrat:700" rel="stylesheet" type="text/css">
-    <link href="//fonts.googleapis.com/css?family=Lato:300,400,700" rel="stylesheet" type="text/css">
-    <link href="//fonts.googleapis.com/css?family=Source+Code+Pro:400,700" rel="stylesheet" type="text/css">
+  <!-- Fonts -->
+  <link href="https://fonts.googleapis.com/css?family=Maven+Pro:400,700" rel="stylesheet">
+  <link href="//fonts.googleapis.com/css?family=Lato:300,400,700" rel="stylesheet" type="text/css">
 
-    <!-- Enable responsiveness on mobile devices -->
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1">
+  <!-- Enable responsiveness on mobile devices -->
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1">
 
-    <title>{% block title %}{% endblock %} &middot; Gavel</title>
-    {% block head %}
-    {% endblock %}
-  </head>
-  <body>
-    <div id="content">
-      {% block content %}
-      {% endblock %}
+  <title>{% block title %}{% endblock %} &middot; Gavel</title>
+  {% block head %}
+  {% endblock %}
+</head>
+<body class="{{ 'judge-view' if not is_admin  else 'admin-view' }}">
+
+{% if not is_admin %}
+  <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+    <a class="navbar-brand" href="/">HackTM</a>
+    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav mr-auto">
+        <li class="nav-item active">
+          <a class="nav-link" href="/">Vote <span class="sr-only">(current)</span></a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="/welcome">Instructions</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" onclick="reload()">Reload Page</a>
+        </li>
+      </ul>
     </div>
-    <div id="footer">
-      <!-- Please don't remove this -->
-      <p>Powered by <a href="https://github.com/anishathalye/gavel" class="colored">Gavel</a></p>
-    </div>
-    {% block end %}
-    {% endblock %}
-  </body>
+  </nav>
+{% endif %}
+<div id="content">
+  {% block content %}
+  {% endblock %}
+</div>
+
+<div id="footer">
+  <!-- Please don't remove this -->
+  <p>Powered by <a href="https://github.com/anishathalye/gavel" class="colored">Gavel</a></p>
+</div>
+{% block end %}
+{% endblock %}
+
+<!-- Javascript -->
+<script src="{{ url_for('static', filename='js/vendor/jquery-3.2.1.slim.min.js') }}"
+        integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN"
+        crossorigin="anonymous"></script>
+<script src="{{ url_for('static', filename='js/vendor/popper.min.js') }}"
+        integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q"
+        crossorigin="anonymous"></script>
+<script src="{{ url_for('static', filename='js/vendor/bootstrap.min.js') }}"
+        integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl"
+        crossorigin="anonymous"></script>
+
+<script type="text/javascript" src="{{ url_for('static', filename='js/gavel.js') }}"></script>
+<script type="text/javascript">
+  function reload() {
+    window.location.reload(true);
+  }
+</script>
+</body>
 </html>

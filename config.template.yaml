@@ -114,7 +114,7 @@ disable_email: null
 # can also be specified as the 'EMAIl_AUTH_MODE' environment variable
 # defaults to 'tls'
 #
-# can either be 'tls' or 'ssl'. if you are setting DISABLE_EMAIL, you can set
+# can either be 'tls', 'ssl' or 'none'. if you are setting DISABLE_EMAIL, you can set
 # this setting to '_unused_' (or anything else).
 email_auth_mode: null
 
@@ -166,3 +166,6 @@ email_body: null
 # event to this list (https://github.com/anishathalye/gavel/wiki/Users), at the
 # very least.
 send_stats: null
+
+# api key
+api_key: null

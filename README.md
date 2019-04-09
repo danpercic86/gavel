@@ -60,7 +60,7 @@ We'd really appreciate any kind of input, especially pull requests.
 
 ## Deployment
 
-[![Deploy](https://www.herokucdn.com/deploy/button.svg)](https://heroku.com/deploy?template=https://github.com/anishathalye/gavel/tree/master)
+[![Deploy](https://www.herokucdn.com/deploy/button.svg)](https://heroku.com/deploy?template=https://github.com/BanatIT/gavel/tree/hacktm/)
 
 The latest stable version is the `master` branch (and it's signed and tagged).
 Development happens in the `develop` branch.
@@ -168,7 +168,7 @@ If you use Gavel in any way in academic work, please cite the following:
 
 ## License
 
-Copyright (c) 2015-2018 Anish Athalye. Released under AGPLv3. See
+Copyright (c) 2015-2019 Anish Athalye. Released under AGPLv3. See
 [LICENSE.txt][license] for details.
 
 [blog-1]: http://www.anishathalye.com/2015/03/07/designing-a-better-judging-system/

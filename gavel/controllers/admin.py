@@ -1,3 +1,6 @@
+import requests
+from sqlalchemy.dialects.mssql import IMAGE
+from django.utils.html import strip_tags
 from gavel import app
 from gavel.models import *
 from gavel.constants import *
@@ -7,10 +10,13 @@ from flask import (
     redirect,
     render_template,
     request,
+    session,
     url_for,
 )
 import urllib.parse
 import xlrd
+import urllib.request
+import json
 
 ALLOWED_EXTENSIONS = set(['csv', 'xlsx', 'xls'])
 
@@ -39,6 +45,7 @@ def admin():
     setting_closed = Setting.value_of(SETTING_CLOSED) == SETTING_TRUE
     return render_template(
         'admin.html',
+        is_admin=True,
         annotators=annotators,
         counts=counts,
         item_counts=item_counts,
@@ -46,6 +53,9 @@ def admin():
         items=items,
         votes=len(decisions),
         setting_closed=setting_closed,
+        time_per_project=Setting.value_of('TIME_PER_PROJECT'),
+        max_time_per_project=Setting.value_of('MAX_TIME_PER_PROJECT'),
+        jury_end=Setting.value_of('JURY_END_DATETIME')
     )
 
 @app.route('/admin/item', methods=['POST'])
@@ -166,11 +176,48 @@ def annotator():
 @app.route('/admin/setting', methods=['POST'])
 @utils.requires_auth
 def setting():
-    key = request.form['key']
-    if key == 'closed':
-        action = request.form['action']
-        new_value = SETTING_TRUE if action == 'Close' else SETTING_FALSE
+    action = request.form['action']
+    if action == 'update-time-per-project':
+        Setting.set('TIME_PER_PROJECT', request.form['time-per-project'])
+        db.session.commit()
+    if action == 'update-max-time-per-project':
+        Setting.set('MAX_TIME_PER_PROJECT', request.form['max-time-per-project'])
+        db.session.commit()
+    if action == 'update-jury-end':
+        Setting.set('JURY_END_DATETIME', request.form['jury-end-datetime'])
+        db.session.commit()
+    if action == 'update-voting-status':
+        new_value = SETTING_TRUE if request.form['voting-status'] == 'Close' else SETTING_FALSE
         Setting.set(SETTING_CLOSED, new_value)
+        db.session.commit()
+    if action == 'delete-skips':
+        db.session.execute("DELETE FROM ignore")
+        db.session.commit()
+    if action == 'wipe-data':
+        Decision.query.delete()
+        db.session.execute("DELETE FROM ignore")
+        db.session.execute("DELETE FROM view")
+        db.session.commit()
+        Annotator.query.delete()
+        db.session.commit()
+        Item.query.delete()
+        db.session.commit()
+    if action == 'import-teams':
+        response = requests.get(IMPORT_URL)
+        data = json.loads(response.content.decode('utf-8'))
+
+        for item in data:
+            print('identifier' + item['_id'])
+            exitingItem = Item.by_identifier(item['_id'])
+            if exitingItem is None:
+                if 'name' in item and 'location' in item:
+                    description = '...'
+                    if 'description' in item and item['description'] is not None:
+                        description = strip_tags(item['description'])
+                    _item = Item(strip_tags(item['name']), strip_tags(item['location']), description, item['_id'])
+                    print('created')
+                    print(_item)
+                    db.session.add(_item)
         db.session.commit()
     return redirect(url_for('admin'))
 
@@ -191,6 +238,7 @@ def item_detail(item_id):
             skipped = Annotator.query.filter(Annotator.ignore.contains(item))
         return render_template(
             'admin_item.html',
+            is_admin=True,
             item=item,
             assigned=assigned,
             skipped=skipped
@@ -214,6 +262,7 @@ def annotator_detail(annotator_id):
         return render_template(
             'admin_annotator.html',
             annotator=annotator,
+            is_admin=True,
             login_link=annotator_link(annotator),
             seen=seen,
             skipped=skipped
