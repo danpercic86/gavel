@@ -1,9 +1,10 @@
 import requests
 from sqlalchemy.dialects.mssql import IMAGE
 from django.utils.html import strip_tags
+from sqlalchemy.exc import IntegrityError
+
 from gavel import app
-from gavel.models import *
-from gavel.constants import *
+
 import gavel.settings as settings
 import gavel.utils as utils
 from flask import (
@@ -17,6 +18,9 @@ import urllib.parse
 import xlrd
 import urllib.request
 import json
+
+from gavel.constants import SETTING_CLOSED, SETTING_FALSE, SETTING_TRUE
+from gavel.models import Annotator, Item, Decision, ignore_table, Setting, db
 
 ALLOWED_EXTENSIONS = set(['csv', 'xlsx', 'xls'])
 
@@ -173,6 +177,40 @@ def annotator():
             return utils.server_error(str(e))
     return redirect(url_for('admin'))
 
+
+def import_projects():
+    response = requests.get(settings.IMPORT_URL)
+    data = json.loads(response.content.decode('utf-8'))
+    if 'data' in data:
+        data = data['data']
+
+    for item in data:
+        if '_id' not in item:
+            print("no id...", item)
+            continue
+
+        name = strip_tags(item.get('name', None) or '')
+        location = strip_tags(item.get('location', None) or '')
+        if not name or not location:
+            print("bad item...", item)
+            continue
+
+        description = strip_tags(item.get('description', None) or '') or '...'
+
+        existing = Item.by_identifier(item['_id'])
+        if existing is None:
+            _item = Item(name, location, description, item['_id'])
+            print("insert", item['_id'])
+            db.session.add(_item)
+        else:
+            existing.name = name
+            existing.location = location
+            existing.description = description
+            print("update", item['_id'])
+
+    db.session.commit()
+
+
 @app.route('/admin/setting', methods=['POST'])
 @utils.requires_auth
 def setting():
@@ -184,7 +222,7 @@ def setting():
         Setting.set('MAX_TIME_PER_PROJECT', request.form['max-time-per-project'])
         db.session.commit()
     if action == 'update-jury-end':
-        Setting.set('JURY_END_DATETIME', request.form['jury-end-datetime'])
+        Setting.set('JURimpoY_END_DATETIME', request.form['jury-end-datetime'])
         db.session.commit()
     if action == 'update-voting-status':
         new_value = SETTING_TRUE if request.form['voting-status'] == 'Close' else SETTING_FALSE
@@ -203,23 +241,10 @@ def setting():
         Item.query.delete()
         db.session.commit()
     if action == 'import-teams':
-        response = requests.get(IMPORT_URL)
-        data = json.loads(response.content.decode('utf-8'))
+        import_projects()
 
-        for item in data:
-            print('identifier' + item['_id'])
-            exitingItem = Item.by_identifier(item['_id'])
-            if exitingItem is None:
-                if 'name' in item and 'location' in item:
-                    description = '...'
-                    if 'description' in item and item['description'] is not None:
-                        description = strip_tags(item['description'])
-                    _item = Item(strip_tags(item['name']), strip_tags(item['location']), description, item['_id'])
-                    print('created')
-                    print(_item)
-                    db.session.add(_item)
-        db.session.commit()
     return redirect(url_for('admin'))
+
 
 @app.route('/admin/item/<item_id>/')
 @utils.requires_auth
