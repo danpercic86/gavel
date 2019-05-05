@@ -1,4 +1,5 @@
 from gavel import app
+from gavel.controllers.admin import import_projects
 from gavel.models import *
 from gavel.constants import *
 import gavel.settings as settings
@@ -47,9 +48,9 @@ def decisions_dump():
     ] for d in decisions]
     return Response(utils.data_to_csv_string(data), mimetype='text/csv')
 
+
 @app.route('/api/submissions.json')
 def item_json_dump():
-
     if not request.args['key'] == settings.API_KEY:
         return Response(json.dumps({'error' : 'Invalid api key.'}), mimetype='application/json')
 
@@ -66,3 +67,12 @@ def item_json_dump():
         'teamId'          : item.identifier.strip()
     } for item in items]
     return Response(json.dumps(data), mimetype='application/json')
+
+
+@app.route('/api/import-projects', methods=['POST'])
+def trigger_import_projects():
+    if not request.args['key'] == settings.API_KEY:
+        return Response(json.dumps({'error': 'Invalid api key.'}), mimetype='application/json')
+
+    import_projects()
+    return Response(status=204)
