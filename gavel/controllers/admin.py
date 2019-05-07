@@ -181,7 +181,7 @@ def annotator():
 def import_projects():
     response = requests.get(settings.IMPORT_URL)
     data = json.loads(response.content.decode('utf-8'))
-    if 'data' in data:
+    if isinstance(data, dict) and 'data' in data:
         data = data['data']
 
     for item in data:
