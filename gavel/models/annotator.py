@@ -12,7 +12,7 @@ ignore_table = db.Table('ignore',
 class Annotator(db.Model):
     id = db.Column(db.Integer, primary_key=True, nullable=False)
     name = db.Column(db.String(120), nullable=False)
-    email = db.Column(db.String(120), nullable=False)
+    email = db.Column(db.String(120), nullable=False, unique=True)
     active = db.Column(db.Boolean, default=True, nullable=False)
     read_welcome = db.Column(db.Boolean, default=False, nullable=False)
     description = db.Column(db.Text, nullable=False)

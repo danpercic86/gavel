@@ -1,11 +1,14 @@
+from sqlalchemy import desc
+
 from gavel import app
-from gavel.controllers.admin import import_projects
-from gavel.models import *
-from gavel.constants import *
+from gavel.controllers.admin import import_projects, annotator_link
 import gavel.settings as settings
 import gavel.utils as utils
 import json
 from flask import ( Response, request)
+
+from gavel.models import Item, Annotator, Decision, db
+
 
 @app.route('/api/items.csv')
 @utils.requires_auth
@@ -22,6 +25,7 @@ def item_dump():
     ] for item in items]
     return Response(utils.data_to_csv_string(data), mimetype='text/csv')
 
+
 @app.route('/api/annotators.csv')
 @utils.requires_auth
 def annotator_dump():
@@ -34,6 +38,7 @@ def annotator_dump():
         a.secret
     ] for a in annotators]
     return Response(utils.data_to_csv_string(data), mimetype='text/csv')
+
 
 @app.route('/api/decisions.csv')
 @utils.requires_auth
@@ -50,10 +55,8 @@ def decisions_dump():
 
 
 @app.route('/api/submissions.json')
+@utils.requires_auth
 def item_json_dump():
-    if not request.args['key'] == settings.API_KEY:
-        return Response(json.dumps({'error' : 'Invalid api key.'}), mimetype='application/json')
-
     items = Item.query.order_by(desc(Item.mu)).all()
     data = []
     data += [{
@@ -70,9 +73,23 @@ def item_json_dump():
 
 
 @app.route('/api/import-projects', methods=['POST'])
+@utils.requires_auth
 def trigger_import_projects():
-    if not request.args['key'] == settings.API_KEY:
-        return Response(json.dumps({'error': 'Invalid api key.'}), mimetype='application/json')
-
     import_projects()
     return Response(status=204)
+
+
+@app.route('/api/register-judge', methods=['POST'])
+@utils.requires_auth
+def register_judge():
+    name = request.form['name']
+    email = request.form['email']
+    description = request.form.get('description', None) or ''
+
+    assert not Annotator.query.filter(Annotator.email == email).first()
+    judge = Annotator(name, email, description)
+    db.session.add(judge)
+    db.session.commit()
+
+    response = {'loginUrl': annotator_link(judge)}
+    return Response(json.dumps(response), mimetype='application/json')
