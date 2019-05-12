@@ -86,7 +86,9 @@ def register_judge():
     email = request.form['email']
     description = request.form.get('description', None) or ''
 
-    assert not Annotator.query.filter(Annotator.email == email).first()
+    if Annotator.query.filter(Annotator.email == email).first():
+        return Response(f"judge {email} already exists", status=409)
+
     judge = Annotator(name, email, description)
     db.session.add(judge)
     db.session.commit()
