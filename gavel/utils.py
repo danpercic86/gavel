@@ -2,7 +2,7 @@ from gavel import celery
 import gavel.settings as settings
 import gavel.crowd_bt as crowd_bt
 import gavel.constants as constants
-from flask import Markup, Response, request, render_template
+from flask import Markup, Response, request, render_template, session, abort
 import markdown
 import requests
 from functools import wraps
@@ -15,6 +15,9 @@ import smtplib
 import email
 import email.mime.multipart
 import email.mime.text
+
+from gavel.controllers.csrf_protection import csrf_protect
+
 
 def gen_secret(length):
     return base64.b32encode(os.urandom(length))[:length].decode('utf8').lower()
@@ -31,6 +34,9 @@ def check_auth():
 
     auth = request.authorization
     if auth:
+        token = session.pop('_csrf_token', None)
+        if not token or token != request.form.get('_csrf_token'):
+            abort(403)
         return auth.username == 'admin' and auth.password == settings.ADMIN_PASSWORD
 
     auth_header = request.headers.get('Authorization', None)
