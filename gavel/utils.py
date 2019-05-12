@@ -16,8 +16,6 @@ import email
 import email.mime.multipart
 import email.mime.text
 
-from gavel.controllers.csrf_protection import csrf_protect
-
 
 def gen_secret(length):
     return base64.b32encode(os.urandom(length))[:length].decode('utf8').lower()
