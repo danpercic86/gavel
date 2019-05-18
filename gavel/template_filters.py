@@ -11,4 +11,4 @@ def _jinja2_filter_datetime_local(datetime):
 def _jinja2_filter_datetime_epoch(datetime):
     if datetime is None:
         return 0
-    return datetime.strftime('%s')
+    return naturaltime(datetime)

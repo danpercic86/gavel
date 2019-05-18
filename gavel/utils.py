@@ -33,8 +33,9 @@ def check_auth():
     auth = request.authorization
     if auth:
         token = session.pop('_csrf_token', None)
-        if not token or token != request.form.get('_csrf_token'):
-            abort(403)
+        if request.method not in ("GET", "HEAD", "OPTIONS"):
+            if not token or token != request.form.get('_csrf_token'):
+                abort(403)
         return auth.username == 'admin' and auth.password == settings.ADMIN_PASSWORD
 
     auth_header = request.headers.get('Authorization', None)
