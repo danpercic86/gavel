@@ -18,7 +18,8 @@ RUN set -ex \
         openjpeg \
         tiff \
         # numpy/scipy
-        openblas
+        openblas \
+        lapack
 
 COPY requirements.txt ./
 RUN set -ex \
@@ -40,6 +41,7 @@ RUN set -ex \
         tiff-dev \
         # scipy
         openblas-dev \
+        lapack-dev \
     && pip install --no-cache-dir -r requirements.txt \
     && apk del .build-deps
 
