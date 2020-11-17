@@ -15,6 +15,7 @@ from numpy.random import choice, random, shuffle
 from functools import wraps
 from datetime import datetime
 
+
 def requires_open(redirect_to):
     def decorator(f):
         @wraps(f)
@@ -23,8 +24,11 @@ def requires_open(redirect_to):
                 return redirect(url_for(redirect_to))
             else:
                 return f(*args, **kwargs)
+
         return decorated
+
     return decorator
+
 
 def requires_active_annotator(redirect_to):
     def decorator(f):
@@ -35,7 +39,9 @@ def requires_active_annotator(redirect_to):
                 return redirect(url_for(redirect_to))
             else:
                 return f(*args, **kwargs)
+
         return decorated
+
     return decorator
 
 
@@ -71,29 +77,29 @@ def index():
             )
         elif annotator.prev is None:
             return render_template('begin.html',
-            item=annotator.next,
-            items=items,
-            seen=seen,
-            time_per_project=Setting.value_of('TIME_PER_PROJECT'),
-            max_time_per_project=Setting.value_of('MAX_TIME_PER_PROJECT'),
-            jury_end=Setting.value_of('JURY_END_DATETIME')
-            )
+                                   item=annotator.next,
+                                   items=items,
+                                   seen=seen,
+                                   time_per_project=Setting.value_of('TIME_PER_PROJECT'),
+                                   max_time_per_project=Setting.value_of('MAX_TIME_PER_PROJECT'),
+                                   jury_end=Setting.value_of('JURY_END_DATETIME')
+                                   )
         else:
             return render_template('vote.html',
-            prev=annotator.prev,
-            next=annotator.next,
-            items=items,
-            seen=seen,
-            time_per_project=Setting.value_of('TIME_PER_PROJECT'),
-            max_time_per_project=Setting.value_of('MAX_TIME_PER_PROJECT'),
-            jury_end_datetime=Setting.value_of('JURY_END_DATETIME')
-            )
+                                   prev=annotator.prev,
+                                   next=annotator.next,
+                                   items=items,
+                                   seen=seen,
+                                   time_per_project=Setting.value_of('TIME_PER_PROJECT'),
+                                   max_time_per_project=Setting.value_of('MAX_TIME_PER_PROJECT'),
+                                   jury_end_datetime=Setting.value_of('JURY_END_DATETIME')
+                                   )
+
 
 @app.route('/vote', methods=['POST'])
 @requires_open(redirect_to='index')
 @requires_active_annotator(redirect_to='index')
 def vote():
-
     annotator = get_current_annotator()
     if annotator.prev.id == int(request.form['prev_id']) and annotator.next.id == int(request.form['next_id']):
         if request.form['action'] == 'Skip':
@@ -108,12 +114,13 @@ def vote():
                     perform_vote(annotator, next_won=True)
                     decision = Decision(annotator, winner=annotator.next, loser=annotator.prev)
                 db.session.add(decision)
-            annotator.next.viewed.append(annotator) # counted as viewed even if deactivated
+            annotator.next.viewed.append(annotator)  # counted as viewed even if deactivated
             annotator.prev = annotator.next
             annotator.ignore.append(annotator.prev)
         annotator.update_next(choose_next(annotator))
         db.session.commit()
     return redirect(url_for('index'))
+
 
 @app.route('/begin', methods=['POST'])
 @requires_open(redirect_to='index')
@@ -127,14 +134,16 @@ def begin():
             annotator.prev = annotator.next
             annotator.update_next(choose_next(annotator))
         elif request.form['action'] == 'Skip':
-            annotator.next = None # will be reset in index
+            annotator.next = None  # will be reset in index
         db.session.commit()
     return redirect(url_for('index'))
+
 
 @app.route('/logout')
 def logout():
     session.pop(ANNOTATOR_ID, None)
     return redirect(url_for('index'))
+
 
 @app.route('/login/<secret>/')
 def login(secret):
@@ -146,6 +155,7 @@ def login(secret):
         session[ANNOTATOR_ID] = annotator.id
     return redirect(url_for('index'))
 
+
 @app.route('/welcome/')
 @requires_open(redirect_to='index')
 @requires_active_annotator(redirect_to='index')
@@ -155,6 +165,7 @@ def welcome():
         content=utils.render_markdown(settings.WELCOME_MESSAGE)
     )
 
+
 @app.route('/map/')
 @requires_open(redirect_to='index')
 @requires_active_annotator(redirect_to='index')
@@ -162,6 +173,7 @@ def map():
     return render_template(
         'map.html'
     )
+
 
 @app.route('/welcome/done', methods=['POST'])
 @requires_open(redirect_to='index')
@@ -173,8 +185,10 @@ def welcome_done():
     db.session.commit()
     return redirect(url_for('index'))
 
+
 def get_current_annotator():
     return Annotator.by_id(session.get(ANNOTATOR_ID, None))
+
 
 def preferred_items(annotator):
     '''
@@ -201,13 +215,14 @@ def preferred_items(annotator):
         (Annotator.active == True) & (Annotator.next != None) & (Annotator.updated != None)
     ).all()
     busy = {i.next.id for i in annotators if \
-        (datetime.utcnow() - i.updated).total_seconds() < settings.TIMEOUT * 60}
+            (datetime.utcnow() - i.updated).total_seconds() < settings.TIMEOUT * 60}
     nonbusy = [i for i in items if i.id not in busy]
     preferred = nonbusy if nonbusy else items
 
     less_seen = [i for i in preferred if len(i.viewed) < settings.MIN_VIEWS]
 
     return less_seen if less_seen else preferred
+
 
 def maybe_init_annotator(annotator):
     if annotator.next is None:
@@ -216,10 +231,11 @@ def maybe_init_annotator(annotator):
             annotator.update_next(choice(items))
             db.session.commit()
 
+
 def choose_next(annotator):
     items = preferred_items(annotator)
 
-    shuffle(items) # useful for argmax case as well in the case of ties
+    shuffle(items)  # useful for argmax case as well in the case of ties
     if items:
         if random() < crowd_bt.EPSILON:
             return items[0]
@@ -233,6 +249,7 @@ def choose_next(annotator):
                 i.sigma_sq), items)
     else:
         return None
+
 
 def perform_vote(annotator, next_won):
     if next_won:

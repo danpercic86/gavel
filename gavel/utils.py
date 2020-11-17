@@ -1,6 +1,5 @@
 from gavel import celery
 import gavel.settings as settings
-import gavel.crowd_bt as crowd_bt
 import gavel.constants as constants
 from flask import Markup, Response, request, render_template, session, abort
 import markdown
@@ -20,9 +19,9 @@ import email.mime.text
 def gen_secret(length):
     return base64.b32encode(os.urandom(length))[:length].decode('utf8').lower()
 
+
 def authenticate():
-    return Response('Access denied.', 401,
-        {'WWW-Authenticate': 'Basic realm="Login Required"'})
+    return Response('Access denied.', 401, {'WWW-Authenticate': 'Basic realm="Login Required"'})
 
 
 def check_auth():
@@ -57,7 +56,9 @@ def requires_auth(f):
         if not check_auth():
             return authenticate()
         return f(*args, **kwargs)
+
     return decorated
+
 
 def data_to_csv_string(data):
     output = io.StringIO()
@@ -65,15 +66,18 @@ def data_to_csv_string(data):
     writer.writerows(data)
     return output.getvalue()
 
+
 def data_from_csv_string(string):
     data_input = io.StringIO(string)
     reader = csv.reader(data_input)
     return list(reader)
 
+
 def get_paragraphs(message):
     paragraphs = re.split(r'\n\n+', message)
     paragraphs = [i.replace('\n', ' ') for i in paragraphs if i]
     return paragraphs
+
 
 @celery.task
 def send_emails(emails):
@@ -113,20 +117,24 @@ def send_emails(emails):
             msg.attach(email.mime.text.MIMEText(body, 'plain'))
             server.sendmail(settings.EMAIL_FROM, recipients, msg.as_string())
         except Exception as e:
-            exceptions.append(e) # XXX is there a cleaner way to handle this?
+            exceptions.append(e)  # XXX is there a cleaner way to handle this?
 
     server.quit()
     if exceptions:
         raise Exception('Error sending some emails: %s' % exceptions)
 
+
 def render_markdown(content):
     return Markup(markdown.markdown(content))
+
 
 def user_error(message):
     return render_template('error.html', message=message), 400
 
+
 def server_error(message):
     return render_template('error.html', message=message), 500
+
 
 def send_telemetry(identifier, data):
     if not settings.SEND_STATS:
@@ -138,7 +146,8 @@ def send_telemetry(identifier, data):
             timeout=5
         )
     except Exception:
-        pass # don't want this to break anything else
+        pass  # don't want this to break anything else
+
 
 def cast_row(row):
     '''

@@ -3,7 +3,7 @@ TELEMETRY_URL = 'https://telemetry.anish.io/api/v1/submit'
 
 # Setting
 # keys
-SETTING_CLOSED = 'closed' # boolean
+SETTING_CLOSED = 'closed'  # boolean
 # values
 SETTING_TRUE = 'true'
 SETTING_FALSE = 'false'
@@ -67,4 +67,4 @@ If you've looked at all the projects already, then you're done.
 
 DEFAULT_API_KEY = '89iuw4gtuyjfbsiukbkwhejbhu4b5'
 
-IMPORT_URL = 'http://now.hacktm.ro/api/teams'
+IMPORT_URL = 'https://dev.unihack.eu/api/Export/GavelProjects'

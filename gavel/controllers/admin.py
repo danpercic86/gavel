@@ -1,5 +1,4 @@
 import requests
-from sqlalchemy.dialects.mssql import IMAGE
 from django.utils.html import strip_tags
 from sqlalchemy.exc import IntegrityError
 
@@ -11,7 +10,6 @@ from flask import (
     redirect,
     render_template,
     request,
-    session,
     url_for,
 )
 import urllib.parse
@@ -22,7 +20,8 @@ import json
 from gavel.constants import SETTING_CLOSED, SETTING_FALSE, SETTING_TRUE
 from gavel.models import Annotator, Item, Decision, ignore_table, Setting, db
 
-ALLOWED_EXTENSIONS = set(['csv', 'xlsx', 'xls'])
+ALLOWED_EXTENSIONS = {'csv', 'xlsx', 'xls'}
+
 
 @app.route('/admin/')
 @utils.requires_auth
@@ -61,6 +60,7 @@ def admin():
         max_time_per_project=Setting.value_of('MAX_TIME_PER_PROJECT'),
         jury_end=Setting.value_of('JURY_END_DATETIME')
     )
+
 
 @app.route('/admin/item', methods=['POST'])
 @utils.requires_auth
@@ -134,6 +134,7 @@ def item_patch():
         item.description = request.form['description']
     db.session.commit()
     return redirect(url_for('item_detail', item_id=item.id))
+
 
 @app.route('/admin/annotator', methods=['POST'])
 @utils.requires_auth
@@ -269,6 +270,7 @@ def item_detail(item_id):
             skipped=skipped
         )
 
+
 @app.route('/admin/annotator/<annotator_id>/')
 @utils.requires_auth
 def annotator_detail(annotator_id):
@@ -293,8 +295,10 @@ def annotator_detail(annotator_id):
             skipped=skipped
         )
 
+
 def annotator_link(annotator):
-        return urllib.parse.urljoin(settings.BASE_URL, url_for('login', secret=annotator.secret))
+    return urllib.parse.urljoin(settings.BASE_URL, url_for('login', secret=annotator.secret))
+
 
 def email_invite_links(annotators):
     if settings.DISABLE_EMAIL or annotators is None:

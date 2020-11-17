@@ -2,10 +2,12 @@ from gavel.models import db
 import gavel.crowd_bt as crowd_bt
 from sqlalchemy.orm.exc import NoResultFound
 
-view_table = db.Table('view',
+view_table = db.Table(
+    'view',
     db.Column('item_id', db.Integer, db.ForeignKey('item.id')),
     db.Column('annotator_id', db.Integer, db.ForeignKey('annotator.id'))
 )
+
 
 class Item(db.Model):
     id = db.Column(db.Integer, primary_key=True, nullable=False)
@@ -37,12 +39,13 @@ class Item(db.Model):
         except NoResultFound:
             item = None
         return item
+
     @classmethod
     def by_identifier(cls, identifier):
-            if identifier is None:
-                return None
-            try:
-                item = cls.query.filter(cls.identifier == identifier).one()
-            except NoResultFound:
-                item = None
-            return item
+        if identifier is None:
+            return None
+        try:
+            item = cls.query.filter(cls.identifier == identifier).one()
+        except NoResultFound:
+            item = None
+        return item

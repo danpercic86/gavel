@@ -2,10 +2,9 @@ from sqlalchemy import desc
 
 from gavel import app
 from gavel.controllers.admin import import_projects, annotator_link
-import gavel.settings as settings
 import gavel.utils as utils
 import json
-from flask import ( Response, request)
+from flask import (Response, request)
 
 from gavel.models import Item, Annotator, Decision, db
 
@@ -60,14 +59,14 @@ def item_json_dump():
     items = Item.query.order_by(desc(Item.mu)).all()
     data = []
     data += [{
-        'description'   : item.description.strip(),
-        'id'            : item.id,
-        'mu'            : str(item.mu).strip(),
-        'sigma Squared' : str(item.sigma_sq).strip(),
-        'location'      : item.location.strip(),
-        'active'        : item.active,
-        'name'          : item.name.strip(),
-        'teamId'          : item.identifier.strip()
+        'description': item.description.strip(),
+        'id': item.id,
+        'mu': str(item.mu).strip(),
+        'sigma Squared': str(item.sigma_sq).strip(),
+        'location': item.location.strip(),
+        'active': item.active,
+        'name': item.name.strip(),
+        'teamId': item.identifier.strip()
     } for item in items]
     return Response(json.dumps(data), mimetype='application/json')
 

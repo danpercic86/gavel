@@ -1,6 +1,7 @@
 from gavel.models import db
 from datetime import datetime
 
+
 class Decision(db.Model):
     id = db.Column(db.Integer, primary_key=True, nullable=False)
     annotator_id = db.Column(db.Integer, db.ForeignKey('annotator.id'))
