@@ -22,6 +22,28 @@
             </form>
           </td>
         </tr>
+        <tr>
+          <th>Team name</th>
+          <td>
+            <textarea name="team_name" form="team_name_form">{{ item.team_name }}</textarea>
+            <form action="/admin/item_patch" method="post" id="team_name_form">
+              <input type="submit" name="action" value="Update" class="neutral">
+              <input type="hidden" name="item_id" value="{{ item.id }}">
+              <input type="hidden" name="_csrf_token" value="{{ csrf_token() }}">
+            </form>
+          </td>
+        </tr>
+        <tr>
+          <th>Presentation link</th>
+          <td>
+            <textarea name="presentation_link" form="presentation_link_form">{{ item.presentation_link }}</textarea>
+            <form action="/admin/item_patch" method="post" id="presentation_link_form">
+              <input type="submit" name="action" value="Update" class="neutral">
+              <input type="hidden" name="item_id" value="{{ item.id }}">
+              <input type="hidden" name="_csrf_token" value="{{ csrf_token() }}">
+            </form>
+          </td>
+        </tr>
         {% if item.location %}
           <tr>
             <th>Location</th>

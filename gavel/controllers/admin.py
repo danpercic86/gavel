@@ -71,8 +71,8 @@ def item():
         if data:
             # validate data
             for index, row in enumerate(data):
-                if len(row) != 4:
-                    return utils.user_error('Bad data: row %d has %d elements (expecting 3)' % (index + 1, len(row)))
+                if len(row) != 5:
+                    return utils.user_error('Bad data: row %d has %d elements (expecting 5)' % (index + 1, len(row)))
             for row in data:
                 _item = Item(*row)
                 db.session.add(_item)
@@ -110,7 +110,7 @@ def parse_upload_form():
         if extension == "xlsx" or extension == "xls":
             workbook = xlrd.open_workbook(file_contents=f.read())
             worksheet = workbook.sheet_by_index(0)
-            data = list(utils.cast_row(worksheet.row_values(rx, 0, 3)) for rx in range(worksheet.nrows) if worksheet.row_len(rx) == 3)
+            data = list(utils.cast_row(worksheet.row_values(rx, 0, 5)) for rx in range(worksheet.nrows) if worksheet.row_len(rx) == 5)
         elif extension == "csv":
             data = utils.data_from_csv_string(f.read().decode("utf-8"))
     else:
@@ -131,6 +131,10 @@ def item_patch():
         item.name = request.form['name']
     if 'description' in request.form:
         item.description = request.form['description']
+    if 'team_name' in request.form:
+        item.description = request.form['team_name']
+    if 'presentation_link' in request.form:
+        item.description = request.form['presentation_link']
     db.session.commit()
     return redirect(url_for('item_detail', item_id=item.id))
 
@@ -188,6 +192,9 @@ def import_projects():
         if '_id' not in item:
             print("no id...", item)
             continue
+        if 'teamName' not in item:
+            print("no team name...", item)
+            continue
 
         name = strip_tags(item.get('name', None) or '')
         # location = strip_tags(item.get('location', None) or '')
@@ -197,17 +204,21 @@ def import_projects():
             continue
 
         description = strip_tags(item.get('description', None) or '') or '...'
+        team_name = strip_tags(item.get('teamName', None) or '') or '...'
+        presentation_link = strip_tags(item.get('presentationLink', None) or '') or '...'
 
         existing = Item.by_identifier(item['_id'])
         if existing is None:
             # _item = Item(name, location, description, item['_id'])
-            _item = Item(name, description, item['_id'])
+            _item = Item(name, description, item['_id'], team_name, presentation_link)
             print("insert", item['_id'])
             db.session.add(_item)
         else:
             existing.name = name
             # existing.location = location
             existing.description = description
+            existing.team_name = team_name
+            existing.presentation_link = presentation_link
             print("update", item['_id'])
 
     db.session.commit()
@@ -224,7 +235,7 @@ def setting():
         Setting.set('MAX_TIME_PER_PROJECT', request.form['max-time-per-project'])
         db.session.commit()
     if action == 'update-jury-end':
-        Setting.set('JURimpoY_END_DATETIME', request.form['jury-end-datetime'])
+        Setting.set('JURY_END_DATETIME', request.form['jury-end-datetime'])
         db.session.commit()
     if action == 'update-voting-status':
         new_value = SETTING_TRUE if request.form['voting-status'] == 'Close' else SETTING_FALSE

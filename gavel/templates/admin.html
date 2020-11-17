@@ -64,7 +64,9 @@
               <thead class="thead-dark">
               <tr>
                 <th scope="col" data-sort-method="number">Id</th>
+                <th scope="col" data-sort-method="caseInsensitiveSort">Team name</th>
                 <th scope="col" data-sort-method="caseInsensitiveSort">Name</th>
+                <th scope="col" data-sort-method="caseInsensitiveSort">Presentation link</th>
                 {% if items and items.0.location %}
                   <th scope="col" data-sort-method="caseInsensitiveSort">Location</th>
                 {% endif %}
@@ -83,14 +85,17 @@
               {% for item in items %}
                 <tr class="{{ 'disabled' if not item.active else 'prioritized' if item.prioritized else '' }}">
                   <td><a href="{{ url_for('item_detail', item_id=item.id) }}" class="colored">{{ item.id }}</a></td>
+                  <td>{{ item.team_name }}</td>
                   <td>{{ item.name }}</td>
+                  <td><a href="{{ item.presentation_link }}" target="_blank">{{ item.presentation_link }}</a></td>
                   {% if item.location %}
                     <td>{{ item.location }}</td>
                   {% endif %}
-                  <td class="preserve-formatting"><p id="project-{{ item.id }}" class="collapse">{{ item.description }}</p><a href="#"
-                                                                                                                              class="btn"
-                                                                                                                              data-toggle="collapse"
-                                                                                                                              data-target="#project-{{ item.id }}">show</a>
+                  <td class="preserve-formatting"><p id="project-{{ item.id }}" class="collapse">{{ item.description }}</p>
+                    <a href="#"
+                       class="btn"
+                       data-toggle="collapse"
+                       data-target="#project-{{ item.id }}">show</a>
                   </td>
                   <td>{{ item.mu | round(4) }}</td>
                   <td>{{ item.sigma_sq | round(4) }}</td>
@@ -135,9 +140,10 @@
                   <form action="/admin/item" method="post" id="item_form" enctype="multipart/form-data">
                     <div class="form-group">
                       <textarea id="projects-data" name="data" form="item_form" class="form-control" aria-describedby="projectsHelp"
-                                placeholder="Facebook, social network, 5ca7768baad15300167dced1;"></textarea>
+                                placeholder="Facebook, social network, 5ca7768baad15300167dced1, Facebook, https://youtube.com;"></textarea>
                       {#                      <small id="projectsHelp" class="form-text text-muted">Add name, location, description (CSV format)</small>#}
-                      <small id="projectsHelp" class="form-text text-muted">Add name, description (CSV format)</small>
+                      <small id="projectsHelp" class="form-text text-muted">Add name, description, identifier, team_name, presentation_link (CSV
+                        format in this order)</small>
                     </div>
                     <div class="form-group">
                       <div class="upload-container">

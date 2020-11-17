@@ -1,3 +1,5 @@
+from typing import AnyStr
+
 from gavel.models import db
 import gavel.crowd_bt as crowd_bt
 from sqlalchemy.orm.exc import NoResultFound
@@ -15,6 +17,8 @@ class Item(db.Model):
     # location = db.Column(db.Text, nullable=False)
     identifier = db.Column(db.Text, nullable=False)
     description = db.Column(db.Text, nullable=False)
+    team_name = db.Column(db.Text, nullable=False)
+    presentation_link = db.Column(db.Text, nullable=False)
     active = db.Column(db.Boolean, default=True, nullable=False)
     viewed = db.relationship('Annotator', secondary=view_table)
     prioritized = db.Column(db.Boolean, default=False, nullable=False)
@@ -23,10 +27,12 @@ class Item(db.Model):
     sigma_sq = db.Column(db.Float)
 
     # def __init__(self, name, location, description, identifier):
-    def __init__(self, name, description, identifier):
+    def __init__(self, name: AnyStr, description: AnyStr, identifier: AnyStr, team_name: AnyStr, presentation_link: AnyStr):
         self.name = name
         # self.location = location
         self.description = description
+        self.team_name = team_name
+        self.presentation_link = presentation_link
         self.identifier = identifier
         self.mu = crowd_bt.MU_PRIOR
         self.sigma_sq = crowd_bt.SIGMA_SQ_PRIOR
