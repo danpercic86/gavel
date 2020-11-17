@@ -12,7 +12,7 @@ view_table = db.Table(
 class Item(db.Model):
     id = db.Column(db.Integer, primary_key=True, nullable=False)
     name = db.Column(db.Text, nullable=False)
-    location = db.Column(db.Text, nullable=False)
+    # location = db.Column(db.Text, nullable=False)
     identifier = db.Column(db.Text, nullable=False)
     description = db.Column(db.Text, nullable=False)
     active = db.Column(db.Boolean, default=True, nullable=False)
@@ -22,9 +22,10 @@ class Item(db.Model):
     mu = db.Column(db.Float)
     sigma_sq = db.Column(db.Float)
 
-    def __init__(self, name, location, description, identifier):
+    # def __init__(self, name, location, description, identifier):
+    def __init__(self, name, description, identifier):
         self.name = name
-        self.location = location
+        # self.location = location
         self.description = description
         self.identifier = identifier
         self.mu = crowd_bt.MU_PRIOR
@@ -35,9 +36,9 @@ class Item(db.Model):
         if uid is None:
             return None
         try:
-            item = cls.query.get(uid)
+            item: Item = cls.query.get(uid)
         except NoResultFound:
-            item = None
+            return None
         return item
 
     @classmethod
@@ -45,7 +46,7 @@ class Item(db.Model):
         if identifier is None:
             return None
         try:
-            item = cls.query.filter(cls.identifier == identifier).one()
+            item: Item = cls.query.filter(cls.identifier == identifier).one()
         except NoResultFound:
-            item = None
+            return None
         return item

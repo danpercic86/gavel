@@ -99,8 +99,7 @@ def item():
 
 
 def allowed_file(filename):
-    return '.' in filename and \
-           filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
+    return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
 
 
 def parse_upload_form():
@@ -123,11 +122,11 @@ def parse_upload_form():
 @app.route('/admin/item_patch', methods=['POST'])
 @utils.requires_auth
 def item_patch():
-    item = Item.by_id(request.form['item_id'])
+    item: Item = Item.by_id(request.form['item_id'])
     if not item:
         return utils.user_error('Item %s not found ' % request.form['item_id'])
-    if 'location' in request.form:
-        item.location = request.form['location']
+    # if 'location' in request.form:
+    #     item.location = request.form['location']
     if 'name' in request.form:
         item.name = request.form['name']
     if 'description' in request.form:
@@ -191,21 +190,23 @@ def import_projects():
             continue
 
         name = strip_tags(item.get('name', None) or '')
-        location = strip_tags(item.get('location', None) or '')
-        if not name or not location:
-            print("bad item...", item)
+        # location = strip_tags(item.get('location', None) or '')
+        # if not name or not location:
+        if not name:
+            print("Project has no name...", item)
             continue
 
         description = strip_tags(item.get('description', None) or '') or '...'
 
         existing = Item.by_identifier(item['_id'])
         if existing is None:
-            _item = Item(name, location, description, item['_id'])
+            # _item = Item(name, location, description, item['_id'])
+            _item = Item(name, description, item['_id'])
             print("insert", item['_id'])
             db.session.add(_item)
         else:
             existing.name = name
-            existing.location = location
+            # existing.location = location
             existing.description = description
             print("update", item['_id'])
 

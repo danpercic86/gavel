@@ -13,12 +13,13 @@ from gavel.models import Item, Annotator, Decision, db
 @utils.requires_auth
 def item_dump():
     items = Item.query.order_by(desc(Item.mu)).all()
-    data = [['Mu', 'Sigma Squared', 'Name', 'Location', 'Description', 'Active']]
+    # data = [['Mu', 'Sigma Squared', 'Name', 'Location', 'Description', 'Active']]
+    data = [['Mu', 'Sigma Squared', 'Name', 'Description', 'Active']]
     data += [[
         str(item.mu),
         str(item.sigma_sq),
         item.name,
-        item.location,
+        # item.location,
         item.description,
         item.active
     ] for item in items]
@@ -63,7 +64,7 @@ def item_json_dump():
         'id': item.id,
         'mu': str(item.mu).strip(),
         'sigma Squared': str(item.sigma_sq).strip(),
-        'location': item.location.strip(),
+        # 'location': item.location.strip(),
         'active': item.active,
         'name': item.name.strip(),
         'teamId': item.identifier.strip()

@@ -1,5 +1,7 @@
 <div class="info">
-  <strong class="location">Table #{{ item.location }}</strong>
+  {% if item.location %}
+    <strong class="location">Table #{{ item.location }}</strong>
+  {% endif %}
   <h2>{{ item.name }}</h2>
   <p class="preserve-formatting">{{ item.description }}</p>
 </div>
