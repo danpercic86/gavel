@@ -298,7 +298,11 @@
                 <td>Jury end datetime - Remmeber to substract -2 hours for EEST timezone</td>
                 <td class="compact">
                   <form action="/admin/setting" method="post">
-                    <input type="input" name="jury-end-datetime" value="{{ jury_end }}"/>
+                    {% if jury_end %}
+                      <input type="input" name="jury-end-datetime" value="{{ jury_end }}"/>
+                    {% else %}
+                      <input type="input" name="jury-end-datetime" value="2020-11-18T22:00:00"/>
+                    {% endif %}
                     <input type="submit" value="Update" class="btn btn-success">
                     <input type="hidden" name="action" value="update-jury-end">
                     <input type="hidden" name="_csrf_token" value="{{ csrf_token() }}">
