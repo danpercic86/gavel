@@ -1,4 +1,4 @@
-$(document).ready(function(){
+$(document).ready(function () {
 
 
     // implement tabs
@@ -8,7 +8,7 @@ $(document).ready(function(){
     });
 
 
-    if($('body').hasClass('judge-view')) {
+    if ($('body').hasClass('judge-view')) {
 
 
         // manage team selection and unlock vote button
@@ -17,7 +17,7 @@ $(document).ready(function(){
             $(this).addClass('active');
             $('.button-vote').show();
 
-            window.scrollTo(0,document.body.scrollHeight);
+            window.scrollTo(0, document.body.scrollHeight);
 
         });
 
@@ -64,7 +64,6 @@ $(document).ready(function(){
 
             var newDate = new Date();
             var newStamp = newDate.getTime();
-
             var timer;
 
             function updateClock() {
@@ -102,8 +101,8 @@ $(document).ready(function(){
             function calculateTimeLeft() {
                 newDate = new Date();
                 newStamp = newDate.getTime();
-                var diff = Math.round((endJuryTime - newStamp) / 1000);
 
+                var diff = Math.round((endJuryTime - newStamp) / 1000);
                 console.log(diff);
                 var d = Math.floor(diff / (24 * 60 * 60));
                 diff = diff - (d * 24 * 60 * 60);

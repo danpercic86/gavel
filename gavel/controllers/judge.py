@@ -76,24 +76,26 @@ def index():
                 content=utils.render_markdown(settings.WAIT_MESSAGE)
             )
         elif annotator.prev is None:
-            return render_template('begin.html',
-                                   item=annotator.next,
-                                   items=items,
-                                   seen=seen,
-                                   time_per_project=Setting.value_of('TIME_PER_PROJECT'),
-                                   max_time_per_project=Setting.value_of('MAX_TIME_PER_PROJECT'),
-                                   jury_end=Setting.value_of('JURY_END_DATETIME')
-                                   )
+            return render_template(
+                'begin.html',
+                item=annotator.next,
+                items=items,
+                seen=seen,
+                time_per_project=Setting.value_of('TIME_PER_PROJECT'),
+                max_time_per_project=Setting.value_of('MAX_TIME_PER_PROJECT'),
+                jury_end=Setting.value_of('JURY_END_DATETIME')
+            )
         else:
-            return render_template('vote.html',
-                                   prev=annotator.prev,
-                                   next=annotator.next,
-                                   items=items,
-                                   seen=seen,
-                                   time_per_project=Setting.value_of('TIME_PER_PROJECT'),
-                                   max_time_per_project=Setting.value_of('MAX_TIME_PER_PROJECT'),
-                                   jury_end_datetime=Setting.value_of('JURY_END_DATETIME')
-                                   )
+            return render_template(
+                'vote.html',
+                prev=annotator.prev,
+                next=annotator.next,
+                items=items,
+                seen=seen,
+                time_per_project=Setting.value_of('TIME_PER_PROJECT'),
+                max_time_per_project=Setting.value_of('MAX_TIME_PER_PROJECT'),
+                jury_end_datetime=Setting.value_of('JURY_END_DATETIME')
+            )
 
 
 @app.route('/vote', methods=['POST'])
@@ -191,28 +193,27 @@ def get_current_annotator():
 
 
 def preferred_items(annotator):
-    '''
+    """
     Return a list of preferred items for the given annotator to look at next.
 
     This method uses a variety of strategies to try to select good candidate
     projects.
-    '''
-    items = []
+    """
     ignored_ids = {i.id for i in annotator.ignore}
 
     if ignored_ids:
         available_items = Item.query.filter(
-            (Item.active == True) & (~Item.id.in_(ignored_ids))
+            (Item.active is True) & (~Item.id.in_(ignored_ids))
         ).all()
     else:
-        available_items = Item.query.filter(Item.active == True).all()
+        available_items = Item.query.filter(Item.active is True).all()
 
     prioritized_items = [i for i in available_items if i.prioritized]
 
     items = prioritized_items if prioritized_items else available_items
 
     annotators = Annotator.query.filter(
-        (Annotator.active == True) & (Annotator.next != None) & (Annotator.updated != None)
+        (Annotator.active is True) & (Annotator.next is not None) & (Annotator.updated is not None)
     ).all()
     busy = {i.next.id for i in annotators if \
             (datetime.utcnow() - i.updated).total_seconds() < settings.TIMEOUT * 60}
