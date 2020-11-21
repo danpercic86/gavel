@@ -8,8 +8,10 @@ $(document).ready(function () {
     });
 
 
+    console.log('hello gavel')
     if ($('body').hasClass('judge-view')) {
 
+    console.log('i am judge')
 
         // manage team selection and unlock vote button
         $('.label-team').click(function () {
@@ -21,24 +23,17 @@ $(document).ready(function () {
 
         });
 
+        if (currentProject) {
+            var date = new Date();
+            var tempData = {
+                'id': currentProject,
+                'timeStart': date.getTime()
+            };
+            setCookie('projectCounter', JSON.stringify(tempData));
+            $('.overlay').hide();
 
-        $('.btn-overlay').on('click', function (e) {
-            e.preventDefault();
-
-            var role = $(this).data('role');
-
-            if (role == 'vote-start') {
-                var date = new Date();
-                var tempData = {
-                    'id': currentProject,
-                    'timeStart': date.getTime()
-                };
-                setCookie('projectCounter', JSON.stringify(tempData));
-                $('.overlay').hide();
-
-                updateTimer(getCookie('projectCounter', 'timeStart'), '#time-spent');
-            }
-        });
+            updateTimer(getCookie('projectCounter', 'timeStart'), '#time-spent');
+        }
 
         if (getCookie('projectCounter', 'id') == currentProject) {
             $('.overlay').hide();
@@ -55,7 +50,7 @@ $(document).ready(function () {
         function getCookie(set, key) {
             var keyValue = document.cookie.match('(^|;) ?' + set + '=([^;]*)(;|$)');
             var rawValue = keyValue ? keyValue[2] : null;
-            return JSON.parse(rawValue)[key];
+            return (JSON.parse(rawValue) || {})[key];
         }
 
         function updateTimer(start, container) {
@@ -94,7 +89,7 @@ $(document).ready(function () {
         }
 
         function updateTimeLeft() {
-
+            console.log('eeeeee')
             var newDate = new Date();
             var newStamp = newDate.getTime();
 
@@ -103,7 +98,6 @@ $(document).ready(function () {
                 newStamp = newDate.getTime();
 
                 var diff = Math.round((endJuryTime - newStamp) / 1000);
-                console.log(diff);
                 var d = Math.floor(diff / (24 * 60 * 60));
                 diff = diff - (d * 24 * 60 * 60);
                 var h = Math.floor(diff / (60 * 60));

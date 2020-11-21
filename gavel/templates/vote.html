@@ -29,43 +29,20 @@
   <div class="card">
     <div class="card-header" id="headingTwo">
 
-      <button class="btn btn-outline-primary btn-block collapsed btn-custom" data-toggle="collapse" data-target="#collapseTwo"
-              aria-expanded="false" aria-controls="collapseTwo">
+      <button class="btn btn-outline-primary btn-block btn-custom" data-toggle="collapse" data-target="#collapseTwo"
+              aria-expanded="true" aria-controls="collapseTwo">
         <span class="prepend">Current</span>
         <span class="value">{{ next.name }}</span>
         <span class="append">&#9776;</span>
       </button>
 
     </div>
-    <div id="collapseTwo" class="collapsed collapse" aria-labelledby="headingTwo" data-parent="#accordion">
+    <div id="collapseTwo" class="collapse show" aria-labelledby="headingTwo" data-parent="#accordion">
       <div class="card-body">
         {% with item=next %}
           {% include "_item.html" %}
         {% endwith %}
       </div>
-    </div>
-  </div>
-  <div class="item vote-section pt-3">
-    <div class="banner pt-4" id="vote-header">
-      <h1 class="rotate90">&#10095;</h1>
-    </div>
-    <div class="info">
-      <form action="/vote" method="post">
-        <p class="center">Which one is better?</p>
-        <label for="vote-previous" class="label-team">{{ prev.name }}</label>
-        <input type="radio" name="action" value="Previous" id="vote-previous" class="button-left input-team">
-        <label for="vote-current" class="label-team">{{ next.name }}</label>
-        <input type="radio" name="action" value="Current" id="vote-current" class="button-right input-team">
-        <div class="pt-3">
-          <input type="submit" value="Vote" class="btn btn-success btn-block button-vote">
-        </div>
-        <div class="pt-3">
-          <input type="submit" name="action" value="Skip" id="vote-skip" class="btn btn-outline-warning">
-        </div>
-        <input type="hidden" name="prev_id" value="{{ prev.id }}">
-        <input type="hidden" name="next_id" value="{{ next.id }}">
-        <input type="hidden" name="_csrf_token" value="{{ csrf_token() }}">
-      </form>
     </div>
   </div>
   <div class="progress-bar">
