@@ -5,6 +5,7 @@ import yaml
 BASE_DIR = os.path.dirname(__file__)
 CONFIG_FILE = os.path.join(BASE_DIR, '..', 'config.yaml')
 
+NONE_SENTINEL = object()  # because default may be None
 
 class Config(object):
 
@@ -17,7 +18,7 @@ class Config(object):
 
     # checks for an environment variable first, then an entry in the config file,
     # and then falls back to default
-    def get(self, name, env_names=None, default=None):
+    def get(self, name, env_names=None, default=NONE_SENTINEL):
         setting = None
         if env_names is not None:
             if not isinstance(env_names, list):
@@ -29,7 +30,7 @@ class Config(object):
         if setting is None:
             setting = self._config.get(name, None)
         if setting is None:
-            if default is not None:
+            if default is not NONE_SENTINEL:
                 return default
             else:
                 raise LookupError('Cannot find value for setting %s' % name)
@@ -85,3 +86,7 @@ EMAIL_BODY = c.get('email_body', default=constants.DEFAULT_EMAIL_BODY)
 SEND_STATS = _bool(c.get('send_stats', 'SEND_STATS', default=True))
 API_KEY = c.get('api_key', 'API_KEY', default=constants.DEFAULT_API_KEY)
 IMPORT_URL = c.get('import_url', 'IMPORT_URL', default=constants.IMPORT_URL)
+USE_SENDGRID =  _bool(c.get('use_sendgrid',    'USE_SENDGRID',             default=False))
+SENDGRID_API_KEY =    c.get('sendgrid_api_key','SENDGRID_API_KEY',         default=None)
+SERVER_NAME =         c.get('server_name',     'SERVER_NAME',              default=None)
+PROXY =         _bool(c.get('proxy',           'PROXY',                    default=False))

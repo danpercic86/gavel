@@ -11,18 +11,31 @@
       {% endwith %}
     </div>
 
-    <div class="item">
-      <div class="info form-vote">
-        <form action="/begin" method="post">
+<div class="item">
+  <div class="banner" id="vote-header">
+    <h1>Vote</h1>
+  </div>
 
-          <input type="submit" name="action" value="Done" id="vote-done" class="btn btn-success btn-block">
-          <div class="pt-3">
-            <input type="submit" name="action" value="Skip" id="vote-skip" class="btn btn-outline-warning">
-          </div>
-          <input type="hidden" name="item_id" value="{{ item.id }}">
-          <input type="hidden" name="_csrf_token" value="{{ csrf_token() }}">
-        </form>
+  <div class="info">
+    <form action="{{ url_for('begin') }}" method="post">
+      <p class="center">Comparison voting begins after you see your first project. Please click <b>CONTINUE</b> after seeing this project or <b>SKIP</b> if you cannot find this project.</p>
+      <div id="vote-continue" class="radio-button button-full button-gap">
+        <input type="radio" name="action" id="vote-continue-radio" value="Continue">
+        <label for="vote-continue-radio">Continue</label>
       </div>
-    </div>
-  </section>
+
+      <div id="vote-skip" class="radio-button button-full button-gap">
+        <input type="radio" name="action" id="vote-skip-radio" value="Skip" checked>
+        <label for="vote-skip-radio">Skip</label>
+      </div>
+
+      <input type="submit" name="action" value="Submit" id="vote-submit" class="button-full button-gap">
+
+      <input type="hidden" name="item_id" value="{{ item.id }}">
+      <input type="hidden" name="_csrf_token" value="{{ csrf_token() }}">
+    </form>
+
+    <script src="{{ url_for('static', filename='js/smart-button-toggle.js') }}"></script>
+  </div>
+</div>
 {% endblock %}

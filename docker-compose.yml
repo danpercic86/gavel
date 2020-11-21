@@ -4,10 +4,6 @@ x-gavel-base: &gavel_base
   image: gavel
   build: .
   restart: always
-  volumes:
-    - type: bind
-      source: ./config.yaml
-      target: /app/config.yaml
   env_file:
     - gavel_config.env
 
@@ -21,8 +17,9 @@ services:
     <<: *gavel_base
     environment:
       <<: *gavel_env
+      FLASK_ENV: development
     ports:
-      - 80:80
+      - 5050:80
     networks:
       - gavel-net
     depends_on:
@@ -32,7 +29,7 @@ services:
   celery-worker:
     <<: *gavel_base
     environment:
-      <<: *gavel_env      
+      <<: *gavel_env
     networks:
       - gavel-net
     depends_on:
@@ -55,6 +52,6 @@ services:
     restart: always
     networks:
       - gavel-net
-  
+
 networks:
   gavel-net:

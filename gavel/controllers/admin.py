@@ -6,6 +6,7 @@ from gavel import app
 
 import gavel.settings as settings
 import gavel.utils as utils
+import gavel.stats as stats
 from flask import (
     redirect,
     render_template,
@@ -18,7 +19,7 @@ import urllib.request
 import json
 
 from gavel.constants import SETTING_CLOSED, SETTING_FALSE, SETTING_TRUE
-from gavel.models import Annotator, Item, Decision, ignore_table, Setting, db
+from gavel.models import Annotator, Item, Decision, ignore_table, Setting, db, with_retries
 
 ALLOWED_EXTENSIONS = {'csv', 'xlsx', 'xls'}
 
@@ -26,6 +27,7 @@ ALLOWED_EXTENSIONS = {'csv', 'xlsx', 'xls'}
 @app.route('/admin/')
 @utils.requires_auth
 def admin():
+    stats.check_send_telemetry()
     annotators = Annotator.query.order_by(Annotator.id).all()
     items = Item.query.order_by(Item.id).all()
     decisions = Decision.query.all()
@@ -73,28 +75,39 @@ def item():
             for index, row in enumerate(data):
                 if len(row) != 5:
                     return utils.user_error('Bad data: row %d has %d elements (expecting 5)' % (index + 1, len(row)))
-            for row in data:
-                _item = Item(*row)
-                db.session.add(_item)
-            db.session.commit()
+            def tx():
+                for row in data:
+                    _item = Item(*row)
+                    db.session.add(_item)
+                db.session.commit()
+            with_retries(tx)
     elif action == 'Prioritize' or action == 'Cancel':
         item_id = request.form['item_id']
         target_state = action == 'Prioritize'
-        Item.by_id(item_id).prioritized = target_state
-        db.session.commit()
+        def tx():
+            Item.by_id(item_id).prioritized = target_state
+            db.session.commit()
+        with_retries(tx)
     elif action == 'Disable' or action == 'Enable':
         item_id = request.form['item_id']
         target_state = action == 'Enable'
-        Item.by_id(item_id).active = target_state
-        db.session.commit()
+        def tx():
+            Item.by_id(item_id).active = target_state
+            db.session.commit()
+        with_retries(tx)
     elif action == 'Delete':
         item_id = request.form['item_id']
         try:
-            db.session.execute(ignore_table.delete(ignore_table.c.item_id == item_id))
-            Item.query.filter_by(id=item_id).delete()
-            db.session.commit()
+            def tx():
+                db.session.execute(ignore_table.delete(ignore_table.c.item_id == item_id))
+                Item.query.filter_by(id=item_id).delete()
+                db.session.commit()
+            with_retries(tx)
         except IntegrityError as e:
-            return utils.server_error(str(e))
+            if isinstance(e.orig, psycopg2.errors.ForeignKeyViolation):
+                return utils.server_error("Projects can't be deleted once they have been voted on by a judge. You can use the 'disable' functionality instead, which has a similar effect, preventing the project from being shown to judges.")
+            else:
+                return utils.server_error(str(e))
     return redirect(url_for('admin'))
 
 
@@ -135,6 +148,7 @@ def item_patch():
         item.description = request.form['team_name']
     if 'presentation_link' in request.form:
         item.description = request.form['presentation_link']
+
     db.session.commit()
     return redirect(url_for('item_detail', item_id=item.id))
 
@@ -151,11 +165,13 @@ def annotator():
             for index, row in enumerate(data):
                 if len(row) != 3:
                     return utils.user_error('Bad data: row %d has %d elements (expecting 3)' % (index + 1, len(row)))
-            for row in data:
-                annotator = Annotator(*row)
-                added.append(annotator)
-                db.session.add(annotator)
-            db.session.commit()
+            def tx():
+                for row in data:
+                    annotator = Annotator(*row)
+                    added.append(annotator)
+                    db.session.add(annotator)
+                db.session.commit()
+            with_retries(tx)
             try:
                 email_invite_links(added)
             except Exception as e:
@@ -169,16 +185,23 @@ def annotator():
     elif action == 'Disable' or action == 'Enable':
         annotator_id = request.form['annotator_id']
         target_state = action == 'Enable'
-        Annotator.by_id(annotator_id).active = target_state
-        db.session.commit()
+        def tx():
+            Annotator.by_id(annotator_id).active = target_state
+            db.session.commit()
+        with_retries(tx)
     elif action == 'Delete':
         annotator_id = request.form['annotator_id']
         try:
-            db.session.execute(ignore_table.delete(ignore_table.c.annotator_id == annotator_id))
-            Annotator.query.filter_by(id=annotator_id).delete()
-            db.session.commit()
+            def tx():
+                db.session.execute(ignore_table.delete(ignore_table.c.annotator_id == annotator_id))
+                Annotator.query.filter_by(id=annotator_id).delete()
+                db.session.commit()
+            with_retries(tx)
         except IntegrityError as e:
-            return utils.server_error(str(e))
+            if isinstance(e.orig, psycopg2.errors.ForeignKeyViolation):
+                return utils.server_error("Judges can't be deleted once they have voted on a project. You can use the 'disable' functionality instead, which has a similar effect, locking out the judge and preventing them from voting on any other projects.")
+            else:
+                return utils.server_error(str(e))
     return redirect(url_for('admin'))
 
 
@@ -309,7 +332,7 @@ def annotator_detail(annotator_id):
 
 
 def annotator_link(annotator):
-    return urllib.parse.urljoin(settings.BASE_URL, url_for('login', secret=annotator.secret))
+        return url_for('login', secret=annotator.secret, _external=True)
 
 
 def email_invite_links(annotators):
@@ -325,4 +348,7 @@ def email_invite_links(annotators):
         body = '\n\n'.join(utils.get_paragraphs(raw_body))
         emails.append((annotator.email, settings.EMAIL_SUBJECT, body))
 
-    utils.send_emails.delay(emails)
+    if settings.USE_SENDGRID and settings.SENDGRID_API_KEY != None:
+        utils.send_sendgrid_emails(emails)
+    else:
+        utils.send_emails.delay(emails)

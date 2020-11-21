@@ -5,7 +5,6 @@
 
 if __name__ == '__main__':
     from gavel import app
-    from gavel.settings import PORT
     import os
 
     extra_files = []
@@ -16,6 +15,6 @@ if __name__ == '__main__':
         app.config['TEMPLATES_AUTO_RELOAD'] = True
     app.run(
         host='0.0.0.0',
-        port=PORT,
+        port=os.environ.get('PORT', 5000),
         extra_files=extra_files
     )
