@@ -206,20 +206,19 @@ def preferred_items(annotator):
     projects.
     """
     ignored_ids = {i.id for i in annotator.ignore}
-
     if ignored_ids:
         available_items = Item.query.filter(
-            (Item.active is True) & (~Item.id.in_(ignored_ids))
+            (Item.active == True) & (~Item.id.in_(ignored_ids))
         ).all()
     else:
-        available_items = Item.query.filter(Item.active is True).all()
+        available_items = Item.query.filter(Item.active == True).all()
 
     prioritized_items = [i for i in available_items if i.prioritized]
 
     items = prioritized_items if prioritized_items else available_items
 
     annotators = Annotator.query.filter(
-        (Annotator.active is True) & (Annotator.next is not None) & (Annotator.updated is not None)
+        (Annotator.active == True) & (Annotator.next != None) & (Annotator.updated != None)
     ).all()
     busy = {i.next.id for i in annotators if \
             (datetime.utcnow() - i.updated).total_seconds() < settings.TIMEOUT * 60}
