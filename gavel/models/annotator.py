@@ -1,4 +1,7 @@
+from typing import List
+
 from gavel.models import db
+import gavel.models
 import gavel.utils as utils
 import gavel.crowd_bt as crowd_bt
 from sqlalchemy.orm.exc import NoResultFound
@@ -44,6 +47,11 @@ class Annotator(db.Model):
             # doesn't re-prioritize the project
             self.updated = datetime.utcnow()
         self.next = new_next
+
+    @property
+    def decisions(self) -> List['gavel.models.Decision']:
+        Decision = gavel.models.Decision
+        return Decision.query.filter(Decision.annotator_id == self.id).all()
 
     @classmethod
     def by_secret(cls, secret):

@@ -18,11 +18,25 @@ from functools import wraps
 from datetime import datetime
 
 
-def requires_open(redirect_to):
+def check_open():
+    return Setting.value_of(SETTING_CLOSED) != SETTING_TRUE
+
+
+def check_active_annotator():
+    current = get_current_annotator()
+    return current and current.active
+
+
+def check_has_decisions():
+    current = get_current_annotator()
+    return current and len(current.decisions) >= 2
+
+
+def requires(predicate, redirect_to):
     def decorator(f):
         @wraps(f)
         def decorated(*args, **kwargs):
-            if Setting.value_of(SETTING_CLOSED) == SETTING_TRUE:
+            if not predicate():
                 return redirect(url_for(redirect_to))
             else:
                 return f(*args, **kwargs)
@@ -30,21 +44,14 @@ def requires_open(redirect_to):
         return decorated
 
     return decorator
+
+
+def requires_open(redirect_to):
+    return requires(check_open, redirect_to)
 
 
 def requires_active_annotator(redirect_to):
-    def decorator(f):
-        @wraps(f)
-        def decorated(*args, **kwargs):
-            annotator = get_current_annotator()
-            if annotator is None or not annotator.active:
-                return redirect(url_for(redirect_to))
-            else:
-                return f(*args, **kwargs)
-
-        return decorated
-
-    return decorator
+    return requires(check_active_annotator, redirect_to)
 
 
 @app.route('/')
@@ -184,13 +191,11 @@ def map():
 
 
 @app.route('/decisions/')
-@requires_open(redirect_to='index')
-@requires_active_annotator(redirect_to='index')
+@requires(check_has_decisions, redirect_to='index')
 def plot_decisions():
     import graphviz
 
     judge = get_current_annotator()
-    decisions = Decision.query.filter(Decision.annotator_id == judge.id).all()
     projects = dict()
     edges = []
 
@@ -203,7 +208,7 @@ def plot_decisions():
     def add_edge(winner: Item, loser: Item):
         edges.append((node_name(winner), node_name(loser)))
 
-    for dec in decisions:  # type: Decision
+    for dec in judge.decisions:
         add_project(dec.winner)
         add_project(dec.loser)
         add_edge(dec.winner, dec.loser)
