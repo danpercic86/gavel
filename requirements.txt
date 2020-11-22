@@ -37,3 +37,4 @@ zipp==0.6.0
 # --- extra requirements
 django-utils2>=2.5.4
 django>=3
+graphviz>=0.15

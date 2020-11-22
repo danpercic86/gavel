@@ -1,3 +1,5 @@
+import io
+
 from gavel import app
 from gavel.models import *
 from gavel.constants import *
@@ -9,7 +11,7 @@ from flask import (
     render_template,
     request,
     session,
-    url_for,
+    url_for, send_file,
 )
 from numpy.random import choice, random, shuffle
 from functools import wraps
@@ -181,6 +183,44 @@ def map():
     )
 
 
+@app.route('/decisions/')
+@requires_open(redirect_to='index')
+@requires_active_annotator(redirect_to='index')
+def plot_decisions():
+    import graphviz
+
+    judge = get_current_annotator()
+    decisions = Decision.query.filter(Decision.annotator_id == judge.id).all()
+    projects = dict()
+    edges = []
+
+    def node_name(it: Item):
+        return f'P{it.id}'
+
+    def add_project(it: Item):
+        projects[node_name(it)] = it.team_name
+
+    def add_edge(winner: Item, loser: Item):
+        edges.append((node_name(winner), node_name(loser)))
+
+    for dec in decisions:  # type: Decision
+        add_project(dec.winner)
+        add_project(dec.loser)
+        add_edge(dec.winner, dec.loser)
+
+    dot = graphviz.Digraph(comment=f'UniHack votes for {judge.name}', graph_attr={'label': '-> means better than'})
+    for proj, team in projects.items():
+        dot.node(proj, team)
+
+    for edge in edges:
+        dot.edge(*edge)
+
+    graph = graphviz.pipe('dot', 'png', dot.source.encode())
+    return send_file(
+        io.BytesIO(graph),
+        mimetype='image/png')
+
+
 @app.route('/welcome/done', methods=['POST'])
 @requires_open(redirect_to='index')
 @requires_active_annotator(redirect_to='index')
@@ -194,7 +234,7 @@ def welcome_done():
     return redirect(url_for('index'))
 
 
-def get_current_annotator():
+def get_current_annotator() -> Annotator:
     return Annotator.by_id(session.get(ANNOTATOR_ID, None))
 
 
