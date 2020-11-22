@@ -224,7 +224,7 @@ def plot_decisions():
     graph = graphviz.pipe('dot', 'png', dot.source.encode())
     return send_file(
         io.BytesIO(graph),
-        mimetype='image/png')@app.route('/decisions/')
+        mimetype='image/png')
 
 
 @app.route('/welcome/done', methods=['POST'])
