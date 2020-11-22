@@ -79,6 +79,7 @@
                 <th scope="col" data-sort-method="caseInsensitiveSort" data-sort-order="desc">Prioritize</th>
                 <th scope="col" data-sort-method="caseInsensitiveSort">Active</th>
                 <th scope="col" class="no-sort">Delete</th>
+                <th scope="col" class="no-sort">Plot</th>
               </tr>
               </thead>
               <tbody>
@@ -123,6 +124,11 @@
                       <input type="submit" name="action" value="Delete" class="btn btn-danger">
                       <input type="hidden" name="item_id" value="{{ item.id }}">
                       <input type="hidden" name="_csrf_token" value="{{ csrf_token() }}">
+                    </form>
+                  </td>
+                  <td class="compact" align="center">
+                    <form action="{{ url_for('plot_decisions_project', item_id=item.id) }}" method="get">
+                      <input type="submit" name="action" value="Decisions plot" class="btn btn-danger">
                     </form>
                   </td>
                 </tr>

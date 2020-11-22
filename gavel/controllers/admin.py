@@ -1,3 +1,5 @@
+import io
+
 import requests
 from django.utils.html import strip_tags
 from sqlalchemy.exc import IntegrityError
@@ -11,7 +13,7 @@ from flask import (
     redirect,
     render_template,
     request,
-    url_for,
+    url_for, send_file,
 )
 import urllib.parse
 import xlrd
@@ -331,8 +333,51 @@ def annotator_detail(annotator_id):
         )
 
 
+@app.route('/admin/project-decisions/<item_id>/')
+@utils.requires_auth
+def plot_decisions_project(item_id):
+    app.logger.info('yoloooo')
+    import graphviz
+
+    item = Item.by_id(item_id)
+    decisions = Decision.query.filter((Decision.winner_id == item_id) | (Decision.loser_id == item_id))
+    projects = dict()
+    edges = []
+
+    def node_name(it: Item):
+        return f'P{it.id}'
+
+    def add_project(it: Item):
+        projects[node_name(it)] = f'"{it.name}" by {it.team_name}'
+
+    def add_edge(winner: Item, loser: Item):
+        edges.append((node_name(winner), node_name(loser)))
+
+    for dec in decisions:
+        add_project(dec.winner)
+        add_project(dec.loser)
+        add_edge(dec.winner, dec.loser)
+
+    title = f'UniHack votes for project {item.name}'
+    dot = graphviz.Digraph(comment=title, graph_attr={'label': f'{title}, A -> B means A is better than B'})
+    for proj, team in projects.items():
+        if proj == node_name(item):
+            node_kwargs = {'fillcolor': 'red', 'color': 'red', 'style': 'filled'}
+        else:
+            node_kwargs = {}
+        dot.node(proj, team, **node_kwargs)
+
+    for edge in edges:
+        dot.edge(*edge)
+
+    graph = graphviz.pipe('dot', 'png', dot.source.encode())
+    return send_file(
+        io.BytesIO(graph),
+        mimetype='image/png')
+
+
 def annotator_link(annotator):
-        return url_for('login', secret=annotator.secret, _external=True)
+    return url_for('login', secret=annotator.secret, _external=True)
 
 
 def email_invite_links(annotators):

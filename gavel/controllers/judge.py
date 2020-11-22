@@ -203,7 +203,7 @@ def plot_decisions():
         return f'P{it.id}'
 
     def add_project(it: Item):
-        projects[node_name(it)] = it.team_name
+        projects[node_name(it)] = f'{it.name} -- {it.team_name}'
 
     def add_edge(winner: Item, loser: Item):
         edges.append((node_name(winner), node_name(loser)))
@@ -213,7 +213,8 @@ def plot_decisions():
         add_project(dec.loser)
         add_edge(dec.winner, dec.loser)
 
-    dot = graphviz.Digraph(comment=f'UniHack votes for {judge.name}', graph_attr={'label': '-> means better than'})
+    title = f'UniHack votes from judge {judge.name}'
+    dot = graphviz.Digraph(comment=title, graph_attr={'label': f'{title}, A -> B means A is better than B'})
     for proj, team in projects.items():
         dot.node(proj, team)
 
@@ -223,7 +224,7 @@ def plot_decisions():
     graph = graphviz.pipe('dot', 'png', dot.source.encode())
     return send_file(
         io.BytesIO(graph),
-        mimetype='image/png')
+        mimetype='image/png')@app.route('/decisions/')
 
 
 @app.route('/welcome/done', methods=['POST'])
