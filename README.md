@@ -1,4 +1,4 @@
-<img src="https://raw.githubusercontent.com/anishathalye/gavel/docs/banner.png" width="450" height="150" alt="Gavel banner">
+<img src="https://raw.githubusercontent.com/anishathalye/assets/master/gavel/banner.png" width="450" alt="Gavel banner">
 
 **Gavel** is a project expo judging system.
 
@@ -9,13 +9,11 @@ been used by [dozens][users] of other events since then.
 It only takes a minute, and knowing that Gavel is helping real events helps
 keep us going <3**
 
-[![Join the chat at https://gitter.im/anishathalye/gavel](https://badges.gitter.im/anishathalye/gavel.svg)](https://gitter.im/anishathalye/gavel?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
-
 ## Demo
 
 <p align="center">
     <a href="http://www.anishathalye.com/2016/09/19/gavel-an-expo-judging-system/">
-        <img src="https://raw.githubusercontent.com/anishathalye/gavel/docs/screenshot.png" width="320" height="568" alt="Gavel screenshot">
+        <img src="https://raw.githubusercontent.com/anishathalye/assets/master/gavel/screenshot.png" width="320" alt="Gavel screenshot">
     </a>
 </p>
 
@@ -77,9 +75,15 @@ that Gavel does not preserve database schema compatibility between versions.**
 
 In order to send emails, you'll need to install Redis.
 
-When testing, you can run the app with `python runserver.py`. In production,
-you should use something like [Gunicorn][gunicorn] to serve this. You can run
-the app with `gunicorn -b :<PORT> -w <number of workers> gavel:app`.
+When testing, you can run the app with `python runserver.py`.
+
+In production, you should use something like [Gunicorn][gunicorn] to serve
+this. You can run the app with `gunicorn -b :<PORT> -w <number of workers>
+gavel:app`. This is sufficient if you want to serve Gavel under its own domain
+(e.g. `judging.example.com`). If you are serving Gavel under a subpath, e.g.
+`example.com/judging`, you need to set the `SCRIPT_NAME` environment variable
+(e.g. by passing `-e SCRIPT_NAME=/judging` to Gunicorn). If you are running
+Gavel behind a proxy server, be sure to set `PROXY=true` in Gavel's settings.
 
 For sending emails, you'll also need to start a celery worker with `celery -A
 gavel:celery worker`.
@@ -168,7 +172,7 @@ If you use Gavel in any way in academic work, please cite the following:
 
 ## License
 
-Copyright (c) 2015-2017 Anish Athalye. Released under AGPLv3. See
+Copyright (c) 2015-2021 Anish Athalye. Released under AGPLv3. See
 [LICENSE.txt][license] for details.
 
 [blog-1]: http://www.anishathalye.com/2015/03/07/designing-a-better-judging-system/

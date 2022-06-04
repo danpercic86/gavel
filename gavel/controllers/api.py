@@ -1,12 +1,13 @@
 from gavel import app
 from gavel.models import *
-from gavel.constants import *
 import gavel.settings as settings
 import gavel.utils as utils
 import json
-from flask import ( Response, request)
+from flask import (Response, request)
+
 
 @app.route('/api/items.csv')
+@app.route('/api/projects.csv')
 @utils.requires_auth
 def item_dump():
     items = Item.query.order_by(desc(Item.mu)).all()
@@ -21,7 +22,9 @@ def item_dump():
     ] for item in items]
     return Response(utils.data_to_csv_string(data), mimetype='text/csv')
 
+
 @app.route('/api/annotators.csv')
+@app.route('/api/judges.csv')
 @utils.requires_auth
 def annotator_dump():
     annotators = Annotator.query.all()
@@ -33,6 +36,7 @@ def annotator_dump():
         a.secret
     ] for a in annotators]
     return Response(utils.data_to_csv_string(data), mimetype='text/csv')
+
 
 @app.route('/api/decisions.csv')
 @utils.requires_auth
@@ -47,22 +51,23 @@ def decisions_dump():
     ] for d in decisions]
     return Response(utils.data_to_csv_string(data), mimetype='text/csv')
 
+
 @app.route('/api/submissions.json')
 def item_json_dump():
-
     if not request.args['key'] == settings.API_KEY:
-        return Response(json.dumps({'error' : 'Invalid api key.'}), mimetype='application/json')
+        return Response(json.dumps({'error': 'Invalid api key.'}),
+                        mimetype='application/json')
 
     items = Item.query.order_by(desc(Item.mu)).all()
     data = []
     data += [{
-        'description'   : item.description.strip(),
-        'id'            : item.id,
-        'mu'            : str(item.mu).strip(),
-        'sigma Squared' : str(item.sigma_sq).strip(),
-        'location'      : item.location.strip(),
-        'active'        : item.active,
-        'name'          : item.name.strip(),
-        'teamId'          : item.identifier.strip()
+        'description': item.description.strip(),
+        'id': item.id,
+        'mu': str(item.mu).strip(),
+        'sigma Squared': str(item.sigma_sq).strip(),
+        'location': item.location.strip(),
+        'active': item.active,
+        'name': item.name.strip(),
+        'teamId': item.identifier.strip()
     } for item in items]
     return Response(json.dumps(data), mimetype='application/json')

@@ -48,8 +48,9 @@
   <div class="banner pt-4" id="vote-header">
     <h1 class="rotate90">&#10095;</h1>
   </div>
+
   <div class="info">
-    <form action="/vote" method="post">
+    <form action="{{ url_for('vote') }}" method="post">
       <p class="center">Which one is better?</p>
       <label for="vote-previous" class="label-team">{{ prev.name }}</label>
       <input type="radio" name="action" value="Previous" id="vote-previous" class="button-left input-team">
@@ -65,6 +66,8 @@
       <input type="hidden" name="next_id" value="{{ next.id }}">
       <input type="hidden" name="_csrf_token" value="{{ csrf_token() }}">
     </form>
+
+    <script src="{{ url_for('static', filename='js/smart-button-toggle.js') }}"></script>
   </div>
 </div>
 <div class="progress-bar">

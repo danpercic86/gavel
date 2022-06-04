@@ -163,6 +163,15 @@ hr {
   }
 }
 
+.api-link {
+  text-align: center;
+  margin-top: 1rem;
+  font-size: 1.2rem;
+  a {
+    color: $link-color;
+  }
+}
+
 .compact {
   padding: 0 0;
 }
@@ -201,6 +210,22 @@ hr {
 
 
 
+input[type=submit] {
+  color: $light;
+  background-color: $dark;
+  border: 2px solid $dark;
+  font-size: 1.2rem;
+  text-transform: uppercase;
+  text-align: center;
+  height: 3rem;
+  -webkit-border-radius: 0; // fix rounded buttons on iOS
+  td & {
+    border: none;
+    width: 100%;
+    height: 100%;
+  }
+}
+
 .button-left {
   float: left;
   width: 48%;
@@ -221,10 +246,57 @@ hr {
 
 #vote-previous {
   background-color: $previous-color;
+  border: 3px solid $previous-color;
 }
 
 #vote-current {
   background-color: $current-color;
+  border: 3px solid $current-color;
+}
+
+#vote-continue {
+  background-color: $current-color;
+  border: 3px solid $current-color;
+}
+
+#vote-skip {
+  background-color: $vote-skip-color;
+  border: 3px solid $vote-skip-color;
+}
+
+#vote-submit {
+  background-color: $vote-submit-color;
+}
+
+#vote-submit:disabled {
+  background-color: $light-grey;
+  border: none;
+}
+
+.radio-button {
+  display: inline-block;
+}
+
+.radio-button > input {
+  opacity: 0;
+  position: fixed;
+  width: 0;
+}
+
+.radio-button > label {
+  display: inline-block;
+  padding: 10px 20px;
+  width: 100%;
+  color: $light;
+  font-size: 1.2rem;
+  font-weight: bold;
+  text-transform: uppercase;
+  text-align: center;
+}
+
+.radio-button > input:not(:checked) + label {
+  background-color: white;
+  color: $dark;
 }
 
 input[type=submit].positive {
