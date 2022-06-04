@@ -1,9 +1,12 @@
-from gavel import app
-from gavel.models import *
-import gavel.settings as settings
-import gavel.utils as utils
 import json
+
 from flask import (Response, request)
+from sqlalchemy import desc
+
+import gavel.utils as utils
+from gavel import app, settings
+from gavel.controllers.admin import import_projects, annotator_link
+from gavel.models import Item, Annotator, Decision, db
 
 
 @app.route('/api/items.csv')
@@ -53,6 +56,7 @@ def decisions_dump():
 
 
 @app.route('/api/submissions.json')
+@utils.requires_auth
 def item_json_dump():
     if not request.args['key'] == settings.API_KEY:
         return Response(json.dumps({'error': 'Invalid api key.'}),
@@ -71,3 +75,28 @@ def item_json_dump():
         'teamId': item.identifier.strip()
     } for item in items]
     return Response(json.dumps(data), mimetype='application/json')
+
+
+@app.route('/api/import-projects', methods=['POST'])
+@utils.requires_auth
+def trigger_import_projects():
+    import_projects()
+    return Response(status=204)
+
+
+@app.route('/api/register-judge', methods=['POST'])
+@utils.requires_auth
+def register_judge():
+    name = request.form['name']
+    email = request.form['email']
+    description = request.form.get('description', None) or ''
+
+    if Annotator.query.filter(Annotator.email == email).first():
+        return Response(f"judge {email} already exists", status=409)
+
+    judge = Annotator(name, email, description)
+    db.session.add(judge)
+    db.session.commit()
+
+    response = {'loginUrl': annotator_link(judge)}
+    return Response(json.dumps(response), mimetype='application/json')

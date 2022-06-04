@@ -1,3 +1,4 @@
+import io
 import json
 from typing import List
 
@@ -9,7 +10,7 @@ from flask import (
     redirect,
     render_template,
     request,
-    url_for,
+    url_for, send_file,
 )
 from sqlalchemy.exc import IntegrityError
 
@@ -17,7 +18,7 @@ import gavel.settings as settings
 import gavel.stats as stats
 import gavel.utils as utils
 from gavel import app
-from gavel.constants import SETTING_CLOSED, SETTING_TRUE, SETTING_FALSE, IMPORT_URL
+from gavel.constants import SETTING_CLOSED, SETTING_TRUE, SETTING_FALSE
 from gavel.models import Annotator, Item, Decision, Setting, db, with_retries, \
     ignore_table
 
@@ -78,9 +79,9 @@ def item_actions():
         if data:
             # validate data
             for index, row in enumerate(data):
-                if len(row) != 4:
+                if len(row) != 6:
                     return utils.user_error(
-                        'Bad data: row %d has %d elements (expecting 4)' % (
+                        'Bad data: row %d has %d elements (expecting 6)' % (
                             index + 1, len(row)))
 
             def tx():
@@ -128,8 +129,7 @@ def item_actions():
 
 
 def allowed_file(filename):
-    return '.' in filename and \
-           filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
+    return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
 
 
 def parse_upload_form():
@@ -164,6 +164,11 @@ def item_patch():
             item.name = request.form['name']
         if 'description' in request.form:
             item.description = request.form['description']
+
+    if 'team_name' in request.form:
+        item.description = request.form['team_name']
+    if 'presentation_link' in request.form:
+        item.description = request.form['presentation_link']
         db.session.commit()
 
     with_retries(tx)
@@ -233,6 +238,49 @@ def annotator_actions():
     return redirect(url_for('admin'))
 
 
+def import_projects():
+    response = requests.get(settings.IMPORT_URL)
+    data = json.loads(response.content.decode('utf-8'))
+    if isinstance(data, dict) and 'data' in data:
+        data = data['data']
+
+    for item in data:
+        if '_id' not in item:
+            print("no id...", item)
+            continue
+        if 'teamName' not in item:
+            print("no team name...", item)
+            continue
+
+        name = strip_tags(item.get('name', None) or '')
+        location = strip_tags(item.get('location', None) or '')
+
+        if not name or not location:
+            print("Project has no name...", item)
+            continue
+
+        description = strip_tags(item.get('description', None) or '') or '...'
+        team_name = strip_tags(item.get('teamName', None) or '') or '...'
+        presentation_link = strip_tags(
+            item.get('presentationLink', None) or '') or '...'
+
+        existing = Item.by_identifier(item['_id'])
+        if existing is None:
+            _item = Item(name, location, description, item['_id'], team_name,
+                         presentation_link)
+            print("insert", item['_id'])
+            db.session.add(_item)
+        else:
+            existing.name = name
+            existing.location = location
+            existing.description = description
+            existing.team_name = team_name
+            existing.presentation_link = presentation_link
+            print("update", item['_id'])
+
+    db.session.commit()
+
+
 @app.route('/admin/setting', methods=['POST'])
 @utils.requires_auth
 def setting():
@@ -264,23 +312,8 @@ def setting():
         Item.query.delete()
         db.session.commit()
     if action == 'import-teams':
-        response = requests.get(IMPORT_URL)
-        data = json.loads(response.content.decode('utf-8'))
+        import_projects()
 
-        for item in data:
-            print('identifier' + item['_id'])
-            exiting_item = Item.by_identifier(item['_id'])
-            if exiting_item is None:
-                if 'name' in item and 'location' in item:
-                    description = '...'
-                    if 'description' in item and item['description'] is not None:
-                        description = strip_tags(item['description'])
-                    _item = Item(strip_tags(item['name']), strip_tags(item['location']),
-                                 description, item['_id'])
-                    print('created')
-                    print(_item)
-                    db.session.add(_item)
-        db.session.commit()
     return redirect(url_for('admin'))
 
 
@@ -331,6 +364,51 @@ def annotator_detail(annotator_id):
             seen=seen,
             skipped=skipped
         )
+
+
+@app.route('/admin/project-decisions/<item_id>/')
+@utils.requires_auth
+def plot_decisions_project(item_id):
+    app.logger.info('yoloooo')
+    import graphviz
+
+    item = Item.by_id(item_id)
+    decisions = Decision.query.filter(
+        (Decision.winner_id == item_id) | (Decision.loser_id == item_id))
+    projects = dict()
+    edges = []
+
+    def node_name(it: Item):
+        return f'P{it.id}'
+
+    def add_project(it: Item):
+        projects[node_name(it)] = f'"{it.name}" by {it.team_name}'
+
+    def add_edge(winner: Item, loser: Item):
+        edges.append((node_name(winner), node_name(loser)))
+
+    for dec in decisions:
+        add_project(dec.winner)
+        add_project(dec.loser)
+        add_edge(dec.winner, dec.loser)
+
+    title = f'HackTM votes for project {item.name}'
+    dot = graphviz.Digraph(comment=title, graph_attr={
+        'label': f'{title}, A -> B means A is better than B'})
+    for proj, team in projects.items():
+        if proj == node_name(item):
+            node_kwargs = {'fillcolor': 'red', 'color': 'red', 'style': 'filled'}
+        else:
+            node_kwargs = {}
+        dot.node(proj, team, **node_kwargs)
+
+    for edge in edges:
+        dot.edge(*edge)
+
+    graph = graphviz.pipe('dot', 'png', dot.source.encode())
+    return send_file(
+        io.BytesIO(graph),
+        mimetype='image/png')
 
 
 def annotator_link(annotator):

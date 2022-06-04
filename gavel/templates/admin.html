@@ -1,334 +1,438 @@
 {% extends "layout.html" %}
 {% block title %}Admin{% endblock %}
 {% block content %}
-<div class="container-fluid">
-<div class="py-2 text-center">
-  <strong>Gavel</strong> - project expo judging system
-</div>
-<ul class="nav nav-tabs" id="myTab" role="tablist">
-  <li class="nav-item">
-    <a class="nav-link active" id="dashboard-tab" data-toggle="tab" href="#dashboard" role="tab" aria-controls="home" aria-selected="true">Dashboard</a>
-  </li>
-  <li class="nav-item">
-    <a class="nav-link" id="projects-tab" data-toggle="tab" href="#projects" role="tab" aria-controls="projects" aria-selected="false">Projects</a>
-  </li>
-  <li class="nav-item">
-    <a class="nav-link" id="judges-tab" data-toggle="tab" href="#judges" role="tab" aria-controls="judges" aria-selected="false">Judges</a>
-  </li>
-  <li class="nav-item">
-    <a class="nav-link" id="settings-tab" data-toggle="tab" href="#settings" role="tab" aria-controls="settings" aria-selected="false">Settings</a>
-  </li>
-</ul>
-<div class="tab-content" id="myTabContent">
-  <div class="tab-pane fade show active" id="dashboard" role="tabpanel" aria-labelledby="dashboard-tab">
-      <div class="item">
+  <div class="container-fluid">
+    <div class="py-2 text-center">
+      <strong>Gavel</strong> - project expo judging system
+    </div>
+    <ul class="nav nav-tabs" id="myTab" role="tablist">
+      <li class="nav-item">
+        <a class="nav-link active" id="dashboard-tab" data-toggle="tab"
+           href="#dashboard" role="tab" aria-controls="home" aria-selected="true">Dashboard</a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link" id="projects-tab" data-toggle="tab" href="#projects"
+           role="tab" aria-controls="projects" aria-selected="false">Projects</a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link" id="judges-tab" data-toggle="tab" href="#judges" role="tab"
+           aria-controls="judges" aria-selected="false">Judges</a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link" id="settings-tab" data-toggle="tab" href="#settings"
+           role="tab" aria-controls="settings" aria-selected="false">Settings</a>
+      </li>
+    </ul>
+    <div class="tab-content" id="myTabContent">
+      <div class="tab-pane fade show active" id="dashboard" role="tabpanel"
+           aria-labelledby="dashboard-tab">
+        <div class="item">
 
-      <div class="info">
-        <h2>Stats</h2>
-        <div class="row">
-          <div class="col-sm-3">
-          <div class="card" style="width: 18rem;">
-            <div class="card-body">
-              <h5 class="card-title">Votes</h5>
-              <h6 class="card-subtitle mb-2 text-muted">{{ votes }}</h6>
-            </div>
-          </div>
-            </div>
-          <div class="col-sm-3">
-          <div class="card" style="width: 18rem;">
-            <div class="card-body">
-              <h5 class="card-title">Projects</h5>
-              <h6 class="card-subtitle mb-2 text-muted">{{ items|length }}</h6>
-            </div>
-          </div>
-            </div>
-            <div class="col-sm-3">
-          <div class="card" style="width: 18rem;">
-            <div class="card-body">
-              <h5 class="card-title">Judges</h5>
-              <h6 class="card-subtitle mb-2 text-muted">{{ annotators|length }}</h6>
-            </div>
-          </div>
+          <div class="info">
+            <h2>Stats</h2>
+            <div class="row">
+              <div class="col-sm-3">
+                <div class="card" style="width: 18rem;">
+                  <div class="card-body">
+                    <h5 class="card-title">Votes</h5>
+                    <h6 class="card-subtitle mb-2 text-muted">{{ votes }}</h6>
+                  </div>
+                </div>
               </div>
+              <div class="col-sm-3">
+                <div class="card" style="width: 18rem;">
+                  <div class="card-body">
+                    <h5 class="card-title">Projects</h5>
+                    <h6 class="card-subtitle mb-2 text-muted">{{ items|length }}</h6>
+                  </div>
+                </div>
+              </div>
+              <div class="col-sm-3">
+                <div class="card" style="width: 18rem;">
+                  <div class="card-body">
+                    <h5 class="card-title">Judges</h5>
+                    <h6
+                      class="card-subtitle mb-2 text-muted">{{ annotators|length }}</h6>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="tab-pane fade" id="projects" role="tabpanel"
+           aria-labelledby="projects-tab">
+
+        <div class="item">
+
+          <div class="info">
+            <h2>Projects</h2>
+            <table id="items" class="table table-bordered">
+              <thead class="thead-dark">
+              <tr>
+                <th scope="col" data-sort-method="number">Id</th>
+                <th scope="col" data-sort-method="caseInsensitiveSort">Team name</th>
+                <th scope="col" data-sort-method="caseInsensitiveSort">Name</th>
+                <th scope="col" data-sort-method="caseInsensitiveSort">Presentation
+                  link
+                </th>
+                {% if items and items.0.location %}
+                  <th scope="col" data-sort-method="caseInsensitiveSort">Location</th>
+                {% endif %}
+                <th scope="col" data-sort-method="caseInsensitiveSort">Description</th>
+                <th scope="col" class="sort-default" data-sort-method="number"
+                    data-sort-order="desc">Mu
+                </th>
+                <th scope="col" data-sort-method="number">Sigma Squared</th>
+                <th scope="col" data-sort-method="number">Votes</th>
+                <th scope="col" data-sort-method="number">Seen</th>
+                <th scope="col" data-sort-method="number" data-sort-order="desc">
+                  Skipped
+                </th>
+                <th scope="col" data-sort-method="caseInsensitiveSort"
+                    data-sort-order="desc">Prioritize
+                </th>
+                <th scope="col" data-sort-method="caseInsensitiveSort">Active</th>
+                <th scope="col" class="no-sort">Delete</th>
+                <th scope="col" class="no-sort">Plot</th>
+              </tr>
+              </thead>
+              <tbody>
+              {% for item in items %}
+                <tr class="
+                  {{ 'disabled' if not item.active else ('prioritized' if item.prioritized else '') }}">
+                  <td><a href="{{ url_for('item_detail', item_id=item.id) }}"
+                         class="colored">{{ item.id }}</a></td>
+                  <td>{{ item.team_name }}</td>
+                  <td>{{ item.name }}</td>
+                  <td><a href="{{ item.presentation_link }}"
+                         target="_blank">{{ item.presentation_link }}</a></td>
+                  {% if item.location %}
+                    <td>{{ item.location }}</td>
+                  {% endif %}
+                  <td class="preserve-formatting"><p id="project-{{ item.id }}"
+                                                     class="collapse">{{ item.description }}</p>
+                    <a href="#"
+                       class="btn"
+                       data-toggle="collapse"
+                       data-target="#project-{{ item.id }}">show</a>
+                  </td>
+                  <td>{{ item.mu | round(4) }}</td>
+                  <td>{{ item.sigma_sq | round(4) }}</td>
+                  <td>{{ item_counts.get(item.id, 0) }}</td>
+                  <td>{{ item.viewed | length }}</td>
+                  <td>{{ skipped.get(item.id, 0) }}</td>
+                  <td class="compact" data-sort="{{ item.prioritized }}" align="center">
+                    <form action="/admin/item" method="post">
+                      <input type="submit" name="action"
+                             value="{{ 'Prioritize' if not item.prioritized else 'Cancel' }}"
+                             class="btn {{ 'btn-success' if not item.prioritized else 'btn-danger' }}">
+                      <input type="hidden" name="item_id" value="{{ item.id }}">
+                      <input type="hidden" name="_csrf_token"
+                             value="{{ csrf_token() }}">
+                    </form>
+                  </td>
+                  <td class="compact" data-sort="{{ item.active }}" align="center">
+                    <form action="/admin/item" method="post">
+                      <input type="submit" name="action"
+                             value="{{ 'Disable' if item.active else 'Enable' }}"
+                             class="btn {{ 'btn-danger' if item.active else 'btn-success' }}">
+                      <input type="hidden" name="item_id" value="{{ item.id }}">
+                      <input type="hidden" name="_csrf_token"
+                             value="{{ csrf_token() }}">
+                    </form>
+                  </td>
+                  <td class="compact" align="center">
+                    <form action="/admin/item" method="post">
+                      <input type="submit" name="action" value="Delete"
+                             class="btn btn-danger">
+                      <input type="hidden" name="item_id" value="{{ item.id }}">
+                      <input type="hidden" name="_csrf_token"
+                             value="{{ csrf_token() }}">
+                    </form>
+                  </td>
+                  <td class="compact" align="center">
+                    <form
+                      action="{{ url_for('plot_decisions_project', item_id=item.id) }}"
+                      method="get">
+                      <input type="submit" name="action" value="Decisions plot"
+                             class="btn btn-danger">
+                    </form>
+                  </td>
+                </tr>
+              {% endfor %}
+              </tbody>
+            </table>
+          </div>
+        </div>
+        <div>
+          <div class="info col-md-6 col-sm-12">
+            <div class="card">
+              <div class="card-body">
+                <h5 class="card-title">Add Projects</h5>
+                <div class="card-subtitle mb-2 text-muted">
+                  <form action="/admin/item" method="post" id="item_form"
+                        enctype="multipart/form-data">
+                    <div class="form-group">
+                      <textarea id="projects-data" name="data" form="item_form"
+                                class="form-control" aria-describedby="projectsHelp"
+                                placeholder="Facebook, table 2, social network, 5ca7768baad15300167dced1, Facebook, https://youtube.com;"></textarea>
+                      <small id="projectsHelp" class="form-text text-muted">Add name,
+                        location,
+                        description, identifier, team_name, presentation_link (CSV
+                        format in this order)</small>
+                    </div>
+                    <div class="form-group">
+                      <div class="upload-container">
+                        <input id="projects-file" class="form-control"
+                               aria-describedby="projectsFileHelp" type="file"
+                               name="file"
+                               accept=".csv,.xls,.xlsx">
+                        <small id="projectsFileHelp" class="field">Or upload a file
+                          here</small>
+                      </div>
+                    </div>
+                    <input type="submit" name="action" value="Submit"
+                           class="btn btn-primary">
+                    <input type="hidden" name="_csrf_token" value="{{ csrf_token() }}">
+                  </form>
+                </div>
+              </div>
+            </div>
+
+          </div>
+        </div>
+      </div>
+      <div class="tab-pane fade" id="judges" role="tabpanel"
+           aria-labelledby="judges-tab">
+        <div class="item">
+          <div class="info">
+            <h2>Judges</h2>
+            <table id="annotators" class="table table-bordered">
+              <thead class="thead-dark">
+              <tr>
+                <th scope="col" class="sort-default" data-sort-method="number">Id</th>
+                <th scope="col" data-sort-method="caseInsensitiveSort">Name</th>
+                <th scope="col" data-sort-method="caseInsensitiveSort">Email</th>
+                <th scope="col" data-sort-method="caseInsensitiveSort">Description</th>
+                <th scope="col" data-sort-method="number">Votes</th>
+                <th scope="col" data-sort-method="number">Next (Id)</th>
+                <th scope="col" data-sort-method="number">Previous (Id)</th>
+                <th scope="col" data-sort-method="number" data-sort-order="desc">
+                  Updated
+                </th>
+                <th scope="col" class="no-sort">Email</th>
+                <th scope="col" data-sort-method="caseInsensitiveSort">Active</th>
+                <th scope="col" class="no-sort">Delete</th>
+              </tr>
+              </thead>
+              <tbody>
+              {% for annotator in annotators %}
+                <tr class="{{ 'disabled' if not annotator.active else '' }}">
+                  <td><a
+                    href="{{ url_for('annotator_detail', annotator_id=annotator.id) }}"
+                    class="colored">{{ annotator.id }}</a></td>
+                  <td>{{ annotator.name }}</td>
+                  <td>{{ annotator.email }}</td>
+                  <td>{{ annotator.description }}</td>
+                  <td>{{ counts.get(annotator.id, 0) }}</td>
+                  <td
+                    data-sort="{{ annotator.next_id or -1 }}">{{ annotator.next_id }}</td>
+                  <td
+                    data-sort="{{ annotator.prev_id or -1 }}">{{ annotator.prev_id }}</td>
+                  <td
+                    data-sort="{{ annotator.updated | utcdatetime_epoch }}">{{ annotator.updated | utcdatetime_local }}</td>
+                  <td class="compact">
+                    <form action="/admin/annotator" method="post">
+                      <input type="submit" name="action" value="Email"
+                             class="btn btn-warning">
+                      <input type="hidden" name="annotator_id"
+                             value="{{ annotator.id }}">
+                      <input type="hidden" name="_csrf_token"
+                             value="{{ csrf_token() }}">
+                    </form>
+                  </td>
+                  <td class="compact" data-sort="{{ annotator.active }}">
+                    <form action="/admin/annotator" method="post">
+                      <input type="submit" name="action"
+                             value="{{ 'Disable' if annotator.active else 'Enable' }}"
+                             class="btn {{ 'btn-danger' if annotator.active else 'btn-success' }}">
+                      <input type="hidden" name="annotator_id"
+                             value="{{ annotator.id }}">
+                      <input type="hidden" name="_csrf_token"
+                             value="{{ csrf_token() }}">
+                    </form>
+                  </td>
+                  <td class="compact">
+                    <form action="/admin/annotator" method="post">
+                      <input type="submit" name="action" value="Delete"
+                             class="btn btn-danger">
+                      <input type="hidden" name="annotator_id"
+                             value="{{ annotator.id }}">
+                      <input type="hidden" name="_csrf_token"
+                             value="{{ csrf_token() }}">
+                    </form>
+                  </td>
+                </tr>
+              {% endfor %}
+              </tbody>
+            </table>
+          </div>
+        </div>
+        <div class="item">
+          <div class="info col-md-6 col-sm-12">
+            <div class="card">
+              <div class="card-body">
+                <h5>Add Judges</h5>
+                <div class="card-subtitle mb-2 text-muted">
+                  <form action="/admin/annotator" method="post" id="annotator_form"
+                        enctype="multipart/form-data">
+                    <div class="form-group">
+                      <textarea name="data" form="annotator_form" class="form-control"
+                                aria-describedby="annotatorHelp"
+                                placeholder="Adrian, adrian@banatit.ro, Fullstack developer;"></textarea>
+                      <small id="annotatorHelp" class="form-text text-muted">Add name,
+                        email, description (CSV format)</small>
+                    </div>
+                    <div class="form-group">
+                      <div class="upload-container">
+                        <input id="annotatorFile" class="form-control"
+                               aria-describedby="annotatorFileHelp" type="file"
+                               name="file"
+                               accept=".csv,.xls,.xlsx">
+                        <small id="annotatorFileHelp" class="field">Or upload a file
+                          here</small>
+                      </div>
+                    </div>
+                    <input type="submit" name="action" value="Submit"
+                           class="btn btn-primary">
+                    <input type="hidden" name="_csrf_token" value="{{ csrf_token() }}">
+                  </form>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="tab-pane fade" id="settings" role="tabpanel"
+           aria-labelledby="settings-tab">
+        <div class="item">
+          <div class="info">
+            <h2>Global Settings</h2>
+            <table class="table table-bordered">
+              <thead class="thead-dark">
+              <tr>
+                <th scope="col">Setting</th>
+                <th scope="col">Edit</th>
+              </tr>
+              </thead>
+              <tbody>
+              <tr class="{{ 'disabled' if setting_closed else '' }}">
+                <td>Voting status</td>
+                <td class="compact">
+                  <form action="/admin/setting" method="post">
+                    <input type="submit" name="voting-status"
+                           value="{{ 'Open' if setting_closed else 'Close' }}"
+                           class="btn {{ 'btn-success' if setting_closed else 'btn-danger' }}">
+                    <input type="hidden" name="action" value="update-voting-status">
+                    <input type="hidden" name="_csrf_token" value="{{ csrf_token() }}">
+                  </form>
+                </td>
+              </tr>
+              <tr>
+                <td>Time per project</td>
+                <td class="compact">
+                  <form action="/admin/setting" method="post">
+                    <input type="input" name="time-per-project"
+                           value="{{ time_per_project }}"/>
+                    <input type="submit" value="Update" class="btn btn-success">
+                    <input type="hidden" name="action" value="update-time-per-project">
+                    <input type="hidden" name="_csrf_token" value="{{ csrf_token() }}">
+                  </form>
+                </td>
+              </tr>
+              <tr>
+                <td>Max time per project / general alert starts</td>
+                <td class="compact">
+                  <form action="/admin/setting" method="post">
+                    <input type="input" name="max-time-per-project"
+                           value="{{ max_time_per_project }}"/>
+                    <input type="submit" value="Update" class="btn btn-success">
+                    <input type="hidden" name="action"
+                           value="update-max-time-per-project">
+                    <input type="hidden" name="_csrf_token" value="{{ csrf_token() }}">
+                  </form>
+                </td>
+              </tr>
+              <tr>
+                <td>Jury end datetime - Remmeber to substract -2 hours for EEST
+                  timezone
+                </td>
+                <td class="compact">
+                  <form action="/admin/setting" method="post">
+                    {% if jury_end %}
+                      <input type="input" name="jury-end-datetime"
+                             value="{{ jury_end }}"/>
+                    {% else %}
+                      <input type="input" name="jury-end-datetime"
+                             value="2020-11-18T22:00:00"/>
+                    {% endif %}
+                    <input type="submit" value="Update" class="btn btn-success">
+                    <input type="hidden" name="action" value="update-jury-end">
+                    <input type="hidden" name="_csrf_token" value="{{ csrf_token() }}">
+                  </form>
+                </td>
+              </tr>
+              <tr>
+                <td>Import teams</td>
+                <td class="compact">
+                  <form action="/admin/setting" method="post">
+                    <input type="submit" value="Import" class="btn btn-success">
+                    <input type="hidden" name="action" value="import-teams">
+                    <input type="hidden" name="_csrf_token" value="{{ csrf_token() }}">
+                  </form>
+                </td>
+              </tr>
+              <tr>
+                <td>Delete All Skips</td>
+                <td class="compact">
+                  <form action="/admin/setting" method="post">
+                    <input type="submit" value="Delete Skips" class="btn btn-danger">
+                    <input type="hidden" name="action" value="delete-skips">
+                    <input type="hidden" name="_csrf_token" value="{{ csrf_token() }}">
+                  </form>
+                </td>
+              </tr>
+              <tr>
+                <td>Wipe Data</td>
+                <td class="compact">
+                  <form action="/admin/setting" method="post">
+                    <input type="submit" value="Wipe All Data" class="btn btn-danger">
+                    <input type="hidden" name="action" value="wipe-data">
+                    <input type="hidden" name="_csrf_token" value="{{ csrf_token() }}">
+                  </form>
+                </td>
+              </tr>
+              </tbody>
+            </table>
+          </div>
         </div>
       </div>
     </div>
   </div>
-  <div class="tab-pane fade" id="projects" role="tabpanel" aria-labelledby="projects-tab">
-
-    <div class="item">
-
-      <div class="info">
-        <h2>Projects</h2>
-        <table id="items" class="table table-bordered">
-          <thead class="thead-dark">
-          <tr>
-            <th scope="col" data-sort-method="number">Id</th>
-            <th scope="col" data-sort-method="caseInsensitiveSort">Name</th>
-            <th scope="col" data-sort-method="caseInsensitiveSort">Location</th>
-            <th scope="col" data-sort-method="caseInsensitiveSort">Description</th>
-            <th scope="col" class="sort-default" data-sort-method="number" data-sort-order="desc">Mu</th>
-            <th scope="col" data-sort-method="number">Sigma Squared</th>
-            <th scope="col" data-sort-method="number">Votes</th>
-            <th scope="col" data-sort-method="number">Seen</th>
-            <th scope="col" data-sort-method="number" data-sort-order="desc">Skipped</th>
-            <th scope="col" data-sort-method="caseInsensitiveSort" data-sort-order="desc">Prioritize</th>
-            <th scope="col" data-sort-method="caseInsensitiveSort">Active</th>
-            <th scope="col" class="no-sort">Delete</th>
-          </tr>
-          </thead>
-          <tbody>
-          {% for item in items %}
-          <tr class="{{ 'disabled' if not item.active else 'prioritized' if item.prioritized else '' }}">
-            <td><a href="{{ url_for('item_detail', item_id=item.id) }}" class="colored">{{ item.id }}</a></td>
-            <td>{{ item.name }}</td>
-            <td>{{ item.location }}</td>
-            <td class="preserve-formatting"><p id="project-{{ item.id }}" class="collapse">{{ item.description }}</p><a href="#" class="btn" data-toggle="collapse" data-target="#project-{{ item.id }}">show</a></td>
-            <td>{{ item.mu | round(4) }}</td>
-            <td>{{ item.sigma_sq | round(4) }}</td>
-            <td>{{ item_counts.get(item.id, 0) }}</td>
-            <td>{{ item.viewed | length }}</td>
-            <td>{{ skipped.get(item.id, 0) }}</td>
-            <td class="compact" data-sort="{{ item.prioritized }}" align="center">
-              <form action="/admin/item" method="post">
-                <input type="submit" name="action" value="{{ 'Prioritize' if not item.prioritized else 'Cancel' }}" class="btn {{ 'btn-success' if not item.prioritized else 'btn-danger' }}">
-                <input type="hidden" name="item_id" value="{{ item.id }}">
-                <input type="hidden" name="_csrf_token" value="{{ csrf_token() }}">
-              </form>
-            </td>
-            <td class="compact" data-sort="{{ item.active }}" align="center">
-              <form action="/admin/item" method="post">
-                <input type="submit" name="action" value="{{ 'Disable' if item.active else 'Enable' }}" class="btn {{ 'btn-danger' if item.active else 'btn-success' }}">
-                <input type="hidden" name="item_id" value="{{ item.id }}">
-                <input type="hidden" name="_csrf_token" value="{{ csrf_token() }}">
-              </form>
-            </td>
-            <td class="compact" align="center">
-              <form action="/admin/item" method="post">
-                <input type="submit" name="action" value="Delete" class="btn btn-danger">
-                <input type="hidden" name="item_id" value="{{ item.id }}">
-                <input type="hidden" name="_csrf_token" value="{{ csrf_token() }}">
-              </form>
-            </td>
-          </tr>
-          {% endfor %}
-          </tbody>
-        </table>
-      </div>
-    </div>
-    <div>
-      <div class="info col-md-6 col-sm-12">
-        <div class="card">
-          <div class="card-body">
-            <h5 class="card-title">Add Projects</h5>
-            <div class="card-subtitle mb-2 text-muted">
-              <form action="/admin/item" method="post" id="item_form" enctype="multipart/form-data">
-              <div class="form-group">
-                <textarea id="projects-data" name="data" form="item_form" class="form-control" aria-describedby="projectsHelp" placeholder="Facebook, table 2, social network, 3h4nfhagru48573764;"></textarea>
-                <small id="projectsHelp" class="form-text text-muted">Add name, location, description, identifier (CSV format)</small>
-              </div>
-              <div class="form-group">
-                <div class="upload-container">
-                  <input id="projects-file" class="form-control" aria-describedby="projectsFileHelp" type="file" name="file" accept=".csv,.xls,.xlsx">
-                  <small id="projectsFileHelp" class="field">Or upload a file here</small>
-                </div>
-              </div>
-              <input type="submit" name="action" value="Submit" class="btn btn-primary">
-              <input type="hidden" name="_csrf_token" value="{{ csrf_token() }}">
-            </form></div>
-          </div>
-        </div>
-
-      </div>
-    </div>
-  </div>
-  <div class="tab-pane fade" id="judges" role="tabpanel" aria-labelledby="judges-tab">
-    <div class="item">
-      <div class="info">
-        <h2>Judges</h2>
-        <table id="annotators" class="table table-bordered">
-          <thead class="thead-dark">
-          <tr>
-            <th scope="col" class="sort-default" data-sort-method="number">Id</th>
-            <th scope="col" data-sort-method="caseInsensitiveSort">Name</th>
-            <th scope="col" data-sort-method="caseInsensitiveSort">Email</th>
-            <th scope="col" data-sort-method="caseInsensitiveSort">Description</th>
-            <th scope="col"  data-sort-method="number">Votes</th>
-            <th scope="col"  data-sort-method="number">Next (Id)</th>
-            <th scope="col"  data-sort-method="number">Previous (Id)</th>
-            <th scope="col"  data-sort-method="number" data-sort-order="desc">Updated</th>
-            <th scope="col"  class="no-sort">Email</th>
-            <th scope="col"  data-sort-method="caseInsensitiveSort">Active</th>
-            <th scope="col"  class="no-sort">Delete</th>
-          </tr>
-          </thead>
-          <tbody>
-          {% for annotator in annotators %}
-          <tr class="{{ 'disabled' if not annotator.active else '' }}">
-            <td><a href="{{ url_for('annotator_detail', annotator_id=annotator.id) }}" class="colored">{{ annotator.id }}</a></td>
-            <td>{{ annotator.name }}</td>
-            <td>{{ annotator.email }}</td>
-            <td>{{ annotator.description  }}</td>
-            <td>{{ counts.get(annotator.id, 0) }}</td>
-            <td data-sort="{{ annotator.next_id or -1 }}">{{ annotator.next_id }}</td>
-            <td data-sort="{{ annotator.prev_id or -1 }}">{{ annotator.prev_id }}</td>
-            <td data-sort="{{ annotator.updated | utcdatetime_epoch }}">{{ annotator.updated | utcdatetime_local }}</td>
-            <td class="compact">
-              <form action="/admin/annotator" method="post">
-                <input type="submit" name="action" value="Email" class="btn btn-warning">
-                <input type="hidden" name="annotator_id" value="{{ annotator.id }}">
-                <input type="hidden" name="_csrf_token" value="{{ csrf_token() }}">
-              </form>
-            </td>
-            <td class="compact" data-sort="{{ annotator.active }}">
-              <form action="/admin/annotator" method="post">
-                <input type="submit" name="action" value="{{ 'Disable' if annotator.active else 'Enable' }}" class="btn {{ 'btn-danger' if annotator.active else 'btn-success' }}">
-                <input type="hidden" name="annotator_id" value="{{ annotator.id }}">
-                <input type="hidden" name="_csrf_token" value="{{ csrf_token() }}">
-              </form>
-            </td>
-            <td class="compact">
-              <form action="/admin/annotator" method="post">
-                <input type="submit" name="action" value="Delete" class="btn btn-danger">
-                <input type="hidden" name="annotator_id" value="{{ annotator.id }}">
-                <input type="hidden" name="_csrf_token" value="{{ csrf_token() }}">
-              </form>
-            </td>
-          </tr>
-          {% endfor %}
-          </tbody>
-        </table>
-      </div>
-    </div>
-    <div class="item">
-      <div class="info col-md-6 col-sm-12">
-        <div class="card">
-          <div class="card-body">
-        <h5>Add Judges</h5>
-            <div class="card-subtitle mb-2 text-muted">
-            <form action="/admin/annotator" method="post" id="annotator_form" enctype="multipart/form-data">
-              <div class="form-group">
-            <textarea name="data" form="annotator_form" class="form-control" aria-describedby="annotatorHelp" placeholder="Adrian, adrian@banatit.ro, Fullstack developer;"></textarea>
-            <small id="annotatorHelp" class="form-text text-muted">Add name, email, description (CSV format)</small>
-              </div>
-              <div class="form-group">
-              <div class="upload-container">
-                <input id="annotatorFile" class="form-control" aria-describedby="annotatorFileHelp" type="file" name="file" accept=".csv,.xls,.xlsx">
-                <small id="annotatorFileHelp" class="field">Or upload a file here</small>
-              </div>
-                </div>
-          <input type="submit" name="action" value="Submit" class="btn btn-primary">
-          <input type="hidden" name="_csrf_token" value="{{ csrf_token() }}">
-        </form>
-              </div>
-            </div>
-          </div>
-      </div>
-    </div>
-  </div>
-  <div class="tab-pane fade" id="settings" role="tabpanel" aria-labelledby="settings-tab">
-    <div class="item">
-      <div class="info">
-        <h2>Global Settings</h2>
-        <table class="table table-bordered">
-          <thead class="thead-dark">
-          <tr>
-            <th scope="col">Setting</th>
-            <th  scope="col">Edit</th>
-          </tr>
-          </thead>
-          <tbody>
-          <tr class="{{ 'disabled' if setting_closed else '' }}">
-            <td>Voting status</td>
-            <td class="compact">
-              <form action="/admin/setting" method="post">
-                <input type="submit" name="voting-status" value="{{ 'Open' if setting_closed else 'Close' }}" class="btn {{ 'btn-success' if setting_closed else 'btn-danger' }}">
-                <input type="hidden" name="action" value="update-voting-status">
-                <input type="hidden" name="_csrf_token" value="{{ csrf_token() }}">
-              </form>
-            </td>
-          </tr>
-          <tr>
-            <td>Time per project</td>
-            <td class="compact">
-              <form action="/admin/setting" method="post">
-                <input type="input" name="time-per-project" value="{{ time_per_project }}"/>
-                <input type="submit" value="Update" class="btn btn-success">
-                <input type="hidden" name="action" value="update-time-per-project">
-                <input type="hidden" name="_csrf_token" value="{{ csrf_token() }}">
-              </form>
-            </td>
-          </tr>
-          <tr>
-            <td>Max time per project / general alert starts</td>
-            <td class="compact">
-              <form action="/admin/setting" method="post">
-                <input type="input" name="max-time-per-project" value="{{ max_time_per_project }}"/>
-                <input type="submit" value="Update" class="btn btn-success">
-                <input type="hidden" name="action" value="update-max-time-per-project">
-                <input type="hidden" name="_csrf_token" value="{{ csrf_token() }}">
-              </form>
-            </td>
-          </tr>
-          <tr>
-            <td>Jury end datetime - Remmeber to substract -2 hours for EEST timezone</td>
-            <td class="compact">
-              <form action="/admin/setting" method="post">
-                <input type="input" name="jury-end-datetime" value="{{ jury_end }}"/>
-                <input type="submit" value="Update" class="btn btn-success">
-                <input type="hidden" name="action" value="update-jury-end">
-                <input type="hidden" name="_csrf_token" value="{{ csrf_token() }}">
-              </form>
-            </td>
-          </tr>
-          <tr>
-            <td>Import teams</td>
-            <td class="compact">
-              <form action="/admin/setting" method="post">
-                <input type="submit" value="Import" class="btn btn-success">
-                <input type="hidden" name="action" value="import-teams">
-                <input type="hidden" name="_csrf_token" value="{{ csrf_token() }}">
-              </form>
-            </td>
-          </tr>
-          <tr>
-            <td>Delete All Skips</td>
-            <td class="compact">
-              <form action="/admin/setting" method="post">
-                <input type="submit" value="Delete Skips" class="btn btn-danger">
-                <input type="hidden" name="action" value="delete-skips">
-                <input type="hidden" name="_csrf_token" value="{{ csrf_token() }}">
-              </form>
-            </td>
-          </tr>
-          <tr>
-            <td>Wipe Data</td>
-            <td class="compact">
-              <form action="/admin/setting" method="post">
-                <input type="submit" value="Wipe All Data" class="btn btn-danger">
-                <input type="hidden" name="action" value="wipe-data">
-                <input type="hidden" name="_csrf_token" value="{{ csrf_token() }}">
-              </form>
-            </td>
-          </tr>
-          </tbody>
-        </table>
-      </div>
-    </div>
-  </div>
-</div>
-</div>
 {% endblock %}
 {% block end %}
-<script src="{{ url_for('static', filename='js/vendor/tablesort.min.js') }}"></script>
-<script src="{{ url_for('static', filename='js/vendor/tablesort.number.js') }}"></script>
-<script>
-var tables = [
-  document.getElementById('items'),
-  document.getElementById('annotators'),
-];
-for (var i = 0; i < tables.length; i++) {
-  new Tablesort(tables[i]);
-}
-</script>
+  <script src="{{ url_for('static', filename='js/vendor/tablesort.min.js') }}"></script>
+  <script
+    src="{{ url_for('static', filename='js/vendor/tablesort.number.js') }}"></script>
+  <script>
+    const tables = [
+      document.getElementById('items'),
+      document.getElementById('annotators'),
+    ];
+    for (let i = 0; i < tables.length; i++) {
+      new Tablesort(tables[i]);
+    }
+
+  </script>
 {% endblock %}

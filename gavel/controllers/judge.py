@@ -1,3 +1,4 @@
+import io
 from datetime import datetime
 from functools import wraps
 
@@ -6,7 +7,7 @@ from flask import (
     render_template,
     request,
     session,
-    url_for,
+    url_for, send_file,
 )
 from numpy.random import choice, random, shuffle
 
@@ -17,11 +18,25 @@ from gavel.constants import SETTING_CLOSED, SETTING_TRUE, ANNOTATOR_ID
 from gavel.models import Setting, Item, Decision, db, with_retries, Annotator
 
 
-def requires_open(redirect_to):
+def check_open():
+    return Setting.value_of(SETTING_CLOSED) != SETTING_TRUE
+
+
+def check_active_annotator():
+    current = get_current_annotator()
+    return current and current.active
+
+
+def check_has_decisions():
+    current = get_current_annotator()
+    return current and len(current.decisions) >= 2
+
+
+def requires(predicate, redirect_to):
     def decorator(f):
         @wraps(f)
         def decorated(*args, **kwargs):
-            if Setting.value_of(SETTING_CLOSED) == SETTING_TRUE:
+            if not predicate():
                 return redirect(url_for(redirect_to))
             else:
                 return f(*args, **kwargs)
@@ -29,21 +44,14 @@ def requires_open(redirect_to):
         return decorated
 
     return decorator
+
+
+def requires_open(redirect_to):
+    return requires(check_open, redirect_to)
 
 
 def requires_active_annotator(redirect_to):
-    def decorator(f):
-        @wraps(f)
-        def decorated(*args, **kwargs):
-            annotator = get_current_annotator()
-            if annotator is None or not annotator.active:
-                return redirect(url_for(redirect_to))
-            else:
-                return f(*args, **kwargs)
-
-        return decorated
-
-    return decorator
+    return requires(check_active_annotator, redirect_to)
 
 
 @app.route('/')
@@ -196,6 +204,44 @@ def map():
     return render_template('map.html')
 
 
+@app.route('/decisions/')
+@requires(check_has_decisions, redirect_to='index')
+def plot_decisions():
+    import graphviz
+
+    judge = get_current_annotator()
+    projects = dict()
+    edges = []
+
+    def node_name(it: Item):
+        return f'P{it.id}'
+
+    def add_project(it: Item):
+        projects[node_name(it)] = f'{it.name} -- {it.team_name}'
+
+    def add_edge(winner: Item, loser: Item):
+        edges.append((node_name(winner), node_name(loser)))
+
+    for dec in judge.decisions:
+        add_project(dec.winner)
+        add_project(dec.loser)
+        add_edge(dec.winner, dec.loser)
+
+    title = f'UniHack votes from judge {judge.name}'
+    dot = graphviz.Digraph(comment=title, graph_attr={
+        'label': f'{title}, A -> B means A is better than B'})
+    for proj, team in projects.items():
+        dot.node(proj, team)
+
+    for edge in edges:
+        dot.edge(*edge)
+
+    graph = graphviz.pipe('dot', 'png', dot.source.encode())
+    return send_file(
+        io.BytesIO(graph),
+        mimetype='image/png')
+
+
 @app.route('/welcome/done', methods=['POST'])
 @requires_open(redirect_to='index')
 @requires_active_annotator(redirect_to='index')
@@ -210,20 +256,18 @@ def welcome_done():
     return redirect(url_for('index'))
 
 
-def get_current_annotator():
+def get_current_annotator() -> Annotator:
     return Annotator.by_id(session.get(ANNOTATOR_ID, None))
 
 
 def preferred_items(annotator):
-    '''
+    """
     Return a list of preferred items for the given annotator to look at next.
 
     This method uses a variety of strategies to try to select good candidate
     projects.
-    '''
-    items = []
+    """
     ignored_ids = {i.id for i in annotator.ignore}
-
     if ignored_ids:
         available_items = Item.query.filter(
             (Item.active == True) & (~Item.id.in_(ignored_ids))

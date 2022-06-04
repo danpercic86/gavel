@@ -10,6 +10,12 @@
         {% include "_item.html" %}
       {% endwith %}
     </div>
+  </section>
+
+  <div class="item">
+    <div class="banner" id="vote-header">
+      <h1>Vote</h1>
+    </div>
 
     <div class="item">
       <div class="info form-vote">
@@ -21,6 +27,7 @@
             <input type="submit" name="action" value="Skip" id="vote-skip"
                    class="btn btn-outline-warning">
           </div>
+
           <input type="hidden" name="item_id" value="{{ item.id }}">
           <input type="hidden" name="_csrf_token" value="{{ csrf_token() }}">
         </form>
@@ -29,5 +36,5 @@
           src="{{ url_for('static', filename='js/smart-button-toggle.js') }}"></script>
       </div>
     </div>
-  </section>
+  </div>
 {% endblock %}

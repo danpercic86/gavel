@@ -1,18 +1,24 @@
-from gavel.models import db
-import gavel.utils as utils
-import gavel.crowd_bt as crowd_bt
-from sqlalchemy.orm.exc import NoResultFound
 from datetime import datetime
+from typing import List
 
-ignore_table = db.Table('ignore',
+from sqlalchemy.exc import NoResultFound
+
+import gavel.crowd_bt as crowd_bt
+import gavel.models
+import gavel.utils as utils
+from gavel.models import db
+
+ignore_table = db.Table(
+    'ignore',
     db.Column('annotator_id', db.Integer, db.ForeignKey('annotator.id')),
     db.Column('item_id', db.Integer, db.ForeignKey('item.id'))
 )
 
+
 class Annotator(db.Model):
     id = db.Column(db.Integer, primary_key=True, nullable=False)
     name = db.Column(db.String(120), nullable=False)
-    email = db.Column(db.String(120), nullable=False)
+    email = db.Column(db.String(120), nullable=False, unique=True)
     active = db.Column(db.Boolean, default=True, nullable=False)
     read_welcome = db.Column(db.Boolean, default=False, nullable=False)
     description = db.Column(db.Text, nullable=False)
@@ -37,11 +43,16 @@ class Annotator(db.Model):
 
     def update_next(self, new_next):
         if new_next is not None:
-            new_next.prioritized = False # it's now assigned, so cancel the prioritization
+            new_next.prioritized = False  # it's now assigned, so cancel the prioritization
             # it could happen that the judge skips the project, but that
             # doesn't re-prioritize the project
             self.updated = datetime.utcnow()
         self.next = new_next
+
+    @property
+    def decisions(self) -> List['gavel.models.Decision']:
+        decision = gavel.models.Decision
+        return decision.query.filter(decision.annotator_id == self.id).all()
 
     @classmethod
     def by_secret(cls, secret):

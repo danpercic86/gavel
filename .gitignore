@@ -1,6 +1,11 @@
 config.yaml
+.env
+gavel_config.env
 *.pyc
 env/
 .vagrant/
 .idea/
 *.iml
+/venv/
+
+db/

@@ -53,8 +53,7 @@ def update(alpha, beta, mu_winner, sigma_sq_winner, mu_loser, sigma_sq_loser):
                                                                            sigma_sq_winner,
                                                                            mu_loser,
                                                                            sigma_sq_loser)
-    return (updated_alpha, updated_beta, updated_mu_winner, updated_sigma_sq_winner,
-            updated_mu_loser, updated_sigma_sq_loser)
+    return updated_alpha, updated_beta, updated_mu_winner, updated_sigma_sq_winner, updated_mu_loser, updated_sigma_sq_loser
 
 
 def expected_information_gain(alpha, beta, mu_a, sigma_sq_a, mu_b, sigma_sq_b):
@@ -88,7 +87,7 @@ def _updated_mus(alpha, beta, mu_winner, sigma_sq_winner, mu_loser, sigma_sq_los
     updated_mu_winner = mu_winner + sigma_sq_winner * mult
     updated_mu_loser = mu_loser - sigma_sq_loser * mult
 
-    return (updated_mu_winner, updated_mu_loser)
+    return updated_mu_winner, updated_mu_loser
 
 
 # returns (updated sigma squared of winner, updated sigma squared of loser)
@@ -101,7 +100,7 @@ def _updated_sigma_sqs(alpha, beta, mu_winner, sigma_sq_winner, mu_loser,
     updated_sigma_sq_winner = sigma_sq_winner * max(1 + sigma_sq_winner * mult, KAPPA)
     updated_sigma_sq_loser = sigma_sq_loser * max(1 + sigma_sq_loser * mult, KAPPA)
 
-    return (updated_sigma_sq_winner, updated_sigma_sq_loser)
+    return updated_sigma_sq_winner, updated_sigma_sq_loser
 
 
 # returns (updated alpha, updated beta, pr i >k j which is c)
@@ -124,4 +123,4 @@ def _updated_annotator(alpha, beta, mu_winner, sigma_sq_winner, mu_loser,
     updated_alpha = ((expt - expt_sq) * expt) / variance
     updated_beta = (expt - expt_sq) * (1 - expt) / variance
 
-    return (updated_alpha, updated_beta, c)
+    return updated_alpha, updated_beta, c

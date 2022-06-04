@@ -6,7 +6,7 @@ from gavel import app
 
 @app.before_request
 def csrf_protect():
-    if request.method == "POST":
+    if request.method == "POST" and not request.path.startswith('/api/'):
         token = session.get('_csrf_token', None)
         if not token or token != request.form.get('_csrf_token'):
             abort(403)

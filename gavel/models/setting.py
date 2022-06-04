@@ -1,5 +1,7 @@
+from sqlalchemy.exc import NoResultFound
+
 from gavel.models import db
-from sqlalchemy.orm.exc import NoResultFound
+
 
 class Setting(db.Model):
     key = db.Column(db.Text, unique=True, nullable=False, primary_key=True)

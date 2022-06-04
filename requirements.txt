@@ -41,4 +41,6 @@ Werkzeug==2.0.1
 xlrd==2.0.1
 zipp==3.5.0
 
+graphviz>=0.15
+django-utils2>=2.5.4
 Django~=4.0.5

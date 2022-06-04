@@ -12,7 +12,7 @@ from functools import wraps
 
 import markdown
 import requests
-from flask import Markup, Response, request, render_template
+from flask import Markup, Response, request, render_template, session, abort
 
 import gavel.constants as constants
 import gavel.settings as settings
@@ -23,20 +23,41 @@ def gen_secret(length):
     return base64.b32encode(os.urandom(length))[:length].decode('utf8').lower()
 
 
-def check_auth(username, password):
-    return username == 'admin' and password == settings.ADMIN_PASSWORD
-
-
 def authenticate():
     return Response('Access denied.', 401,
                     {'WWW-Authenticate': 'Basic realm="Login Required"'})
 
 
+def check_auth():
+    api_key = request.args.get('key', '')
+    if api_key:
+        return api_key == settings.API_KEY
+
+    auth = request.authorization
+    if auth:
+        token = session.pop('_csrf_token', None)
+        if request.method not in ("GET", "HEAD", "OPTIONS"):
+            if not token or token != request.form.get('_csrf_token'):
+                abort(403)
+        return auth.username == 'admin' and auth.password == settings.ADMIN_PASSWORD
+
+    auth_header = request.headers.get('Authorization', None)
+    if auth_header:
+        try:
+            auth_type, api_key = auth_header.split(None, 1)
+            auth_type = auth_type.lower()
+        except ValueError:
+            return False
+
+        return auth_type == 'key' and api_key == settings.API_KEY
+
+    return False
+
+
 def requires_auth(f):
     @wraps(f)
     def decorated(*args, **kwargs):
-        auth = request.authorization
-        if not auth or not check_auth(auth.username, auth.password):
+        if not check_auth():
             return authenticate()
         return f(*args, **kwargs)
 
