@@ -1,21 +1,27 @@
+import json
+from typing import List
+
+import psycopg2.errors
 import requests
+import xlrd
 from django.utils.html import strip_tags
-from gavel import app
-from gavel.models import *
-from gavel.constants import *
-import gavel.settings as settings
-import gavel.utils as utils
-import gavel.stats as stats
 from flask import (
     redirect,
     render_template,
     request,
     url_for,
 )
-import xlrd
-import json
+from sqlalchemy.exc import IntegrityError
 
-ALLOWED_EXTENSIONS = set(['csv', 'xlsx', 'xls'])
+import gavel.settings as settings
+import gavel.stats as stats
+import gavel.utils as utils
+from gavel import app
+from gavel.constants import SETTING_CLOSED, SETTING_TRUE, SETTING_FALSE, IMPORT_URL
+from gavel.models import Annotator, Item, Decision, Setting, db, with_retries, \
+    ignore_table
+
+ALLOWED_EXTENSIONS = {'csv', 'xlsx', 'xls'}
 
 
 @app.route('/admin/')
@@ -27,21 +33,25 @@ def admin():
     decisions = Decision.query.all()
     counts = {}
     item_counts = {}
+
     for d in decisions:
-        a = d.annotator_id
-        w = d.winner_id
-        l = d.loser_id
-        counts[a] = counts.get(a, 0) + 1
-        item_counts[w] = item_counts.get(w, 0) + 1
-        item_counts[l] = item_counts.get(l, 0) + 1
+        jury_id = d.annotator_id
+        winner_id = d.winner_id
+        loser_id = d.loser_id
+        counts[jury_id] = counts.get(jury_id, 0) + 1
+        item_counts[winner_id] = item_counts.get(winner_id, 0) + 1
+        item_counts[loser_id] = item_counts.get(loser_id, 0) + 1
+
     viewed = {i.id: {a.id for a in i.viewed} for i in items}
     skipped = {}
-    for a in annotators:
-        for i in a.ignore:
-            if a.id not in viewed[i.id]:
+
+    for jury_id in annotators:
+        for i in jury_id.ignore:
+            if jury_id.id not in viewed[i.id]:
                 skipped[i.id] = skipped.get(i.id, 0) + 1
-    # settings
+
     setting_closed = Setting.value_of(SETTING_CLOSED) == SETTING_TRUE
+
     return render_template(
         'admin.html',
         is_admin=True,
@@ -60,17 +70,18 @@ def admin():
 
 @app.route('/admin/item', methods=['POST'])
 @utils.requires_auth
-def item():
+def item_actions():
     action = request.form['action']
+
     if action == 'Submit':
         data = parse_upload_form()
         if data:
             # validate data
             for index, row in enumerate(data):
-                if len(row) != 3:
+                if len(row) != 4:
                     return utils.user_error(
-                        'Bad data: row %d has %d elements (expecting 3)' % (
-                        index + 1, len(row)))
+                        'Bad data: row %d has %d elements (expecting 4)' % (
+                            index + 1, len(row)))
 
             def tx():
                 for row in data:
@@ -111,8 +122,8 @@ def item():
             if isinstance(e.orig, psycopg2.errors.ForeignKeyViolation):
                 return utils.server_error(
                     "Projects can't be deleted once they have been voted on by a judge. You can use the 'disable' functionality instead, which has a similar effect, preventing the project from being shown to judges.")
-            else:
-                return utils.server_error(str(e))
+
+            return utils.server_error(str(e))
     return redirect(url_for('admin'))
 
 
@@ -142,8 +153,9 @@ def parse_upload_form():
 @app.route('/admin/item_patch', methods=['POST'])
 @utils.requires_auth
 def item_patch():
+    item = Item.by_id(request.form['item_id'])
+
     def tx():
-        item = Item.by_id(request.form['item_id'])
         if not item:
             return utils.user_error('Item %s not found ' % request.form['item_id'])
         if 'location' in request.form:
@@ -155,13 +167,15 @@ def item_patch():
         db.session.commit()
 
     with_retries(tx)
+
     return redirect(url_for('item_detail', item_id=item.id))
 
 
 @app.route('/admin/annotator', methods=['POST'])
 @utils.requires_auth
-def annotator():
+def annotator_actions():
     action = request.form['action']
+
     if action == 'Submit':
         data = parse_upload_form()
         added = []
@@ -171,7 +185,7 @@ def annotator():
                 if len(row) != 3:
                     return utils.user_error(
                         'Bad data: row %d has %d elements (expecting 3)' % (
-                        index + 1, len(row)))
+                            index + 1, len(row)))
 
             def tx():
                 for row in data:
@@ -255,8 +269,8 @@ def setting():
 
         for item in data:
             print('identifier' + item['_id'])
-            exitingItem = Item.by_identifier(item['_id'])
-            if exitingItem is None:
+            exiting_item = Item.by_identifier(item['_id'])
+            if exiting_item is None:
                 if 'name' in item and 'location' in item:
                     description = '...'
                     if 'description' in item and item['description'] is not None:
@@ -323,7 +337,7 @@ def annotator_link(annotator):
     return url_for('login', secret=annotator.secret, _external=True)
 
 
-def email_invite_links(annotators):
+def email_invite_links(annotators: List[Annotator] | Annotator):
     if settings.DISABLE_EMAIL or annotators is None:
         return
     if not isinstance(annotators, list):
@@ -336,7 +350,7 @@ def email_invite_links(annotators):
         body = '\n\n'.join(utils.get_paragraphs(raw_body))
         emails.append((annotator.email, settings.EMAIL_SUBJECT, body))
 
-    if settings.USE_SENDGRID and settings.SENDGRID_API_KEY != None:
+    if settings.USE_SENDGRID and settings.SENDGRID_API_KEY is not None:
         utils.send_sendgrid_emails(emails)
     else:
         utils.send_emails.delay(emails)

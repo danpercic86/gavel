@@ -10,12 +10,11 @@ from flask import (
 )
 from numpy.random import choice, random, shuffle
 
-import gavel.crowd_bt as crowd_bt
 import gavel.settings as settings
 import gavel.utils as utils
-from gavel import app
-from gavel.constants import *
-from gavel.models import *
+from gavel import app, crowd_bt
+from gavel.constants import SETTING_CLOSED, SETTING_TRUE, ANNOTATOR_ID
+from gavel.models import Setting, Item, Decision, db, with_retries, Annotator
 
 
 def requires_open(redirect_to):
@@ -56,51 +55,55 @@ def index():
             'logged_out.html',
             content=utils.render_markdown(settings.LOGGED_OUT_MESSAGE)
         )
-    else:
-        items = Item.query.order_by(Item.id).all()
-        seen = Item.query.filter(Item.viewed.contains(annotator)).all()
-        if Setting.value_of(SETTING_CLOSED) == SETTING_TRUE:
-            return render_template(
-                'closed.html',
-                content=utils.render_markdown(settings.CLOSED_MESSAGE)
-            )
-        if not annotator.active:
-            return render_template(
-                'disabled.html',
-                content=utils.render_markdown(settings.DISABLED_MESSAGE)
-            )
-        if not annotator.read_welcome:
-            return redirect(url_for('welcome'))
-        maybe_init_annotator()
-        if annotator.next is None:
-            return render_template(
-                'wait.html',
-                content=utils.render_markdown(settings.WAIT_MESSAGE)
-            )
-        elif annotator.prev is None:
-            return render_template('begin.html',
-                                   item=annotator.next,
-                                   items=items,
-                                   seen=seen,
-                                   time_per_project=Setting.value_of(
-                                       'TIME_PER_PROJECT'),
-                                   max_time_per_project=Setting.value_of(
-                                       'MAX_TIME_PER_PROJECT'),
-                                   jury_end=Setting.value_of('JURY_END_DATETIME')
-                                   )
-        else:
-            return render_template('vote.html',
-                                   prev=annotator.prev,
-                                   next=annotator.next,
-                                   items=items,
-                                   seen=seen,
-                                   time_per_project=Setting.value_of(
-                                       'TIME_PER_PROJECT'),
-                                   max_time_per_project=Setting.value_of(
-                                       'MAX_TIME_PER_PROJECT'),
-                                   jury_end_datetime=Setting.value_of(
-                                       'JURY_END_DATETIME')
-                                   )
+
+    items = Item.query.order_by(Item.id).all()
+    seen = Item.query.filter(Item.viewed.contains(annotator)).all()
+    if Setting.value_of(SETTING_CLOSED) == SETTING_TRUE:
+        return render_template(
+            'closed.html',
+            content=utils.render_markdown(settings.CLOSED_MESSAGE)
+        )
+
+    if not annotator.active:
+        return render_template(
+            'disabled.html',
+            content=utils.render_markdown(settings.DISABLED_MESSAGE)
+        )
+
+    if not annotator.read_welcome:
+        return redirect(url_for('welcome'))
+
+    maybe_init_annotator()
+
+    if annotator.next is None:
+        return render_template(
+            'wait.html',
+            content=utils.render_markdown(settings.WAIT_MESSAGE)
+        )
+
+    time_per_project = Setting.value_of('TIME_PER_PROJECT')
+    max_time_per_project = Setting.value_of('MAX_TIME_PER_PROJECT')
+    jury_end = Setting.value_of('JURY_END_DATETIME')
+
+    if annotator.prev is None:
+        return render_template('begin.html',
+                               item=annotator.next,
+                               items=items,
+                               seen=seen,
+                               time_per_project=time_per_project,
+                               max_time_per_project=max_time_per_project,
+                               jury_end=jury_end
+                               )
+
+    return render_template('vote.html',
+                           prev=annotator.prev,
+                           next=annotator.next,
+                           items=items,
+                           seen=seen,
+                           time_per_project=time_per_project,
+                           max_time_per_project=max_time_per_project,
+                           jury_end_datetime=jury_end
+                           )
 
 
 @app.route('/vote', methods=['POST'])
@@ -108,28 +111,34 @@ def index():
 @requires_active_annotator(redirect_to='index')
 def vote():
     annotator = get_current_annotator()
-    if annotator.prev.id == int(request.form['prev_id']) and annotator.next.id == int(
-        request.form['next_id']):
-        if request.form['action'] == 'Skip':
-            annotator.ignore.append(annotator.next)
-        else:
-            # ignore things that were deactivated in the middle of judging
-            if annotator.prev.active and annotator.next.active:
-                if request.form['action'] == 'Previous':
-                    perform_vote(annotator, next_won=False)
-                    decision = Decision(annotator, winner=annotator.prev,
-                                        loser=annotator.next)
-                elif request.form['action'] == 'Current':
-                    perform_vote(annotator, next_won=True)
-                    decision = Decision(annotator, winner=annotator.next,
-                                        loser=annotator.prev)
-                db.session.add(decision)
-            annotator.next.viewed.append(
-                annotator)  # counted as viewed even if deactivated
-            annotator.prev = annotator.next
-            annotator.ignore.append(annotator.prev)
-        annotator.update_next(choose_next(annotator))
-        db.session.commit()
+    prev_id = int(request.form['prev_id'])
+    next_id = int(request.form['next_id'])
+
+    if annotator.prev.id != prev_id or annotator.next.id != next_id:
+        return redirect(url_for('index'))
+
+    if request.form['action'] == 'Skip':
+        annotator.ignore.append(annotator.next)
+    else:
+        # ignore things that were deactivated in the middle of judging
+        if annotator.prev.active and annotator.next.active:
+            if request.form['action'] == 'Previous':
+                perform_vote(annotator, next_won=False)
+                decision = Decision(annotator, winner=annotator.prev,
+                                    loser=annotator.next)
+            elif request.form['action'] == 'Current':
+                perform_vote(annotator, next_won=True)
+                decision = Decision(annotator, winner=annotator.next,
+                                    loser=annotator.prev)
+            db.session.add(decision)
+
+        annotator.next.viewed.append(annotator)  # counted as viewed even if deactivated
+        annotator.prev = annotator.next
+        annotator.ignore.append(annotator.prev)
+
+    annotator.update_next(choose_next(annotator))
+    db.session.commit()
+
     return redirect(url_for('index'))
 
 
@@ -184,9 +193,7 @@ def welcome():
 @requires_open(redirect_to='index')
 @requires_active_annotator(redirect_to='index')
 def map():
-    return render_template(
-        'map.html'
-    )
+    return render_template('map.html')
 
 
 @app.route('/welcome/done', methods=['POST'])

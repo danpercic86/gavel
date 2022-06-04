@@ -1,23 +1,24 @@
 {% extends "layout.html" %}
 {% block title %}Welcome{% endblock %}
 {% block content %}
-<section class="front">
-<div class="item">
-  <div class="banner">
-    <h1>HackTM</h1>
-  </div>
-  <div class="info">
-    {{ content }}
-  </div>
-</div>
+  <section class="front">
+    <div class="item">
+      <div class="banner">
+        <h1>HackTM</h1>
+      </div>
+      <div class="info">
+        {{ content }}
+      </div>
+    </div>
 
-<div class="item">
-  <div class="info">
-    <form action="/welcome/done" method="post">
-      <input type="submit" name="action" value="Done" class="btn btn-primary btn-block">
-      <input type="hidden" name="_csrf_token" value="{{ csrf_token() }}">
-    </form>
-  </div>
-</div>
-</section>
+    <div class="item">
+      <div class="info">
+        <form action="/welcome/done" method="post">
+          <input type="submit" name="action" value="Continue"
+                 class="btn btn-primary btn-block">
+          <input type="hidden" name="_csrf_token" value="{{ csrf_token() }}">
+        </form>
+      </div>
+    </div>
+  </section>
 {% endblock %}
