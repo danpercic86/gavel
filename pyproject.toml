@@ -1,0 +1,47 @@
+[tool.poetry]
+name = "gavel"
+version = "0.1.0"
+description = "A project expo judging system"
+authors = ["Your Name <you@example.com>"]
+license = "AGPLv3"
+
+[tool.poetry.dependencies]
+python = "3.10"
+celery = "5.2.7"
+Flask = "2.0.1"
+Flask-Assets = "2.0"
+Flask-SQLAlchemy = "2.5.1"
+Markdown = "3.3.4"
+humanize = "4.1.0"
+numpy = "1.22.4"
+psycopg2 = "2.9.3"
+PyYAML = "5.4.1"
+requests = "2.27.1"
+scipy = "1.8.1"
+SQLAlchemy = "1.4.20"
+Werkzeug = "2.0.1"
+xlrd = "2.0.1"
+zipp = "3.8.0"
+graphviz = "^0.20"
+Django = "^4.0.5"
+
+[tool.poetry.dev-dependencies]
+black = "^22.3.0"
+typing-extensions = "4.2.0"
+types-PyYAML = "^6.0.3"
+
+[tool.black]
+target-version = ['py310']
+exclude = '''
+/(
+    \.git
+  | \__pycache__
+  | \venv
+  | \.venv
+  | migrations
+)/
+'''
+
+[build-system]
+requires = ["poetry-core>=1.0.0"]
+build-backend = "poetry.core.masonry.api"

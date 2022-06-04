@@ -1,3 +1,12 @@
 .dockerignore
 .git
-
+.editorconfig
+.gitattributes
+.gitignore
+.gitlab-ci.yml
+config.template.yaml
+CONTRIBUTING.md
+DEVELOPMENT.md
+gavel_config.template.env
+Makefile
+run.bat

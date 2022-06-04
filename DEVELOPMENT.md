@@ -11,9 +11,6 @@ and run everything inside a virtual machine.
 If you really want, you could also manually install stuff on your machine and
 get Gavel running there.
 
-Also, if you need help with anything, feel free to ask in the [Gitter
-chat][gitter].
-
 ### Vagrant
 
 Make sure you have [Vagrant][vagrant] installed on your machine.
@@ -47,7 +44,6 @@ this once, unless Gavel's dependencies change:
 cd /gavel
 virtualenv env
 source ./env/bin/activate
-pip install -r requirements.txt
 ```
 
 Next, set up Gavel. You should only need to do this once, unless Gavel's config
@@ -81,37 +77,39 @@ machine so that whenever you change any files, they're automatically synced
 over to the VM.** When the app running in the VM detects changed files, it'll
 automatically restart (because of the debug flag).
 
-### Manual setup
+## Manual setup
 
 This is not the recommended way to do things, so this section isn't super
 detailed.
 
 * Be using Python 3
-* Install Postgres
-* Do development inside a [virtualenv][virtualenv]
-* `pip install -r requirements.txt`
+* Run a Postgres Docker container / Install Postgres
+* Create a database
 * `cp config.template.yaml config.yaml`
-* Edit config file for your setup
-* `python initialize.py`
-* `DEBUG=true python gavel.py`
+* Fill all required fields in `config.yaml`
+* Install [Poetry]
+* Add poetry to path if needed
+* `poetry config virtualenvs.in-project true`
+* `poetry install`
+* `poetry run python initialize.py`
+* `poetry run python runserver.py`
 
 ## Tips
 
 * While developing, it's helpful to set the environment variable `DEBUG=true`
 
 * If Gavel's database schema is changed or if the database gets messed up in
-  any way, you can reset everything by running (in the Vagrant VM):
+  any way then reset everything initialize it again:
 
     ```bash
-    sudo su postgres -c "dropdb gavel && createdb gavel"
     python initialize.py
     ```
 
 * This project uses [EditorConfig][editorconfig].
   [Download][editorconfig-download] a plugin for your editor!
 
-[gitter]: https://gitter.im/anishathalye/gavel
-[vagrant]: https://www.vagrantup.com/
-[virtualenv]: https://virtualenv.pypa.io/en/stable/
+[Poetry]: https://python-poetry.org/docs/master#installing-with-the-official-installer
+
 [editorconfig]: http://editorconfig.org/
+
 [editorconfig-download]: http://editorconfig.org/#download
