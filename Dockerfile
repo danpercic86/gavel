@@ -1,15 +1,50 @@
-FROM python:3.7
+FROM python:3.10-alpine
+
+ENV PYTHONFAULTHANDLER=1 \
+  PYTHONUNBUFFERED=1 \
+  PYTHONHASHSEED=random \
+  PIP_NO_CACHE_DIR=off \
+  PIP_DISABLE_PIP_VERSION_CHECK=on \
+  PIP_DEFAULT_TIMEOUT=100
 
 WORKDIR /app
 
+RUN set -ex
 
-COPY requirements.txt ./
-RUN pip install --no-cache-dir -r requirements.txt
+# Set the time zone inside the container
+RUN apk add tzdata --virtual .tzdata \
+    && cp /usr/share/zoneinfo/Europe/Bucharest /etc/localtime \
+    && echo "Europe/Bucharest" > /etc/timezone \
+    && apk del .tzdata
 
-RUN apt update && apt install -y graphviz gunicorn
+COPY poetry.lock pyproject.toml ./
+
+RUN apk add curl
+
+RUN curl -sSL https://raw.githubusercontent.com/python-poetry/poetry/master/get-poetry.py | python -
+
+# some packages need to be compiled from source and have build-time dependencies
+RUN apk add --virtual .build-deps \
+        gcc \
+        build-base \
+        musl-dev \
+# these 2 are for postgres & gis
+#        libffi-dev \
+        postgresql-dev \
+    && source ${HOME}/.poetry/env \
+    && pip install --upgrade pip \
+    && poetry config virtualenvs.create false \
+    && poetry install --no-dev --no-interaction --no-ansi \
+    && pip install gunicorn whitenoise graphviz \
+    && apk del .build-deps
+
+# link image with github repo
+LABEL org.opencontainers.image.source=https://github.com/BanatIT/gavel
 
 EXPOSE 80
+
 ENV PORT=80
+
 CMD ["sh", "-c", "python initialize.py && gunicorn -b :${PORT} -w 3 gavel:app"]
 
 COPY . .
