@@ -228,7 +228,7 @@ def plot_decisions():
         add_project(dec.loser)
         add_edge(dec.winner, dec.loser)
 
-    title = f"UniHack votes from judge {judge.name}"
+    title = f"HackTM votes from judge {judge.name}"
     dot = graphviz.Digraph(
         comment=title, graph_attr={"label": f"{title}, A -> B means A is better than B"}
     )

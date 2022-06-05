@@ -8,7 +8,6 @@ import xlrd
 from django.utils.html import strip_tags
 from flask import (
     redirect,
-    render_template,
     request,
     url_for,
     send_file,
@@ -294,31 +293,6 @@ def setting():
     return redirect(url_for("admin"))
 
 
-@app.route("/admin/annotator/<annotator_id>/")
-@utils.requires_auth
-def annotator_detail(annotator_id):
-    annotator = Annotator.by_id(annotator_id)
-    if not annotator:
-        return utils.user_error("Annotator %s not found " % annotator_id)
-    else:
-        seen = Item.query.filter(Item.viewed.contains(annotator)).all()
-        ignored_ids = {i.id for i in annotator.ignore}
-        if ignored_ids:
-            skipped = Item.query.filter(
-                Item.id.in_(ignored_ids) & ~Item.viewed.contains(annotator)
-            )
-        else:
-            skipped = []
-        return render_template(
-            "admin_annotator.html",
-            annotator=annotator,
-            is_admin=True,
-            login_link=annotator_link(annotator),
-            seen=seen,
-            skipped=skipped,
-        )
-
-
 @app.route("/admin/project-decisions/<item_id>/")
 @utils.requires_auth
 def plot_decisions_project(item_id):
@@ -362,10 +336,6 @@ def plot_decisions_project(item_id):
 
     graph = graphviz.pipe("dot", "png", dot.source.encode())
     return send_file(io.BytesIO(graph), mimetype="image/png")
-
-
-def annotator_link(annotator):
-    return url_for("login", secret=annotator.secret, _external=True)
 
 
 def email_invite_links(annotators: List[Annotator] | Annotator):

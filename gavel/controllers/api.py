@@ -5,7 +5,8 @@ from sqlalchemy import desc
 
 import gavel.utils as utils
 from gavel import app, settings
-from gavel.controllers.admin import import_projects, annotator_link
+from gavel.controllers.admin import import_projects
+from gavel.controllers.admins.judges import judge_login_link
 from gavel.models import Item, Annotator, Decision, db
 
 
@@ -98,5 +99,5 @@ def register_judge():
     db.session.add(judge)
     db.session.commit()
 
-    response = {"loginUrl": annotator_link(judge)}
+    response = {"loginUrl": judge_login_link(judge)}
     return Response(json.dumps(response), mimetype="application/json")
