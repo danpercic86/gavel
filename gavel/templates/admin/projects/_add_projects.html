@@ -1,0 +1,42 @@
+<div class="info col-md-6 col-sm-12">
+  <div class="card">
+    <div class="card-body">
+      <h5 class="card-title">
+        Add Projects
+      </h5>
+      <div class="card-subtitle mb-2 text-muted">
+        <form action="/admin/item"
+              method="post"
+              id="item_form"
+              enctype="multipart/form-data">
+          <div class="form-group">
+                <textarea id="projects-data"
+                          name="data"
+                          form="item_form"
+                          class="form-control"
+                          aria-describedby="projectsHelp"
+                          placeholder="Facebook, table 2, social network, 5ca7768baad15300167dced1, Facebook, https://youtube.com;"></textarea>
+            <small id="projectsHelp" class="form-text text-muted">Add name,
+              location,
+              description, identifier, team_name, presentation_link (CSV
+              format in this order)</small>
+          </div>
+          <div class="form-group">
+            <div class="upload-container">
+              <input id="projects-file"
+                     class="form-control"
+                     aria-describedby="projectsFileHelp"
+                     type="file"
+                     name="file"
+                     accept=".csv,.xls,.xlsx">
+              <small id="projectsFileHelp" class="field">Or upload a file
+                here</small>
+            </div>
+          </div>
+          <input type="submit" name="action" value="Submit" class="btn btn-primary">
+          <input type="hidden" name="_csrf_token" value="{{ csrf_token() }}">
+        </form>
+      </div>
+    </div>
+  </div>
+</div>

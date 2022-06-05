@@ -27,7 +27,7 @@ def admin_judges():
         counts[jury_id] = counts.get(jury_id, 0) + 1
 
     return render_template(
-        "admin/judges.html",
+        "admin/judges/index.html",
         is_admin=True,
         annotators=annotators,
         counts=counts,

@@ -22,14 +22,11 @@ def admin_projects():
     items = Item.query.order_by(Item.id).all()
 
     decisions = Decision.query.all()
-    # counts = {}
     item_counts = {}
 
     for d in decisions:
-        # jury_id = d.annotator_id
         winner_id = d.winner_id
         loser_id = d.loser_id
-        # counts[jury_id] = counts.get(jury_id, 0) + 1
         item_counts[winner_id] = item_counts.get(winner_id, 0) + 1
         item_counts[loser_id] = item_counts.get(loser_id, 0) + 1
 
@@ -42,9 +39,36 @@ def admin_projects():
                 skipped[i.id] = skipped.get(i.id, 0) + 1
 
     return render_template(
-        "admin/projects.html",
+        "admin/projects/index.html",
         is_admin=True,
         skipped=skipped,
         items=items,
         item_counts=item_counts,
+    )
+
+
+@app.route("/admin/projects/<project_id>/")
+@utils.requires_auth
+def project_details(project_id: str):
+    item = Item.by_id(project_id)
+
+    if not item:
+        return utils.user_error("Project %s not found " % project_id)
+
+    assigned = Annotator.query.filter(Annotator.next == item).all()
+    viewed_ids = {i.id for i in item.viewed}
+
+    if viewed_ids:
+        skipped = Annotator.query.filter(
+            Annotator.ignore.contains(item) & ~Annotator.id.in_(viewed_ids)
+        )
+    else:
+        skipped = Annotator.query.filter(Annotator.ignore.contains(item))
+
+    return render_template(
+        "admin/projects/detail.html",
+        is_admin=True,
+        item=item,
+        assigned=assigned,
+        skipped=skipped,
     )

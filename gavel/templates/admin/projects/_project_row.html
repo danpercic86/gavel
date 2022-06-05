@@ -1,0 +1,77 @@
+<tr
+  class=" {{ 'disabled' if not item.active else ('prioritized' if item.prioritized else '') }}">
+  <td>
+    <a href="{{ url_for('project_details', project_id=item.id) }}"
+       class="colored">{{ item.id }}</a>
+  </td>
+
+  <td>
+    <a href="{{ url_for('project_details', project_id=item.id) }}"
+       class="colored"
+    >{{ item.name }}</a>
+  </td>
+
+  <td>{{ item.team_name }}</td>
+
+  <td>
+    <a href="{{ item.presentation_link }}"
+       target="_blank">{{ item.presentation_link }}</a>
+  </td>
+
+  <td>{{ item.location }}</td>
+
+  <td class="preserve-formatting">
+    <p id="project-{{ item.id }}" class="collapse">{{ item.description }}</p>
+    <a href="#"
+       class="btn"
+       data-toggle="collapse"
+       data-target="#project-{{ item.id }}">show</a>
+  </td>
+
+  <td>{{ item.mu | round(4) }}</td>
+  <td>{{ item.sigma_sq | round(4) }}</td>
+  <td>{{ item_counts.get(item.id, 0) }}</td>
+  <td>{{ item.viewed | length }}</td>
+  <td>{{ skipped.get(item.id, 0) }}</td>
+
+  <td class="compact" data-sort="{{ item.prioritized }}" align="center">
+    <form action="/admin/item" method="post">
+      <input type="submit"
+             name="action"
+             value="{{ 'Prioritize' if not item.prioritized else 'Cancel' }}"
+             class="btn {{ 'btn-success' if not item.prioritized else 'btn-danger' }}">
+      <input type="hidden" name="item_id" value="{{ item.id }}">
+      <input type="hidden" name="_csrf_token" value="{{ csrf_token() }}">
+    </form>
+  </td>
+
+  <td class="compact" data-sort="{{ item.active }}" align="center">
+    <form action="/admin/item" method="post">
+      <input type="submit"
+             name="action"
+             value="{{ 'Disable' if item.active else 'Enable' }}"
+             class="btn {{ 'btn-danger' if item.active else 'btn-success' }}">
+      <input type="hidden" name="item_id" value="{{ item.id }}">
+      <input type="hidden" name="_csrf_token" value="{{ csrf_token() }}">
+    </form>
+  </td>
+
+  <td class="compact" align="center">
+    <form action="/admin/item" method="post">
+      <input type="submit" name="action" value="Delete"
+             class="btn btn-danger">
+      <input type="hidden" name="item_id" value="{{ item.id }}">
+      <input type="hidden" name="_csrf_token" value="{{ csrf_token() }}">
+    </form>
+  </td>
+
+  <td class="compact" align="center">
+    <form action="{{ url_for('plot_decisions_project', item_id=item.id) }}"
+          method="get">
+      <input type="submit"
+             name="action"
+             value="Decisions plot"
+             class="btn btn-danger">
+    </form>
+  </td>
+</tr>

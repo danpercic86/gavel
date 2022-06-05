@@ -16,7 +16,6 @@ from flask import (
 from sqlalchemy.exc import IntegrityError
 
 import gavel.settings as settings
-import gavel.stats as stats
 import gavel.utils as utils
 from gavel import app
 from gavel.constants import SETTING_CLOSED, SETTING_TRUE, SETTING_FALSE
@@ -31,50 +30,6 @@ from gavel.models import (
 )
 
 ALLOWED_EXTENSIONS = {"csv", "xlsx", "xls"}
-
-
-@app.route("/admin/")
-@utils.requires_auth
-def admin():
-    stats.check_send_telemetry()
-    annotators = Annotator.query.order_by(Annotator.id).all()
-    items = Item.query.order_by(Item.id).all()
-    decisions = Decision.query.all()
-    counts = {}
-    item_counts = {}
-
-    for d in decisions:
-        jury_id = d.annotator_id
-        winner_id = d.winner_id
-        loser_id = d.loser_id
-        counts[jury_id] = counts.get(jury_id, 0) + 1
-        item_counts[winner_id] = item_counts.get(winner_id, 0) + 1
-        item_counts[loser_id] = item_counts.get(loser_id, 0) + 1
-
-    viewed = {i.id: {a.id for a in i.viewed} for i in items}
-    skipped = {}
-
-    for jury_id in annotators:
-        for i in jury_id.ignore:
-            if jury_id.id not in viewed[i.id]:
-                skipped[i.id] = skipped.get(i.id, 0) + 1
-
-    setting_closed = Setting.value_of(SETTING_CLOSED) == SETTING_TRUE
-
-    return render_template(
-        "admin.html",
-        is_admin=True,
-        annotators=annotators,
-        counts=counts,
-        item_counts=item_counts,
-        skipped=skipped,
-        items=items,
-        votes=len(decisions),
-        setting_closed=setting_closed,
-        time_per_project=Setting.value_of("TIME_PER_PROJECT"),
-        max_time_per_project=Setting.value_of("MAX_TIME_PER_PROJECT"),
-        jury_end=Setting.value_of("JURY_END_DATETIME"),
-    )
 
 
 @app.route("/admin/item", methods=["POST"])
@@ -337,30 +292,6 @@ def setting():
         import_projects()
 
     return redirect(url_for("admin"))
-
-
-@app.route("/admin/item/<item_id>/")
-@utils.requires_auth
-def item_detail(item_id):
-    item = Item.by_id(item_id)
-    if not item:
-        return utils.user_error("Item %s not found " % item_id)
-    else:
-        assigned = Annotator.query.filter(Annotator.next == item).all()
-        viewed_ids = {i.id for i in item.viewed}
-        if viewed_ids:
-            skipped = Annotator.query.filter(
-                Annotator.ignore.contains(item) & ~Annotator.id.in_(viewed_ids)
-            )
-        else:
-            skipped = Annotator.query.filter(Annotator.ignore.contains(item))
-        return render_template(
-            "admin_item.html",
-            is_admin=True,
-            item=item,
-            assigned=assigned,
-            skipped=skipped,
-        )
 
 
 @app.route("/admin/annotator/<annotator_id>/")

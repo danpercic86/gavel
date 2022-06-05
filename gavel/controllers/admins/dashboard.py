@@ -12,6 +12,7 @@ from gavel.models import (
 )
 
 
+@app.route("/admin/")
 @app.route("/admin/dashboard/")
 @utils.requires_auth
 def admin_dashboard():
