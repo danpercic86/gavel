@@ -12,9 +12,9 @@
     integrity="sha384-0evHe/X+R7YkIZDRvuzKMRqM+OrBnVFBL6DOitfPri4tjfHxaWutUpFmBp4vmVor"
     crossorigin="anonymous">
 
-  {#  {% assets "scss_all" %}#}
-  {#    <link rel=stylesheet type=text/css href="{{ ASSET_URL }}">#}
-  {#  {% endassets %}#}
+    {% assets "scss_all" %}
+      <link rel=stylesheet type=text/css href="{{ ASSET_URL }}">
+    {% endassets %}
 
   <!-- Favicon -->
   <link rel="shortcut icon" href="{{ url_for('static', filename='favicon.ico') }}">
