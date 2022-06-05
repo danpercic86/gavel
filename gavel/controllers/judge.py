@@ -24,12 +24,12 @@ def check_open():
 
 
 def check_active_annotator():
-    current = get_current_annotator()
+    current = get_current_judge()
     return current and current.active
 
 
 def check_has_decisions():
-    current = get_current_annotator()
+    current = get_current_judge()
     return current and len(current.decisions) >= 2
 
 
@@ -57,7 +57,7 @@ def requires_active_annotator(redirect_to):
 
 @app.route("/")
 def index():
-    annotator = get_current_annotator()
+    annotator = get_current_judge()
 
     if annotator is None:
         return render_template(
@@ -93,7 +93,7 @@ def index():
 
     if annotator.prev is None:
         return render_template(
-            "begin.html",
+            "judge/begin.html",
             item=annotator.next,
             items=items,
             seen=seen,
@@ -103,7 +103,7 @@ def index():
         )
 
     return render_template(
-        "vote.html",
+        "judge/vote.html",
         prev=annotator.prev,
         next=annotator.next,
         items=items,
@@ -118,35 +118,35 @@ def index():
 @requires_open(redirect_to="index")
 @requires_active_annotator(redirect_to="index")
 def vote():
-    annotator = get_current_annotator()
+    judge = get_current_judge()
     prev_id = int(request.form["prev_id"])
     next_id = int(request.form["next_id"])
 
-    if annotator.prev.id != prev_id or annotator.next.id != next_id:
+    if judge.prev.id != prev_id or judge.next.id != next_id:
         return redirect(url_for("index"))
 
     if request.form["action"] == "Skip":
-        annotator.ignore.append(annotator.next)
+        judge.ignore.append(judge.next)
     else:
         # ignore things that were deactivated in the middle of judging
-        if annotator.prev.active and annotator.next.active:
+        if judge.prev.active and judge.next.active:
             if request.form["action"] == "Previous":
-                perform_vote(annotator, next_won=False)
+                perform_vote(judge, next_won=False)
                 decision = Decision(
-                    annotator, winner=annotator.prev, loser=annotator.next
+                    judge, winner=judge.prev, loser=judge.next
                 )
             elif request.form["action"] == "Current":
-                perform_vote(annotator, next_won=True)
+                perform_vote(judge, next_won=True)
                 decision = Decision(
-                    annotator, winner=annotator.next, loser=annotator.prev
+                    judge, winner=judge.next, loser=judge.prev
                 )
             db.session.add(decision)
 
-        annotator.next.viewed.append(annotator)  # counted as viewed even if deactivated
-        annotator.prev = annotator.next
-        annotator.ignore.append(annotator.prev)
+        judge.next.viewed.append(judge)  # counted as viewed even if deactivated
+        judge.prev = judge.next
+        judge.ignore.append(judge.prev)
 
-    annotator.update_next(choose_next(annotator))
+    judge.update_next(choose_next(judge))
     db.session.commit()
 
     return redirect(url_for("index"))
@@ -157,7 +157,7 @@ def vote():
 @requires_active_annotator(redirect_to="index")
 def begin():
     def tx():
-        annotator = get_current_annotator()
+        annotator = get_current_judge()
         if annotator.next.id == int(request.form["item_id"]):
             annotator.ignore.append(annotator.next)
             if request.form["action"] == "Continue":
@@ -210,7 +210,7 @@ def map():
 def plot_decisions():
     import graphviz
 
-    judge = get_current_annotator()
+    judge = get_current_judge()
     projects = dict()
     edges = []
 
@@ -247,7 +247,7 @@ def plot_decisions():
 @requires_active_annotator(redirect_to="index")
 def welcome_done():
     def tx():
-        annotator = get_current_annotator()
+        annotator = get_current_judge()
         if request.form["action"] == "Continue":
             annotator.read_welcome = True
         db.session.commit()
@@ -256,7 +256,7 @@ def welcome_done():
     return redirect(url_for("index"))
 
 
-def get_current_annotator() -> Annotator:
+def get_current_judge() -> Annotator:
     return Annotator.by_id(session.get(ANNOTATOR_ID, None))
 
 
@@ -299,7 +299,7 @@ def preferred_items(annotator):
 
 def maybe_init_annotator():
     def tx():
-        annotator = get_current_annotator()
+        annotator = get_current_judge()
         if annotator.next is None:
             items = preferred_items(annotator)
             if items:

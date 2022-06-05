@@ -1,8 +1,11 @@
 {% extends "index.html" %}
-{% block title %}Admin{% endblock %}
+{% block title %}
+  Admin
+{% endblock title %}
 {% block content %}
   {% include 'admin/_admin_navbar.html' %}
   <div class="tab-content" id="myTabContent">
-    {% block page %}{% endblock %}
+    {% block page %}
+    {% endblock page %}
   </div>
-{% endblock %}
+{% endblock content %}

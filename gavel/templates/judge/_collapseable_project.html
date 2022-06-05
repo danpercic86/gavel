@@ -1,0 +1,19 @@
+<div class="card">
+  <div class="card-header" id="heading-{{ project.id }}">
+    <button class="btn btn-outline-primary btn-block collapsed btn-custom"
+            data-bs-toggle="collapse"
+            data-bs-target="#collapse-{{ project.id }}"
+            aria-expanded="false"
+            aria-controls="collapse-{{ project.id }}">
+      <span class="prepend">{{ state }}</span>
+      <span class="value">{{ project.name }}</span>
+      <span class="append">&#9776;</span>
+    </button>
+  </div>
+  <div id="collapse-{{ project.id }}"
+       class="collapse {{ 'show' if show else 'collapsed' }}"
+       aria-labelledby="heading-{{ project.id }}"
+       data-parent="#accordion">
+    <div class="card-body previous-body">{% include "judge/_project.html" %}</div>
+  </div>
+</div>

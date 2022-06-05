@@ -1,4 +1,3 @@
-import gavel.controllers.admin
 import gavel.controllers.admins
 import gavel.controllers.api
 import gavel.controllers.csrf_protection

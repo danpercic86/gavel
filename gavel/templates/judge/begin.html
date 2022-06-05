@@ -1,13 +1,13 @@
-{% extends "layout.html" %}
-{% block title %}Start{% endblock %}
-{% block content %}
+{% extends "judge/judge_layout.html" %}
+{% block title %}Start{% endblock title %}
+{% block page %}
   <section class="front">
     <div class="item">
       <div class="banner-tight">
         <h1>This is the first project you see</h1>
       </div>
-      {% with item=item %}
-        {% include "_item.html" %}
+      {% with project=item %}
+        {% include "judge/_project.html" %}
       {% endwith %}
     </div>
   </section>
@@ -37,4 +37,4 @@
       </div>
     </div>
   </div>
-{% endblock %}
+{% endblock title %}
