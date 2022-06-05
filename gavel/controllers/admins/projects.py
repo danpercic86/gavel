@@ -7,7 +7,8 @@ import gavel.utils as utils
 from gavel import app
 from gavel.models import (
     Annotator,
-    Item, Decision,
+    Item,
+    Decision,
 )
 
 ALLOWED_EXTENSIONS = {"csv", "xlsx", "xls"}

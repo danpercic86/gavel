@@ -4,6 +4,7 @@
   <div class="item">
     <div class="info">
       <h2>Judges</h2>
+
       <table id="annotators" class="table table-bordered">
         <thead class="thead-dark">
         <tr>
@@ -22,91 +23,15 @@
           <th scope="col" class="no-sort">Delete</th>
         </tr>
         </thead>
+
         <tbody>
         {% for annotator in annotators %}
-          <tr class="{{ 'disabled' if not annotator.active else '' }}">
-            <td><a
-              href="{{ url_for('annotator_detail', annotator_id=annotator.id) }}"
-              class="colored">{{ annotator.id }}</a></td>
-            <td>{{ annotator.name }}</td>
-            <td>{{ annotator.email }}</td>
-            <td>{{ annotator.description }}</td>
-            <td>{{ counts.get(annotator.id, 0) }}</td>
-            <td
-              data-sort="{{ annotator.next_id or -1 }}">{{ annotator.next_id }}</td>
-            <td
-              data-sort="{{ annotator.prev_id or -1 }}">{{ annotator.prev_id }}</td>
-            <td
-              data-sort="{{ annotator.updated | utcdatetime_epoch }}">{{ annotator.updated | utcdatetime_local }}</td>
-            <td class="compact">
-              <form action="/admin/annotator" method="post">
-                <input type="submit" name="action" value="Email"
-                       class="btn btn-warning">
-                <input type="hidden" name="annotator_id"
-                       value="{{ annotator.id }}">
-                <input type="hidden" name="_csrf_token"
-                       value="{{ csrf_token() }}">
-              </form>
-            </td>
-            <td class="compact" data-sort="{{ annotator.active }}">
-              <form action="/admin/annotator" method="post">
-                <input type="submit" name="action"
-                       value="{{ 'Disable' if annotator.active else 'Enable' }}"
-                       class="btn {{ 'btn-danger' if annotator.active else 'btn-success' }}">
-                <input type="hidden" name="annotator_id"
-                       value="{{ annotator.id }}">
-                <input type="hidden" name="_csrf_token"
-                       value="{{ csrf_token() }}">
-              </form>
-            </td>
-            <td class="compact">
-              <form action="/admin/annotator" method="post">
-                <input type="submit" name="action" value="Delete"
-                       class="btn btn-danger">
-                <input type="hidden" name="annotator_id"
-                       value="{{ annotator.id }}">
-                <input type="hidden" name="_csrf_token"
-                       value="{{ csrf_token() }}">
-              </form>
-            </td>
-          </tr>
+          {% include 'admin/_judge_row.html' %}
         {% endfor %}
         </tbody>
       </table>
     </div>
   </div>
-  <div class="item">
-    <div class="info col-md-6 col-sm-12">
-      <div class="card">
-        <div class="card-body">
-          <h5>Add Judges</h5>
-          <div class="card-subtitle mb-2 text-muted">
-            <form action="/admin/annotator" method="post" id="annotator_form"
-                  enctype="multipart/form-data">
-              <div class="form-group">
-                      <textarea name="data" form="annotator_form" class="form-control"
-                                aria-describedby="annotatorHelp"
-                                placeholder="Adrian, adrian@banatit.ro, Fullstack developer;"></textarea>
-                <small id="annotatorHelp" class="form-text text-muted">Add name,
-                  email, description (CSV format)</small>
-              </div>
-              <div class="form-group">
-                <div class="upload-container">
-                  <input id="annotatorFile" class="form-control"
-                         aria-describedby="annotatorFileHelp" type="file"
-                         name="file"
-                         accept=".csv,.xls,.xlsx">
-                  <small id="annotatorFileHelp" class="field">Or upload a file
-                    here</small>
-                </div>
-              </div>
-              <input type="submit" name="action" value="Submit"
-                     class="btn btn-primary">
-              <input type="hidden" name="_csrf_token" value="{{ csrf_token() }}">
-            </form>
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
+
+  {% include 'admin/_add_judges.html' %}
 {% endblock %}

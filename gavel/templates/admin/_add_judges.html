@@ -1,0 +1,32 @@
+<div class="info col-md-6 col-sm-12">
+  <div class="card">
+    <div class="card-body">
+      <h5>Add Judges</h5>
+      <div class="card-subtitle mb-2 text-muted">
+        <form action="/admin/annotator" method="post" id="annotator_form"
+              enctype="multipart/form-data">
+          <div class="form-group">
+                      <textarea name="data" form="annotator_form" class="form-control"
+                                aria-describedby="annotatorHelp"
+                                placeholder="Adrian, adrian@banatit.ro, Fullstack developer;"></textarea>
+            <small id="annotatorHelp" class="form-text text-muted">Add name,
+              email, description (CSV format)</small>
+          </div>
+          <div class="form-group">
+            <div class="upload-container">
+              <input id="annotatorFile" class="form-control"
+                     aria-describedby="annotatorFileHelp" type="file"
+                     name="file"
+                     accept=".csv,.xls,.xlsx">
+              <small id="annotatorFileHelp" class="field">Or upload a file
+                here</small>
+            </div>
+          </div>
+          <input type="submit" name="action" value="Submit"
+                 class="btn btn-primary">
+          <input type="hidden" name="_csrf_token" value="{{ csrf_token() }}">
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
