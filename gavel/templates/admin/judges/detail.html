@@ -1,10 +1,13 @@
 {% extends "admin/admin_layout.html" %}
-{% block title %}Judge{% endblock title %}
+{% block title %}
+  Judge
+{% endblock title %}
 {% block page %}
   <div class="banner" id="admin-header">
-    <h1>Judge <strong>{{ annotator.name }}</strong></h1>
+    <h1>
+      Judge <strong>{{ annotator.name }}</strong>
+    </h1>
   </div>
-
   <div class="info">
     <table>
       <tr>
@@ -33,9 +36,7 @@
         <th>Next</th>
         {% if annotator.next %}
           {% set project = annotator.next %}
-          <td>
-            {% include 'admin/judges/_project_link.html' %}
-          </td>
+          <td>{% include 'admin/judges/_project_link.html' %}</td>
         {% else %}
           <td>None</td>
         {% endif %}
@@ -44,9 +45,7 @@
         <th>Previous</th>
         {% if annotator.prev %}
           {% set project = annotator.prev %}
-          <td>
-            {% include 'admin/judges/_project_link.html' %}
-          </td>
+          <td>{% include 'admin/judges/_project_link.html' %}</td>
         {% else %}
           <td>None</td>
         {% endif %}

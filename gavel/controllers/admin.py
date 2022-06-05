@@ -1,11 +1,8 @@
 import io
-import json
 from typing import List
 
 import psycopg2.errors
-import requests
 import xlrd
-from django.utils.html import strip_tags
 from flask import (
     redirect,
     request,
@@ -17,12 +14,11 @@ from sqlalchemy.exc import IntegrityError
 import gavel.settings as settings
 import gavel.utils as utils
 from gavel import app
-from gavel.constants import SETTING_CLOSED, SETTING_TRUE, SETTING_FALSE
+from gavel.controllers.admins.judges import judge_login_link
 from gavel.models import (
     Annotator,
     Item,
     Decision,
-    Setting,
     db,
     with_retries,
     ignore_table,
@@ -211,88 +207,6 @@ def annotator_actions():
     return redirect(url_for("admin"))
 
 
-def import_projects():
-    response = requests.get(settings.IMPORT_URL)
-    data = json.loads(response.content.decode("utf-8"))
-    if isinstance(data, dict) and "data" in data:
-        data = data["data"]
-
-    for item in data:
-        if "_id" not in item:
-            print("no id...", item)
-            continue
-        if "teamName" not in item:
-            print("no team name...", item)
-            continue
-
-        name = strip_tags(item.get("name", None) or "")
-        location = strip_tags(item.get("location", None) or "")
-
-        if not name or not location:
-            print("Project has no name...", item)
-            continue
-
-        description = strip_tags(item.get("description", None) or "") or "..."
-        team_name = strip_tags(item.get("teamName", None) or "") or "..."
-        presentation_link = (
-            strip_tags(item.get("presentationLink", None) or "") or "..."
-        )
-
-        existing = Item.by_identifier(item["_id"])
-        if existing is None:
-            _item = Item(
-                name, location, description, item["_id"], team_name, presentation_link
-            )
-            print("insert", item["_id"])
-            db.session.add(_item)
-        else:
-            existing.name = name
-            existing.location = location
-            existing.description = description
-            existing.team_name = team_name
-            existing.presentation_link = presentation_link
-            print("update", item["_id"])
-
-    db.session.commit()
-
-
-@app.route("/admin/setting", methods=["POST"])
-@utils.requires_auth
-def setting():
-    action = request.form["action"]
-    if action == "update-time-per-project":
-        Setting.set("TIME_PER_PROJECT", request.form["time-per-project"])
-        db.session.commit()
-    if action == "update-max-time-per-project":
-        Setting.set("MAX_TIME_PER_PROJECT", request.form["max-time-per-project"])
-        db.session.commit()
-    if action == "update-jury-end":
-        Setting.set("JURY_END_DATETIME", request.form["jury-end-datetime"])
-        db.session.commit()
-    if action == "update-voting-status":
-        new_value = (
-            SETTING_TRUE if request.form["voting-status"] == "Close" else SETTING_FALSE
-        )
-        Setting.set(SETTING_CLOSED, new_value)
-        db.session.commit()
-    if action == "delete-skips":
-        db.session.execute("DELETE FROM ignore")
-        db.session.commit()
-    if action == "wipe-data":
-        Decision.query.delete()
-        db.session.execute("DELETE FROM ignore")
-        db.session.execute("DELETE FROM view")
-        db.session.commit()
-        Annotator.query.delete()
-        db.session.commit()
-        Item.query.delete()
-        db.session.commit()
-    if action == "import-teams":
-        import_projects()
-
-    return redirect(url_for("admin"))
-
-
 @app.route("/admin/project-decisions/<item_id>/")
 @utils.requires_auth
 def plot_decisions_project(item_id):
@@ -346,7 +260,7 @@ def email_invite_links(annotators: List[Annotator] | Annotator):
 
     emails = []
     for annotator in annotators:
-        link = annotator_link(annotator)
+        link = judge_login_link(annotator)
         raw_body = settings.EMAIL_BODY.format(name=annotator.name, link=link)
         body = "\n\n".join(utils.get_paragraphs(raw_body))
         emails.append((annotator.email, settings.EMAIL_SUBJECT, body))

@@ -5,8 +5,8 @@ from sqlalchemy import desc
 
 import gavel.utils as utils
 from gavel import app, settings
-from gavel.controllers.admin import import_projects
 from gavel.controllers.admins.judges import judge_login_link
+from gavel.controllers.admins.settings import import_projects
 from gavel.models import Item, Annotator, Decision, db
 
 

@@ -13,12 +13,11 @@
         <tr class="{{ 'disabled' if setting_closed else '' }}">
           <td>Voting status</td>
           <td class="compact">
-            <form action="/admin/setting" method="post">
+            <form action="/admin/settings/update-status" method="post">
               <input type="submit"
-                     name="voting-status"
+                     name="value"
                      value="{{ 'Open' if setting_closed else 'Close' }}"
                      class="btn {{ 'btn-success' if setting_closed else 'btn-danger' }}"/>
-              <input type="hidden" name="action" value="update-voting-status"/>
               <input type="hidden" name="_csrf_token" value="{{ csrf_token() }}"/>
             </form>
           </td>
@@ -26,10 +25,10 @@
         <tr>
           <td>Time per project</td>
           <td class="compact">
-            <form action="/admin/setting" method="post">
-              <input type="text" name="time-per-project" value="{{ time_per_project }}"/>
+            <form action="/admin/settings/update" method="post">
+              <input type="text" name="value" value="{{ time_per_project }}"/>
               <input type="submit" value="Update" class="btn btn-success"/>
-              <input type="hidden" name="action" value="update-time-per-project"/>
+              <input type="hidden" name="identifier" value="TIME_PER_PROJECT"/>
               <input type="hidden" name="_csrf_token" value="{{ csrf_token() }}"/>
             </form>
           </td>
@@ -37,12 +36,10 @@
         <tr>
           <td>Max time per project / general alert starts</td>
           <td class="compact">
-            <form action="/admin/setting" method="post">
-              <input type="text"
-                     name="max-time-per-project"
-                     value="{{ max_time_per_project }}"/>
+            <form action="/admin/settings/update" method="post">
+              <input type="text" name="value" value="{{ max_time_per_project }}"/>
               <input type="submit" value="Update" class="btn btn-success"/>
-              <input type="hidden" name="action" value="update-max-time-per-project"/>
+              <input type="hidden" name="identifier" value="MAX_TIME_PER_PROJECT"/>
               <input type="hidden" name="_csrf_token" value="{{ csrf_token() }}"/>
             </form>
           </td>
@@ -53,14 +50,14 @@
             timezone
           </td>
           <td class="compact">
-            <form action="/admin/setting" method="post">
+            <form action="/admin/settings/update" method="post">
               {% if jury_end %}
-                <input type="text" name="jury-end-datetime" value="{{ jury_end }}"/>
+                <input type="text" name="value" value="{{ jury_end }}"/>
               {% else %}
-                <input type="text" name="jury-end-datetime" value="2020-11-18T22:00:00"/>
+                <input type="text" name="value" value="2020-11-18T22:00:00"/>
               {% endif %}
               <input type="submit" value="Update" class="btn btn-success"/>
-              <input type="hidden" name="action" value="update-jury-end"/>
+              <input type="hidden" name="identifier" value="JURY_END_DATETIME"/>
               <input type="hidden" name="_csrf_token" value="{{ csrf_token() }}"/>
             </form>
           </td>
@@ -68,9 +65,8 @@
         <tr>
           <td>Import teams</td>
           <td class="compact">
-            <form action="/admin/setting" method="post">
+            <form action="/admin/settings/import-teams" method="post">
               <input type="submit" value="Import" class="btn btn-success"/>
-              <input type="hidden" name="action" value="import-teams"/>
               <input type="hidden" name="_csrf_token" value="{{ csrf_token() }}"/>
             </form>
           </td>
@@ -78,9 +74,8 @@
         <tr>
           <td>Delete All Skips</td>
           <td class="compact">
-            <form action="/admin/setting" method="post">
+            <form action="/admin/settings/delete-skips" method="post">
               <input type="submit" value="Delete Skips" class="btn btn-danger"/>
-              <input type="hidden" name="action" value="delete-skips"/>
               <input type="hidden" name="_csrf_token" value="{{ csrf_token() }}"/>
             </form>
           </td>
@@ -88,9 +83,8 @@
         <tr>
           <td>Wipe Data</td>
           <td class="compact">
-            <form action="/admin/setting" method="post">
+            <form action="/admin/settings/wipe-data" method="post">
               <input type="submit" value="Wipe All Data" class="btn btn-danger"/>
-              <input type="hidden" name="action" value="wipe-data"/>
               <input type="hidden" name="_csrf_token" value="{{ csrf_token() }}"/>
             </form>
           </td>

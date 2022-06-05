@@ -3,15 +3,16 @@
     <a href="{{ url_for('judge_details', judge_id=annotator.id) }}"
        class="colored">{{ annotator.id }}</a>
   </td>
-  <td><a href="{{ url_for('judge_details', judge_id=annotator.id) }}"
-         class="colored">{{ annotator.name }}</a></td>
+  <td>
+    <a href="{{ url_for('judge_details', judge_id=annotator.id) }}"
+       class="colored">{{ annotator.name }}</a>
+  </td>
   <td>{{ annotator.email }}</td>
   <td>{{ annotator.description }}</td>
   <td>{{ counts.get(annotator.id, 0) }}</td>
   <td data-sort="{{ annotator.next_id or -1 }}">{{ annotator.next_id }}</td>
   <td data-sort="{{ annotator.prev_id or -1 }}">{{ annotator.prev_id }}</td>
-  <td
-    data-sort="{{ annotator.updated | utcdatetime_epoch }}">{{ annotator.updated | utcdatetime_local }}</td>
+  <td data-sort="{{ annotator.updated | utcdatetime_epoch }}">{{ annotator.updated | utcdatetime_local }}</td>
   <td class="compact">
     <form action="/admin/annotator" method="post">
       <input type="submit" name="action" value="Email" class="btn btn-warning">

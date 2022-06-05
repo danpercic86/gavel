@@ -1,5 +1,6 @@
 from flask import (
-    render_template, url_for,
+    render_template,
+    url_for,
 )
 
 import gavel.stats as stats
@@ -7,7 +8,8 @@ import gavel.utils as utils
 from gavel import app
 from gavel.models import (
     Annotator,
-    Decision, Item,
+    Decision,
+    Item,
 )
 
 ALLOWED_EXTENSIONS = {"csv", "xlsx", "xls"}
