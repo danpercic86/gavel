@@ -1,11 +1,11 @@
 $(document).ready(function () {
 
 
-    // implement tabs
-    $('#myTab a').on('click', function (e) {
-        e.preventDefault()
-        $(this).tab('show');
-    });
+//    // implement tabs
+//    $('#myTab a').on('click', function (e) {
+//        e.preventDefault()
+//        $(this).tab('show');
+//    });
 
 
     console.log('hello gavel')
