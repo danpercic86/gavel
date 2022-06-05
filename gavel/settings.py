@@ -75,6 +75,7 @@ c = Config(CONFIG_FILE)
 # note: this should be kept in sync with 'config.template.yaml' and
 # 'config.vagrant.yaml'
 # BASE_URL = c.get('base_url', 'BASE_URL')
+DEBUG = bool(c.get("debug", "DEBUG", default=True))
 ADMIN_PASSWORD = c.get("admin_password", "ADMIN_PASSWORD")
 DB_URI = c.get(
     "db_uri", ["DATABASE_URL", "DB_URI"], default="postgresql://localhost/gavel"
