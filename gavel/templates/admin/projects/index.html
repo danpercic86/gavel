@@ -1,40 +1,41 @@
 {% extends 'admin/admin_layout.html' %}
 {% block page %}
-  <div class="item">
-    <div class="info">
-      <h2>Projects</h2>
-      <table id="items" class="table table-bordered">
-        <thead class="thead-dark">
-          <tr>
-            <th scope="col" data-sort-method="number">Id</th>
-            <th scope="col" data-sort-method="caseInsensitiveSort">Name</th>
-            <th scope="col" data-sort-method="caseInsensitiveSort">Team name</th>
-            <th scope="col" data-sort-method="caseInsensitiveSort">Presentation link</th>
-            <th scope="col" data-sort-method="caseInsensitiveSort">Location</th>
-            <th scope="col" data-sort-method="caseInsensitiveSort">Description</th>
-            <th scope="col"
-                class="sort-default"
-                data-sort-method="number"
-                data-sort-order="desc">Mu</th>
-            <th scope="col" data-sort-method="number">Sigma Squared</th>
-            <th scope="col" data-sort-method="number">Votes</th>
-            <th scope="col" data-sort-method="number">Seen</th>
-            <th scope="col" data-sort-method="number" data-sort-order="desc">Skipped</th>
-            <th scope="col"
-                data-sort-method="caseInsensitiveSort"
-                data-sort-order="desc">Prioritize</th>
-            <th scope="col" data-sort-method="caseInsensitiveSort">Active</th>
-            <th scope="col" class="no-sort">Delete</th>
-            <th scope="col" class="no-sort">Plot</th>
-          </tr>
-        </thead>
-        <tbody>
-          {% for item in items %}
-            {% include 'admin/projects/_project_row.html' %}
-          {% endfor %}
-        </tbody>
-      </table>
-    </div>
+  <div class="info">
+    <h2>Projects</h2>
+    <table id="table" class="table table-bordered">
+      <thead class="thead-dark">
+        <tr>
+          <th scope="col" data-sort-method="number">Id</th>
+          <th scope="col" data-sort-method="caseInsensitiveSort">Name</th>
+          <th scope="col" data-sort-method="caseInsensitiveSort">Team name</th>
+          <th scope="col" data-sort-method="caseInsensitiveSort">Presentation link</th>
+          <th scope="col" data-sort-method="caseInsensitiveSort">Location</th>
+          <th scope="col" data-sort-method="caseInsensitiveSort">Description</th>
+          <th scope="col"
+              class="sort-default"
+              data-sort-method="number"
+              data-sort-order="desc">Mu</th>
+          <th scope="col" data-sort-method="number">Sigma Squared</th>
+          <th scope="col" data-sort-method="number">Votes</th>
+          <th scope="col" data-sort-method="number">Seen</th>
+          <th scope="col" data-sort-method="number" data-sort-order="desc">Skipped</th>
+          <th scope="col"
+              data-sort-method="caseInsensitiveSort"
+              data-sort-order="desc">Prioritize</th>
+          <th scope="col" data-sort-method="caseInsensitiveSort">Active</th>
+          <th scope="col" class="no-sort">Delete</th>
+          <th scope="col" class="no-sort">Plot</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for item in items %}
+          {% include 'admin/projects/_project_row.html' %}
+        {% endfor %}
+      </tbody>
+    </table>
   </div>
   {% include 'admin/projects/_add_projects.html' %}
 {% endblock %}
+{% block end %}
+  {% include 'admin/_table_sorter.html' %}
+{% endblock end %}
