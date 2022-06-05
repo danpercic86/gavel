@@ -7,7 +7,8 @@ from flask import (
     render_template,
     request,
     session,
-    url_for, send_file,
+    url_for,
+    send_file,
 )
 from numpy.random import choice, random, shuffle
 
@@ -54,90 +55,91 @@ def requires_active_annotator(redirect_to):
     return requires(check_active_annotator, redirect_to)
 
 
-@app.route('/')
+@app.route("/")
 def index():
     annotator = get_current_annotator()
 
     if annotator is None:
         return render_template(
-            'logged_out.html',
-            content=utils.render_markdown(settings.LOGGED_OUT_MESSAGE)
+            "logged_out.html",
+            content=utils.render_markdown(settings.LOGGED_OUT_MESSAGE),
         )
 
     items = Item.query.order_by(Item.id).all()
     seen = Item.query.filter(Item.viewed.contains(annotator)).all()
     if Setting.value_of(SETTING_CLOSED) == SETTING_TRUE:
         return render_template(
-            'closed.html',
-            content=utils.render_markdown(settings.CLOSED_MESSAGE)
+            "closed.html", content=utils.render_markdown(settings.CLOSED_MESSAGE)
         )
 
     if not annotator.active:
         return render_template(
-            'disabled.html',
-            content=utils.render_markdown(settings.DISABLED_MESSAGE)
+            "disabled.html", content=utils.render_markdown(settings.DISABLED_MESSAGE)
         )
 
     if not annotator.read_welcome:
-        return redirect(url_for('welcome'))
+        return redirect(url_for("welcome"))
 
     maybe_init_annotator()
 
     if annotator.next is None:
         return render_template(
-            'wait.html',
-            content=utils.render_markdown(settings.WAIT_MESSAGE)
+            "wait.html", content=utils.render_markdown(settings.WAIT_MESSAGE)
         )
 
-    time_per_project = Setting.value_of('TIME_PER_PROJECT')
-    max_time_per_project = Setting.value_of('MAX_TIME_PER_PROJECT')
-    jury_end = Setting.value_of('JURY_END_DATETIME')
+    time_per_project = Setting.value_of("TIME_PER_PROJECT")
+    max_time_per_project = Setting.value_of("MAX_TIME_PER_PROJECT")
+    jury_end = Setting.value_of("JURY_END_DATETIME")
 
     if annotator.prev is None:
-        return render_template('begin.html',
-                               item=annotator.next,
-                               items=items,
-                               seen=seen,
-                               time_per_project=time_per_project,
-                               max_time_per_project=max_time_per_project,
-                               jury_end=jury_end
-                               )
+        return render_template(
+            "begin.html",
+            item=annotator.next,
+            items=items,
+            seen=seen,
+            time_per_project=time_per_project,
+            max_time_per_project=max_time_per_project,
+            jury_end=jury_end,
+        )
 
-    return render_template('vote.html',
-                           prev=annotator.prev,
-                           next=annotator.next,
-                           items=items,
-                           seen=seen,
-                           time_per_project=time_per_project,
-                           max_time_per_project=max_time_per_project,
-                           jury_end_datetime=jury_end
-                           )
+    return render_template(
+        "vote.html",
+        prev=annotator.prev,
+        next=annotator.next,
+        items=items,
+        seen=seen,
+        time_per_project=time_per_project,
+        max_time_per_project=max_time_per_project,
+        jury_end_datetime=jury_end,
+    )
 
 
-@app.route('/vote', methods=['POST'])
-@requires_open(redirect_to='index')
-@requires_active_annotator(redirect_to='index')
+@app.route("/vote", methods=["POST"])
+@requires_open(redirect_to="index")
+@requires_active_annotator(redirect_to="index")
 def vote():
     annotator = get_current_annotator()
-    prev_id = int(request.form['prev_id'])
-    next_id = int(request.form['next_id'])
+    prev_id = int(request.form["prev_id"])
+    next_id = int(request.form["next_id"])
 
     if annotator.prev.id != prev_id or annotator.next.id != next_id:
-        return redirect(url_for('index'))
+        return redirect(url_for("index"))
 
-    if request.form['action'] == 'Skip':
+    if request.form["action"] == "Skip":
         annotator.ignore.append(annotator.next)
     else:
         # ignore things that were deactivated in the middle of judging
         if annotator.prev.active and annotator.next.active:
-            if request.form['action'] == 'Previous':
+            if request.form["action"] == "Previous":
                 perform_vote(annotator, next_won=False)
-                decision = Decision(annotator, winner=annotator.prev,
-                                    loser=annotator.next)
-            elif request.form['action'] == 'Current':
+                decision = Decision(
+                    annotator, winner=annotator.prev, loser=annotator.next
+                )
+            elif request.form["action"] == "Current":
                 perform_vote(annotator, next_won=True)
-                decision = Decision(annotator, winner=annotator.next,
-                                    loser=annotator.prev)
+                decision = Decision(
+                    annotator, winner=annotator.next, loser=annotator.prev
+                )
             db.session.add(decision)
 
         annotator.next.viewed.append(annotator)  # counted as viewed even if deactivated
@@ -147,36 +149,36 @@ def vote():
     annotator.update_next(choose_next(annotator))
     db.session.commit()
 
-    return redirect(url_for('index'))
+    return redirect(url_for("index"))
 
 
-@app.route('/begin', methods=['POST'])
-@requires_open(redirect_to='index')
-@requires_active_annotator(redirect_to='index')
+@app.route("/begin", methods=["POST"])
+@requires_open(redirect_to="index")
+@requires_active_annotator(redirect_to="index")
 def begin():
     def tx():
         annotator = get_current_annotator()
-        if annotator.next.id == int(request.form['item_id']):
+        if annotator.next.id == int(request.form["item_id"]):
             annotator.ignore.append(annotator.next)
-            if request.form['action'] == 'Continue':
+            if request.form["action"] == "Continue":
                 annotator.next.viewed.append(annotator)
                 annotator.prev = annotator.next
                 annotator.update_next(choose_next(annotator))
-            elif request.form['action'] == 'Skip':
+            elif request.form["action"] == "Skip":
                 annotator.next = None  # will be reset in index
             db.session.commit()
 
     with_retries(tx)
-    return redirect(url_for('index'))
+    return redirect(url_for("index"))
 
 
-@app.route('/logout')
+@app.route("/logout")
 def logout():
     session.pop(ANNOTATOR_ID, None)
-    return redirect(url_for('index'))
+    return redirect(url_for("index"))
 
 
-@app.route('/login/<secret>/')
+@app.route("/login/<secret>/")
 def login(secret):
     annotator = Annotator.by_secret(secret)
     if annotator is None:
@@ -184,28 +186,27 @@ def login(secret):
         session.modified = True
     else:
         session[ANNOTATOR_ID] = annotator.id
-    return redirect(url_for('index'))
+    return redirect(url_for("index"))
 
 
-@app.route('/welcome/')
-@requires_open(redirect_to='index')
-@requires_active_annotator(redirect_to='index')
+@app.route("/welcome/")
+@requires_open(redirect_to="index")
+@requires_active_annotator(redirect_to="index")
 def welcome():
     return render_template(
-        'welcome.html',
-        content=utils.render_markdown(settings.WELCOME_MESSAGE)
+        "welcome.html", content=utils.render_markdown(settings.WELCOME_MESSAGE)
     )
 
 
-@app.route('/map/')
-@requires_open(redirect_to='index')
-@requires_active_annotator(redirect_to='index')
+@app.route("/map/")
+@requires_open(redirect_to="index")
+@requires_active_annotator(redirect_to="index")
 def map():
-    return render_template('map.html')
+    return render_template("map.html")
 
 
-@app.route('/decisions/')
-@requires(check_has_decisions, redirect_to='index')
+@app.route("/decisions/")
+@requires(check_has_decisions, redirect_to="index")
 def plot_decisions():
     import graphviz
 
@@ -214,10 +215,10 @@ def plot_decisions():
     edges = []
 
     def node_name(it: Item):
-        return f'P{it.id}'
+        return f"P{it.id}"
 
     def add_project(it: Item):
-        projects[node_name(it)] = f'{it.name} -- {it.team_name}'
+        projects[node_name(it)] = f"{it.name} -- {it.team_name}"
 
     def add_edge(winner: Item, loser: Item):
         edges.append((node_name(winner), node_name(loser)))
@@ -227,33 +228,32 @@ def plot_decisions():
         add_project(dec.loser)
         add_edge(dec.winner, dec.loser)
 
-    title = f'UniHack votes from judge {judge.name}'
-    dot = graphviz.Digraph(comment=title, graph_attr={
-        'label': f'{title}, A -> B means A is better than B'})
+    title = f"UniHack votes from judge {judge.name}"
+    dot = graphviz.Digraph(
+        comment=title, graph_attr={"label": f"{title}, A -> B means A is better than B"}
+    )
     for proj, team in projects.items():
         dot.node(proj, team)
 
     for edge in edges:
         dot.edge(*edge)
 
-    graph = graphviz.pipe('dot', 'png', dot.source.encode())
-    return send_file(
-        io.BytesIO(graph),
-        mimetype='image/png')
+    graph = graphviz.pipe("dot", "png", dot.source.encode())
+    return send_file(io.BytesIO(graph), mimetype="image/png")
 
 
-@app.route('/welcome/done', methods=['POST'])
-@requires_open(redirect_to='index')
-@requires_active_annotator(redirect_to='index')
+@app.route("/welcome/done", methods=["POST"])
+@requires_open(redirect_to="index")
+@requires_active_annotator(redirect_to="index")
 def welcome_done():
     def tx():
         annotator = get_current_annotator()
-        if request.form['action'] == 'Continue':
+        if request.form["action"] == "Continue":
             annotator.read_welcome = True
         db.session.commit()
 
     with_retries(tx)
-    return redirect(url_for('index'))
+    return redirect(url_for("index"))
 
 
 def get_current_annotator() -> Annotator:
@@ -280,11 +280,15 @@ def preferred_items(annotator):
     items = prioritized_items if prioritized_items else available_items
 
     annotators = Annotator.query.filter(
-        (Annotator.active == True) & (Annotator.next != None) & (
-            Annotator.updated != None)
+        (Annotator.active == True)
+        & (Annotator.next != None)
+        & (Annotator.updated != None)
     ).all()
-    busy = {i.next.id for i in annotators if \
-            (datetime.utcnow() - i.updated).total_seconds() < settings.TIMEOUT * 60}
+    busy = {
+        i.next.id
+        for i in annotators
+        if (datetime.utcnow() - i.updated).total_seconds() < settings.TIMEOUT * 60
+    }
     nonbusy = [i for i in items if i.id not in busy]
     preferred = nonbusy if nonbusy else items
 
@@ -313,13 +317,17 @@ def choose_next(annotator):
         if random() < crowd_bt.EPSILON:
             return items[0]
         else:
-            return crowd_bt.argmax(lambda i: crowd_bt.expected_information_gain(
-                annotator.alpha,
-                annotator.beta,
-                annotator.prev.mu,
-                annotator.prev.sigma_sq,
-                i.mu,
-                i.sigma_sq), items)
+            return crowd_bt.argmax(
+                lambda i: crowd_bt.expected_information_gain(
+                    annotator.alpha,
+                    annotator.beta,
+                    annotator.prev.mu,
+                    annotator.prev.sigma_sq,
+                    i.mu,
+                    i.sigma_sq,
+                ),
+                items,
+            )
     else:
         return None
 
@@ -331,13 +339,20 @@ def perform_vote(annotator, next_won):
     else:
         winner = annotator.prev
         loser = annotator.next
-    u_alpha, u_beta, u_winner_mu, u_winner_sigma_sq, u_loser_mu, u_loser_sigma_sq = crowd_bt.update(
+    (
+        u_alpha,
+        u_beta,
+        u_winner_mu,
+        u_winner_sigma_sq,
+        u_loser_mu,
+        u_loser_sigma_sq,
+    ) = crowd_bt.update(
         annotator.alpha,
         annotator.beta,
         winner.mu,
         winner.sigma_sq,
         loser.mu,
-        loser.sigma_sq
+        loser.sigma_sq,
     )
     annotator.alpha = u_alpha
     annotator.beta = u_beta

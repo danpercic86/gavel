@@ -5,9 +5,9 @@ from flask_sqlalchemy import SQLAlchemy
 
 class SerializableAlchemy(SQLAlchemy):
     def apply_driver_hacks(self, app, info, options):
-        if 'isolation_level' not in options:
+        if "isolation_level" not in options:
             # XXX is this slow? are there better ways?
-            options['isolation_level'] = 'SERIALIZABLE'
+            options["isolation_level"] = "SERIALIZABLE"
         return super(SerializableAlchemy, self).apply_driver_hacks(app, info, options)
 
 
@@ -20,13 +20,13 @@ from gavel.models.setting import Setting
 
 
 def with_retries(tx_func):
-    '''
+    """
     Keep retrying a function that involves a database transaction until it
     succeeds.
 
     This only retries due to serialization failures; all other types of
     exceptions are re-raised.
-    '''
+    """
     while True:
         try:
             tx_func()

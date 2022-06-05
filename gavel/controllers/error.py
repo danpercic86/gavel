@@ -5,25 +5,24 @@ from gavel import app
 
 @app.errorhandler(404)
 def error_404(e):
-    return (
-        render_template('error.html', message='Page not found.'),
-        404
-    )
+    return (render_template("error.html", message="Page not found."), 404)
 
 
 @app.errorhandler(403)
 def error_403(e):
     return (
-        render_template('error.html',
-                        message='Forbidden. Go back, refresh the page, and try again.'),
-        403
+        render_template(
+            "error.html", message="Forbidden. Go back, refresh the page, and try again."
+        ),
+        403,
     )
 
 
 @app.errorhandler(500)
 def error_500(e):
     return (
-        render_template('error.html',
-                        message='Internal server error. Go back and try again.'),
-        500
+        render_template(
+            "error.html", message="Internal server error. Go back and try again."
+        ),
+        500,
     )

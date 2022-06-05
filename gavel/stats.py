@@ -25,32 +25,32 @@ def _check_send_telemetry():
     Setting.set(constants.SETTING_TELEMETRY_LAST_SENT, str(int(time.time())))
     db.session.commit()
     stats = gather_stats()
-    send_telemetry('gavel-v1', stats)
+    send_telemetry("gavel-v1", stats)
 
 
 def gather_stats():
     return {
-        'base-url': url_for('index', _external=True),
-        'disable-email': settings.DISABLE_EMAIL,
-        'use-sendgrid': settings.USE_SENDGRID,
-        'custom-messages': (
-            settings.WELCOME_MESSAGE != constants.DEFAULT_WELCOME_MESSAGE or
-            settings.CLOSED_MESSAGE != constants.DEFAULT_CLOSED_MESSAGE or
-            settings.DISABLED_MESSAGE != constants.DEFAULT_DISABLED_MESSAGE or
-            settings.LOGGED_OUT_MESSAGE != constants.DEFAULT_LOGGED_OUT_MESSAGE or
-            settings.WAIT_MESSAGE != constants.DEFAULT_WAIT_MESSAGE or
-            settings.EMAIL_SUBJECT != constants.DEFAULT_EMAIL_SUBJECT or
-            settings.EMAIL_BODY != constants.DEFAULT_EMAIL_BODY
+        "base-url": url_for("index", _external=True),
+        "disable-email": settings.DISABLE_EMAIL,
+        "use-sendgrid": settings.USE_SENDGRID,
+        "custom-messages": (
+            settings.WELCOME_MESSAGE != constants.DEFAULT_WELCOME_MESSAGE
+            or settings.CLOSED_MESSAGE != constants.DEFAULT_CLOSED_MESSAGE
+            or settings.DISABLED_MESSAGE != constants.DEFAULT_DISABLED_MESSAGE
+            or settings.LOGGED_OUT_MESSAGE != constants.DEFAULT_LOGGED_OUT_MESSAGE
+            or settings.WAIT_MESSAGE != constants.DEFAULT_WAIT_MESSAGE
+            or settings.EMAIL_SUBJECT != constants.DEFAULT_EMAIL_SUBJECT
+            or settings.EMAIL_BODY != constants.DEFAULT_EMAIL_BODY
         ),
-        'judges': Annotator.query.count(),
-        'items': Item.query.count(),
-        'decisions': Decision.query.count(),
+        "judges": Annotator.query.count(),
+        "items": Item.query.count(),
+        "decisions": Decision.query.count(),
     }
 
 
 def send_telemetry(identifier, data):
     requests.post(
         constants.TELEMETRY_URL,
-        json={'identifier': identifier, 'data': data},
-        timeout=3
+        json={"identifier": identifier, "data": data},
+        timeout=3,
     )

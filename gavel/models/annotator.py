@@ -9,9 +9,9 @@ import gavel.utils as utils
 from gavel.models import db
 
 ignore_table = db.Table(
-    'ignore',
-    db.Column('annotator_id', db.Integer, db.ForeignKey('annotator.id')),
-    db.Column('item_id', db.Integer, db.ForeignKey('item.id'))
+    "ignore",
+    db.Column("annotator_id", db.Integer, db.ForeignKey("annotator.id")),
+    db.Column("item_id", db.Integer, db.ForeignKey("item.id")),
 )
 
 
@@ -23,12 +23,12 @@ class Annotator(db.Model):
     read_welcome = db.Column(db.Boolean, default=False, nullable=False)
     description = db.Column(db.Text, nullable=False)
     secret = db.Column(db.String(32), unique=True, nullable=False)
-    next_id = db.Column(db.Integer, db.ForeignKey('item.id'))
-    next = db.relationship('Item', foreign_keys=[next_id], uselist=False)
+    next_id = db.Column(db.Integer, db.ForeignKey("item.id"))
+    next = db.relationship("Item", foreign_keys=[next_id], uselist=False)
     updated = db.Column(db.DateTime)
-    prev_id = db.Column(db.Integer, db.ForeignKey('item.id'))
-    prev = db.relationship('Item', foreign_keys=[prev_id], uselist=False)
-    ignore = db.relationship('Item', secondary=ignore_table)
+    prev_id = db.Column(db.Integer, db.ForeignKey("item.id"))
+    prev = db.relationship("Item", foreign_keys=[prev_id], uselist=False)
+    ignore = db.relationship("Item", secondary=ignore_table)
 
     alpha = db.Column(db.Float)
     beta = db.Column(db.Float)
@@ -43,14 +43,16 @@ class Annotator(db.Model):
 
     def update_next(self, new_next):
         if new_next is not None:
-            new_next.prioritized = False  # it's now assigned, so cancel the prioritization
+            new_next.prioritized = (
+                False  # it's now assigned, so cancel the prioritization
+            )
             # it could happen that the judge skips the project, but that
             # doesn't re-prioritize the project
             self.updated = datetime.utcnow()
         self.next = new_next
 
     @property
-    def decisions(self) -> List['gavel.models.Decision']:
+    def decisions(self) -> List["gavel.models.Decision"]:
         decision = gavel.models.Decision
         return decision.query.filter(decision.annotator_id == self.id).all()
 

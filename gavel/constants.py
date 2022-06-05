@@ -1,19 +1,19 @@
-ANNOTATOR_ID = 'annotator_id'
-TELEMETRY_URL = 'https://telemetry.anish.io/api/v1/submit'
+ANNOTATOR_ID = "annotator_id"
+TELEMETRY_URL = "https://telemetry.anish.io/api/v1/submit"
 TELEMETRY_DELTA = 20 * 60  # seconds
 SENDGRID_URL = "https://api.sendgrid.com/v3/mail/send"
 
 # Setting
 # keys
-SETTING_CLOSED = 'closed'  # boolean
-SETTING_TELEMETRY_LAST_SENT = 'telemetry_sent_time'  # integer
+SETTING_CLOSED = "closed"  # boolean
+SETTING_TELEMETRY_LAST_SENT = "telemetry_sent_time"  # integer
 # values
-SETTING_TRUE = 'true'
-SETTING_FALSE = 'false'
+SETTING_TRUE = "true"
+SETTING_FALSE = "false"
 
 # Defaults
 # these can be overridden via the config file
-DEFAULT_WELCOME_MESSAGE = '''
+DEFAULT_WELCOME_MESSAGE = """
 Welcome to HackTM.
 
 **Please read this important message carefully before continuing.**
@@ -32,11 +32,11 @@ unless absolutely necessary.**
 
 Gavel makes it really simple for you to submit votes, but please think hard
 before you vote. **Once you make a decision, you can't take it back.**
-'''.strip()
+""".strip()
 
-DEFAULT_EMAIL_SUBJECT = 'Welcome to the HackTM judging system!'
+DEFAULT_EMAIL_SUBJECT = "Welcome to the HackTM judging system!"
 
-DEFAULT_EMAIL_BODY = '''
+DEFAULT_EMAIL_BODY = """
 Hi {name},
 
 Welcome to Gavel, the online expo judging system. This email contains your
@@ -48,26 +48,26 @@ To access the system, visit {link}.
 
 Once you're in, please take the time to read the welcome message and
 instructions before continuing.
-'''.strip()
+""".strip()
 
-DEFAULT_CLOSED_MESSAGE = '''
+DEFAULT_CLOSED_MESSAGE = """
 The judging system is currently closed. Judging starts at 12:00 and ends at 13:30.
-'''.strip()
+""".strip()
 
-DEFAULT_DISABLED_MESSAGE = '''
+DEFAULT_DISABLED_MESSAGE = """
 Your account is currently disabled. Reload the page to try again.
-'''.strip()
+""".strip()
 
-DEFAULT_LOGGED_OUT_MESSAGE = '''
+DEFAULT_LOGGED_OUT_MESSAGE = """
 You are currently logged out. Open your magic link to get started.
-'''.strip()
+""".strip()
 
-DEFAULT_WAIT_MESSAGE = '''
+DEFAULT_WAIT_MESSAGE = """
 Wait for a little bit and reload the page to try again.
 
 If you've looked at all the projects already, then you're done.
-'''.strip()
+""".strip()
 
-DEFAULT_API_KEY = '89iuw4gtuyjfbsiukbkwhejbhu4b5'
+DEFAULT_API_KEY = "89iuw4gtuyjfbsiukbkwhejbhu4b5"
 
-IMPORT_URL = 'https://now.hacktm.ro/api/Export/GavelProjects'
+IMPORT_URL = "https://now.hacktm.ro/api/Export/GavelProjects"
