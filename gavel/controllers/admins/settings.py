@@ -30,7 +30,6 @@ ALLOWED_EXTENSIONS = {"csv", "xlsx", "xls"}
 def admin_settings():
     stats.check_send_telemetry()
     setting_closed = Setting.value_of(SETTING_CLOSED) == SETTING_TRUE
-    print(setting_closed)
 
     return render_template(
         "admin/settings.html",

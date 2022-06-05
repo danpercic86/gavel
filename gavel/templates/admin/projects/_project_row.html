@@ -16,8 +16,9 @@
     <p id="project-{{ item.id }}" class="collapse">{{ item.description }}</p>
     <a href="#"
        class="btn"
-       data-toggle="collapse"
-       data-target="#project-{{ item.id }}">show</a>
+       aria-controls="project-{{ item.id }}"
+       data-bs-toggle="collapse"
+       data-bs-target="#project-{{ item.id }}">show</a>
   </td>
   <td>{{ item.mu | round(4) }}</td>
   <td>{{ item.sigma_sq | round(4) }}</td>
@@ -25,39 +26,38 @@
   <td>{{ item.viewed | length }}</td>
   <td>{{ skipped.get(item.id, 0) }}</td>
   <td class="compact" data-sort="{{ item.prioritized }}" align="center">
-    <form action="/admin/item" method="post">
+    <form action="/admin/projects/{{ item.id }}/update-importance"
+          method="post">
       <input type="submit"
-             name="action"
+             name="value"
              value="{{ 'Prioritize' if not item.prioritized else 'Cancel' }}"
-             class="btn {{ 'btn-success' if not item.prioritized else 'btn-danger' }}">
-      <input type="hidden" name="item_id" value="{{ item.id }}">
-      <input type="hidden" name="_csrf_token" value="{{ csrf_token() }}">
+             class="btn {{ 'btn-success' if not item.prioritized else 'btn-danger' }}"/>
+      <input type="hidden" name="item_id" value="{{ item.id }}"/>
+      <input type="hidden" name="_csrf_token" value="{{ csrf_token() }}"/>
     </form>
   </td>
   <td class="compact" data-sort="{{ item.active }}" align="center">
-    <form action="/admin/item" method="post">
+    <form action="/admin/projects/{{ item.id }}/update-status" method="post">
       <input type="submit"
-             name="action"
+             name="value"
              value="{{ 'Disable' if item.active else 'Enable' }}"
-             class="btn {{ 'btn-danger' if item.active else 'btn-success' }}">
-      <input type="hidden" name="item_id" value="{{ item.id }}">
-      <input type="hidden" name="_csrf_token" value="{{ csrf_token() }}">
+             class="btn {{ 'btn-danger' if item.active else 'btn-success' }}"/>
+      <input type="hidden" name="_csrf_token" value="{{ csrf_token() }}"/>
     </form>
   </td>
   <td class="compact" align="center">
-    <form action="/admin/item" method="post">
-      <input type="submit" name="action" value="Delete" class="btn btn-danger">
-      <input type="hidden" name="item_id" value="{{ item.id }}">
-      <input type="hidden" name="_csrf_token" value="{{ csrf_token() }}">
+    <form action="/admin/projects/{{ item.id }}/delete" method="post">
+      <input type="submit" name="action" value="Delete" class="btn btn-danger"/>
+      <input type="hidden" name="_csrf_token" value="{{ csrf_token() }}"/>
     </form>
   </td>
   <td class="compact" align="center">
-    <form action="{{ url_for('plot_decisions_project', item_id=item.id) }}"
+    <form action="{{ url_for('plot_decisions_project', project_id=item.id) }}"
           method="get">
       <input type="submit"
              name="action"
              value="Decisions plot"
-             class="btn btn-danger">
+             class="btn btn-danger"/>
     </form>
   </td>
 </tr>

@@ -1,13 +1,10 @@
-import io
 from typing import List
 
 import psycopg2.errors
-import xlrd
 from flask import (
     redirect,
     request,
     url_for,
-    send_file,
 )
 from sqlalchemy.exc import IntegrityError
 
@@ -15,104 +12,14 @@ import gavel.settings as settings
 import gavel.utils as utils
 from gavel import app
 from gavel.controllers.admins.judges import judge_login_link
+from gavel.controllers.admins.projects import parse_upload_form
 from gavel.models import (
     Annotator,
     Item,
-    Decision,
     db,
     with_retries,
     ignore_table,
 )
-
-ALLOWED_EXTENSIONS = {"csv", "xlsx", "xls"}
-
-
-@app.route("/admin/item", methods=["POST"])
-@utils.requires_auth
-def item_actions():
-    action = request.form["action"]
-
-    if action == "Submit":
-        data = parse_upload_form()
-        if data:
-            # validate data
-            for index, row in enumerate(data):
-                if len(row) != 6:
-                    return utils.user_error(
-                        "Bad data: row %d has %d elements (expecting 6)"
-                        % (index + 1, len(row))
-                    )
-
-            def tx():
-                for row in data:
-                    _item = Item(*row)
-                    db.session.add(_item)
-                db.session.commit()
-
-            with_retries(tx)
-    elif action == "Prioritize" or action == "Cancel":
-        item_id = request.form["item_id"]
-        target_state = action == "Prioritize"
-
-        def tx():
-            Item.by_id(item_id).prioritized = target_state
-            db.session.commit()
-
-        with_retries(tx)
-    elif action == "Disable" or action == "Enable":
-        item_id = request.form["item_id"]
-        target_state = action == "Enable"
-
-        def tx():
-            Item.by_id(item_id).active = target_state
-            db.session.commit()
-
-        with_retries(tx)
-    elif action == "Delete":
-        item_id = request.form["item_id"]
-        try:
-
-            def tx():
-                db.session.execute(
-                    ignore_table.delete(ignore_table.c.item_id == item_id)
-                )
-                Item.query.filter_by(id=item_id).delete()
-                db.session.commit()
-
-            with_retries(tx)
-        except IntegrityError as e:
-            if isinstance(e.orig, psycopg2.errors.ForeignKeyViolation):
-                return utils.server_error(
-                    "Projects can't be deleted once they have been voted on by a judge. You can use the 'disable' functionality instead, which has a similar effect, preventing the project from being shown to judges."
-                )
-
-            return utils.server_error(str(e))
-    return redirect(url_for("admin"))
-
-
-def allowed_file(filename):
-    return "." in filename and filename.rsplit(".", 1)[1].lower() in ALLOWED_EXTENSIONS
-
-
-def parse_upload_form():
-    f = request.files.get("file")
-    data = []
-    if f and allowed_file(f.filename):
-        extension = str(f.filename.rsplit(".", 1)[1].lower())
-        if extension == "xlsx" or extension == "xls":
-            workbook = xlrd.open_workbook(file_contents=f.read())
-            worksheet = workbook.sheet_by_index(0)
-            data = list(
-                utils.cast_row(worksheet.row_values(rx, 0, 3))
-                for rx in range(worksheet.nrows)
-                if worksheet.row_len(rx) == 3
-            )
-        elif extension == "csv":
-            data = utils.data_from_csv_string(f.read().decode("utf-8"))
-    else:
-        csv = request.form["data"]
-        data = utils.data_from_csv_string(csv)
-    return data
 
 
 @app.route("/admin/item_patch", methods=["POST"])
@@ -205,51 +112,6 @@ def annotator_actions():
             else:
                 return utils.server_error(str(e))
     return redirect(url_for("admin"))
-
-
-@app.route("/admin/project-decisions/<item_id>/")
-@utils.requires_auth
-def plot_decisions_project(item_id):
-    app.logger.info("yoloooo")
-    import graphviz
-
-    item = Item.by_id(item_id)
-    decisions = Decision.query.filter(
-        (Decision.winner_id == item_id) | (Decision.loser_id == item_id)
-    )
-    projects = dict()
-    edges = []
-
-    def node_name(it: Item):
-        return f"P{it.id}"
-
-    def add_project(it: Item):
-        projects[node_name(it)] = f'"{it.name}" by {it.team_name}'
-
-    def add_edge(winner: Item, loser: Item):
-        edges.append((node_name(winner), node_name(loser)))
-
-    for dec in decisions:
-        add_project(dec.winner)
-        add_project(dec.loser)
-        add_edge(dec.winner, dec.loser)
-
-    title = f"HackTM votes for project {item.name}"
-    dot = graphviz.Digraph(
-        comment=title, graph_attr={"label": f"{title}, A -> B means A is better than B"}
-    )
-    for proj, team in projects.items():
-        if proj == node_name(item):
-            node_kwargs = {"fillcolor": "red", "color": "red", "style": "filled"}
-        else:
-            node_kwargs = {}
-        dot.node(proj, team, **node_kwargs)
-
-    for edge in edges:
-        dot.edge(*edge)
-
-    graph = graphviz.pipe("dot", "png", dot.source.encode())
-    return send_file(io.BytesIO(graph), mimetype="image/png")
 
 
 def email_invite_links(annotators: List[Annotator] | Annotator):

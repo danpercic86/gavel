@@ -3,14 +3,10 @@
     <div class="card-body">
       <h5 class="card-title">Add Projects</h5>
       <div class="card-subtitle mb-2 text-muted">
-        <form action="/admin/item"
-              method="post"
-              id="item_form"
-              enctype="multipart/form-data">
+        <form action="/admin/projects" method="post" enctype="multipart/form-data">
           <div class="form-group">
             <textarea id="projects-data"
                       name="data"
-                      form="item_form"
                       class="form-control"
                       aria-describedby="projectsHelp"
                       placeholder="Facebook, table 2, social network, 5ca7768baad15300167dced1, Facebook, https://youtube.com;"></textarea>
@@ -26,7 +22,7 @@
                      aria-describedby="projectsFileHelp"
                      type="file"
                      name="file"
-                     accept=".csv,.xls,.xlsx">
+                     accept=".csv,.xls,.xlsx"/>
               <small id="projectsFileHelp" class="field">Or upload a file
               here</small>
             </div>
