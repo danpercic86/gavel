@@ -1,9 +1,9 @@
-@import 'constants';
+@use 'constants' as c;
 
 * {
   -webkit-box-sizing: border-box;
-     -moz-box-sizing: border-box;
-          box-sizing: border-box;
+  -moz-box-sizing: border-box;
+  box-sizing: border-box;
   -webkit-font-smoothing: antialiased;
 }
 
@@ -15,15 +15,15 @@ body {
 }
 
 html {
-  font-family: $body-font;
+  font-family: c.$body-font;
   font-size: 16px;
   font-weight: 300;
   line-height: 1.5;
 }
 
 body {
-  color: $text-color;
-  background-color: $light;
+  color: c.$text-color;
+  background-color: c.$light;
 }
 
 body.judge-view {
@@ -46,7 +46,7 @@ h6 {
   margin: 0;
   padding-top: 0.5rem;
   padding-bottom: 0.5rem;
-  font-family: $heading-font;
+  font-family: c.$heading-font;
 }
 
 p {
@@ -67,7 +67,7 @@ textarea {
 
 input,
 textarea {
-  font-family: $body-font;
+  font-family: c.$body-font;
 }
 
 input {
@@ -79,13 +79,11 @@ strong {
 }
 
 
-
-
-
 th.sort-header {
   cursor: pointer;
+
   &::selection {
-    background:transparent;
+    background: transparent;
   }
 }
 
@@ -125,7 +123,7 @@ a {
 }
 
 a.colored {
-  color: $link-color;
+  color: c.$link-color;
 }
 
 a:hover,
@@ -150,9 +148,11 @@ hr {
   padding-top: 2rem;
   padding-left: 1rem;
   padding-right: 1rem;
+
   p {
     font-size: 18px;
   }
+
   strong {
     background: #FDB632;
     padding: 1px 6px;
@@ -167,8 +167,9 @@ hr {
   text-align: center;
   margin-top: 1rem;
   font-size: 1.2rem;
+
   a {
-    color: $link-color;
+    color: c.$link-color;
   }
 }
 
@@ -183,7 +184,7 @@ hr {
 .banner {
   text-align: center;
   margin-bottom: 0.5rem;
-  color: $light;
+  color: c.$light;
 
 }
 
@@ -193,27 +194,23 @@ hr {
 }
 
 #admin-header {
-  background-color: $admin-color;
+  background-color: c.$admin-color;
 }
 
 #wait-header {
-  background-color: $wait-color;
-  color: $dark;
+  background-color: c.$wait-color;
+  color: c.$dark;
 }
 
 #error-header {
-  background-color: $error-color;
+  background-color: c.$error-color;
 }
 
 
-
-
-
-
 input[type=submit] {
-  color: $light;
-  background-color: $dark;
-  border: 2px solid $dark;
+  color: c.$light;
+  background-color: c.$dark;
+  border: 2px solid c.$dark;
   font-size: 1.2rem;
   text-transform: uppercase;
   text-align: center;
@@ -245,31 +242,31 @@ input[type=submit] {
 }
 
 #vote-previous {
-  background-color: $previous-color;
-  border: 3px solid $previous-color;
+  background-color: c.$previous-color;
+  border: 3px solid c.$previous-color;
 }
 
 #vote-current {
-  background-color: $current-color;
-  border: 3px solid $current-color;
+  background-color: c.$current-color;
+  border: 3px solid c.$current-color;
 }
 
 #vote-continue {
-  background-color: $current-color;
-  border: 3px solid $current-color;
+  background-color: c.$current-color;
+  border: 3px solid c.$current-color;
 }
 
 #vote-skip {
-  background-color: $vote-skip-color;
-  border: 3px solid $vote-skip-color;
+  background-color: c.$vote-skip-color;
+  border: 3px solid c.$vote-skip-color;
 }
 
 #vote-submit {
-  background-color: $vote-submit-color;
+  background-color: c.$vote-submit-color;
 }
 
 #vote-submit:disabled {
-  background-color: $light-grey;
+  background-color: c.$light-grey;
   border: none;
 }
 
@@ -287,7 +284,7 @@ input[type=submit] {
   display: inline-block;
   padding: 10px 20px;
   width: 100%;
-  color: $light;
+  color: c.$light;
   font-size: 1.2rem;
   font-weight: bold;
   text-transform: uppercase;
@@ -296,47 +293,47 @@ input[type=submit] {
 
 .radio-button > input:not(:checked) + label {
   background-color: white;
-  color: $dark;
+  color: c.$dark;
 }
 
 input[type=submit].positive {
-  background-color: $positive-color;
+  background-color: c.$positive-color;
 }
 
 input[type=submit].negative {
-  background-color: $negative-color;
+  background-color: c.$negative-color;
 }
 
 input[type=submit].neutral {
-  background-color: $neutral-color;
-  color: $dark;
+  background-color: c.$neutral-color;
+  color: c.$dark;
 }
 
 .disabled {
-  background-color: $disabled-color;
+  background-color: c.$disabled-color;
 }
 
 .prioritized {
-  background-color: $prioritized-color;
+  background-color: c.$prioritized-color;
 }
 
 .upload-container {
-    margin-top: 0.25rem;
-    margin-bottom: 0.5rem;
+  margin-top: 0.25rem;
+  margin-bottom: 0.5rem;
 }
 
 .field {
-    padding-right: 1rem;
+  padding-right: 1rem;
 }
 
 #footer {
   margin-top: 2rem;
+
   p {
     font-size: 0.75rem;
     text-align: center;
   }
 }
-
 
 
 /*** New theme ***/
@@ -345,13 +342,15 @@ input[type=submit].neutral {
   display: inline-block;
 
 }
-.banner-tight h1{
+
+.banner-tight h1 {
   font-size: 12px;
   padding: 6px 12px;
 }
+
 .rotate90 {
-  padding:0;
-  margin:0;
+  padding: 0;
+  margin: 0;
   /* Safari */
   -webkit-transform: rotate(90deg);
 
@@ -368,34 +367,39 @@ input[type=submit].neutral {
   filter: progid:DXImageTransform.Microsoft.BasicImage(rotation=3);
 
 }
+
 .input-team {
   display: none;
 }
-.label-team{
-  width:45vw; /* 20% of the viewport width */
+
+.label-team {
+  width: 45vw; /* 20% of the viewport width */
   height: 45vw;
-  margin:0;
+  margin: 0;
   display: table-cell;
   vertical-align: middle;
-  text-align:center;
-  border: 1px solid rgba(256,256,256,0.5);
+  text-align: center;
+  border: 1px solid rgba(256, 256, 256, 0.5);
   font-size: 18px;
   padding: 10px;
   font-weight: bold;
 
   border-radius: .25rem;
 }
-.label-team.active{
+
+.label-team.active {
   background-color: #28a745;
   border-color: #28a745;
-  color:#fff;
+  color: #fff;
 }
-.label-team.active:after{
+
+.label-team.active:after {
   display: block;
   content: '\2713';
   font-size: 30px;
 }
-.button-vote{
+
+.button-vote {
   display: none;
   width: 100%;
   margin-top: 2em;
@@ -405,36 +409,43 @@ input[type=submit].neutral {
   padding: .5rem;
   vertical-align: middle;
 }
+
 .table thead th {
   vertical-align: top;
 }
+
 .table td {
   background: #ffffff;
 }
 
-#content{
+#content {
   padding-top: 1rem;
 }
-.card{
+
+.card {
   background: transparent;
   border-radius: 0;
   border: 0;
 }
+
 .card-body {
   padding: 0;
 }
 
-.card-header{
+.card-header {
   border-radius: 0;
   border-bottom: 0;
   padding: 0 1rem;
 }
+
 .versus {
   padding: 10px;
 }
-.vs{
-text-align: center;
+
+.vs {
+  text-align: center;
 }
+
 .overlay {
   background: #111026;
   position: fixed;
@@ -445,30 +456,33 @@ text-align: center;
   left: 0;
   right: 0;
   bottom: 0;
-  z-index:100;
+  z-index: 100;
 }
-.bottom{
+
+.bottom {
   position: absolute;
   bottom: 1rem;
   width: 100%;
   padding: 1rem;
 }
-.progress-bar{
+
+.progress-bar {
   color: #111026;
   position: fixed;
 
   bottom: 0;
   width: 100%;
 }
-.progress-bar div{
+
+.progress-bar div {
   background: #FDB632;
 }
 
-.alert-blink{
-  -webkit-animation: RED-BLINK 1s infinite;  /* Safari 4+ */
-  -moz-animation: RED-BLINK 1s infinite;  /* Fx 5+ */
-  -o-animation: RED-BLINK 1s infinite;  /* Opera 12+ */
-  animation: RED-BLINK 1s infinite;  /* IE 10+, Fx 29+ */
+.alert-blink {
+  -webkit-animation: RED-BLINK 1s infinite; /* Safari 4+ */
+  -moz-animation: RED-BLINK 1s infinite; /* Fx 5+ */
+  -o-animation: RED-BLINK 1s infinite; /* Opera 12+ */
+  animation: RED-BLINK 1s infinite; /* IE 10+, Fx 29+ */
   color: #fff;
   background: rgb(256, 0, 0) !important;
 }
@@ -483,25 +497,28 @@ text-align: center;
   }
 }
 
-.btn-custom{
-  padding:0;
-  .prepend{
+.btn-custom {
+  padding: 0;
+
+  .prepend {
     padding: .375rem .75rem;
     float: left;
     background: #007bff;
     color: #fff;
     line-height: 1.5;
   }
-  .value{
+
+  .value {
     padding: .375rem .75rem;
     float: left;
     font-weight: bold;
     color: #fff;
   }
-  .append{
+
+  .append {
     padding: .375rem .75rem;
     color: #fff;
-    float:right;
+    float: right;
   }
 
 }
