@@ -14,27 +14,24 @@
   <td data-sort="{{ annotator.prev_id or -1 }}">{{ annotator.prev_id }}</td>
   <td data-sort="{{ annotator.updated | utcdatetime_epoch }}">{{ annotator.updated | utcdatetime_local }}</td>
   <td class="compact">
-    <form action="/admin/annotator" method="post">
-      <input type="submit" name="action" value="Email" class="btn btn-warning">
-      <input type="hidden" name="annotator_id" value="{{ annotator.id }}">
-      <input type="hidden" name="_csrf_token" value="{{ csrf_token() }}">
+    <form action="/admin/judges/{{ annotator.id }}/send-email" method="post">
+      <input type="submit" value="Send email" class="btn btn-warning"/>
+      <input type="hidden" name="_csrf_token" value="{{ csrf_token() }}"/>
     </form>
   </td>
   <td class="compact" data-sort="{{ annotator.active }}">
-    <form action="/admin/annotator" method="post">
+    <form action="/admin/judges/{{ annotator.id }}/update-status" method="post">
       <input type="submit"
-             name="action"
+             name="value"
              value="{{ 'Disable' if annotator.active else 'Enable' }}"
-             class="btn {{ 'btn-danger' if annotator.active else 'btn-success' }}">
-      <input type="hidden" name="annotator_id" value="{{ annotator.id }}">
-      <input type="hidden" name="_csrf_token" value="{{ csrf_token() }}">
+             class="btn {{ 'btn-danger' if annotator.active else 'btn-success' }}"/>
+      <input type="hidden" name="_csrf_token" value="{{ csrf_token() }}"/>
     </form>
   </td>
   <td class="compact">
-    <form action="/admin/annotator" method="post">
-      <input type="submit" name="action" value="Delete" class="btn btn-danger">
-      <input type="hidden" name="annotator_id" value="{{ annotator.id }}">
-      <input type="hidden" name="_csrf_token" value="{{ csrf_token() }}">
+    <form action="/admin/judges/{{ annotator.id }}/delete" method="post">
+      <input type="submit" value="Delete" class="btn btn-danger"/>
+      <input type="hidden" name="_csrf_token" value="{{ csrf_token() }}"/>
     </form>
   </td>
 </tr>
