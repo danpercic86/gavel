@@ -3,7 +3,9 @@
 {% block content %}
   <div class="item">
     <div class="banner" id="admin-header">
-      <a href="{{ url_for('admin') }}"><h1>Item</h1></a>
+      <a href="{{ url_for('admin') }}">
+        <h1>Item</h1>
+      </a>
     </div>
     <div class="info">
       <table>
@@ -25,8 +27,7 @@
         <tr>
           <th>Team name</th>
           <td>
-            <textarea name="team_name"
-                      form="team_name_form">{{ item.team_name }}</textarea>
+            <textarea name="team_name" form="team_name_form">{{ item.team_name }}</textarea>
             <form action="/admin/item_patch" method="post" id="team_name_form">
               <input type="submit" name="action" value="Update" class="neutral">
               <input type="hidden" name="item_id" value="{{ item.id }}">
@@ -37,8 +38,7 @@
         <tr>
           <th>Presentation link</th>
           <td>
-            <textarea name="presentation_link"
-                      form="presentation_link_form">{{ item.presentation_link }}</textarea>
+            <textarea name="presentation_link" form="presentation_link_form">{{ item.presentation_link }}</textarea>
             <form action="/admin/item_patch" method="post" id="presentation_link_form">
               <input type="submit" name="action" value="Update" class="neutral">
               <input type="hidden" name="item_id" value="{{ item.id }}">
@@ -62,8 +62,7 @@
         <tr>
           <th>Description</th>
           <td>
-            <textarea name="description"
-                      form="description_form">{{ item.description }}</textarea>
+            <textarea name="description" form="description_form">{{ item.description }}</textarea>
             <form action="/admin/item_patch" method="post" id="description_form">
               <input type="submit" name="action" value="Update" class="neutral">
               <input type="hidden" name="item_id" value="{{ item.id }}">
@@ -84,10 +83,11 @@
           <td>
             <ul>
               {% for annotator in item.viewed %}
-                <li><a
-                  href="{{ url_for('annotator_detail', annotator_id=annotator.id) }}"
-                  class="colored">{{ annotator.name }}
-                  [{{ annotator.id }}]</a></li>
+                <li>
+                  <a href="{{ url_for('annotator_detail', annotator_id=annotator.id) }}"
+                     class="colored">{{ annotator.name }}
+                  [{{ annotator.id }}]</a>
+                </li>
               {% endfor %}
             </ul>
           </td>
@@ -97,10 +97,11 @@
           <td>
             <ul>
               {% for annotator in assigned %}
-                <li><a
-                  href="{{ url_for('annotator_detail', annotator_id=annotator.id) }}"
-                  class="colored">{{ annotator.name }}
-                  [{{ annotator.id }}]</a></li>
+                <li>
+                  <a href="{{ url_for('annotator_detail', annotator_id=annotator.id) }}"
+                     class="colored">{{ annotator.name }}
+                  [{{ annotator.id }}]</a>
+                </li>
               {% endfor %}
             </ul>
           </td>
@@ -110,10 +111,11 @@
           <td>
             <ul>
               {% for annotator in skipped %}
-                <li><a
-                  href="{{ url_for('annotator_detail', annotator_id=annotator.id) }}"
-                  class="colored">{{ annotator.name }}
-                  [{{ annotator.id }}]</a></li>
+                <li>
+                  <a href="{{ url_for('annotator_detail', annotator_id=annotator.id) }}"
+                     class="colored">{{ annotator.name }}
+                  [{{ annotator.id }}]</a>
+                </li>
               {% endfor %}
             </ul>
           </td>

@@ -11,29 +11,29 @@
       {% endwith %}
     </div>
   </section>
-
   <div class="item">
     <div class="banner" id="vote-header">
       <h1>Vote</h1>
     </div>
-
     <div class="item">
       <div class="info form-vote">
         <form action="/begin" method="post">
-
-          <input type="submit" name="action" value="Continue" id="vote-done"
+          <input type="submit"
+                 name="action"
+                 value="Continue"
+                 id="vote-done"
                  class="btn btn-success btn-block">
           <div class="pt-3">
-            <input type="submit" name="action" value="Skip" id="vote-skip"
+            <input type="submit"
+                   name="action"
+                   value="Skip"
+                   id="vote-skip"
                    class="btn btn-outline-warning">
           </div>
-
           <input type="hidden" name="item_id" value="{{ item.id }}">
           <input type="hidden" name="_csrf_token" value="{{ csrf_token() }}">
         </form>
-
-        <script
-          src="{{ url_for('static', filename='js/smart-button-toggle.js') }}"></script>
+        <script src="{{ url_for('static', filename='js/smart-button-toggle.js') }}"></script>
       </div>
     </div>
   </div>

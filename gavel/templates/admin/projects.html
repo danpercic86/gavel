@@ -1,137 +1,141 @@
 {% extends 'admin/admin_layout.html' %}
-
 {% block page %}
   <div class="item">
     <div class="info">
       <h2>Projects</h2>
-
       <table id="items" class="table table-bordered">
         <thead class="thead-dark">
-
-        <tr>
-          <th scope="col" data-sort-method="number">Id</th>
-          <th scope="col" data-sort-method="caseInsensitiveSort">Team name</th>
-          <th scope="col" data-sort-method="caseInsensitiveSort">Name</th>
-          <th scope="col" data-sort-method="caseInsensitiveSort">Presentation
-            link
-          </th>
-          <th scope="col" data-sort-method="caseInsensitiveSort">Location</th>
-          <th scope="col" data-sort-method="caseInsensitiveSort">Description</th>
-          <th scope="col" class="sort-default" data-sort-method="number"
-              data-sort-order="desc">Mu
-          </th>
-          <th scope="col" data-sort-method="number">Sigma Squared</th>
-          <th scope="col" data-sort-method="number">Votes</th>
-          <th scope="col" data-sort-method="number">Seen</th>
-          <th scope="col" data-sort-method="number" data-sort-order="desc">
-            Skipped
-          </th>
-          <th scope="col" data-sort-method="caseInsensitiveSort"
-              data-sort-order="desc">Prioritize
-          </th>
-          <th scope="col" data-sort-method="caseInsensitiveSort">Active</th>
-          <th scope="col" class="no-sort">Delete</th>
-          <th scope="col" class="no-sort">Plot</th>
-        </tr>
-
-        </thead>
-
-        <tbody>
-        {% for item in items %}
-          <tr class="
-                  {{ 'disabled' if not item.active else ('prioritized' if item.prioritized else '') }}">
-            <td><a href="{{ url_for('item_detail', item_id=item.id) }}"
-                   class="colored">{{ item.id }}</a></td>
-            <td>{{ item.team_name }}</td>
-            <td>{{ item.name }}</td>
-            <td><a href="{{ item.presentation_link }}"
-                   target="_blank">{{ item.presentation_link }}</a></td>
-            <td>{{ item.location }}</td>
-            <td class="preserve-formatting"><p id="project-{{ item.id }}"
-                                               class="collapse">{{ item.description }}</p>
-              <a href="#"
-                 class="btn"
-                 data-toggle="collapse"
-                 data-target="#project-{{ item.id }}">show</a>
-            </td>
-            <td>{{ item.mu | round(4) }}</td>
-            <td>{{ item.sigma_sq | round(4) }}</td>
-            <td>{{ item_counts.get(item.id, 0) }}</td>
-            <td>{{ item.viewed | length }}</td>
-            <td>{{ skipped.get(item.id, 0) }}</td>
-            <td class="compact" data-sort="{{ item.prioritized }}" align="center">
-              <form action="/admin/item" method="post">
-                <input type="submit" name="action"
-                       value="{{ 'Prioritize' if not item.prioritized else 'Cancel' }}"
-                       class="btn {{ 'btn-success' if not item.prioritized else 'btn-danger' }}">
-                <input type="hidden" name="item_id" value="{{ item.id }}">
-                <input type="hidden" name="_csrf_token"
-                       value="{{ csrf_token() }}">
-              </form>
-            </td>
-            <td class="compact" data-sort="{{ item.active }}" align="center">
-              <form action="/admin/item" method="post">
-                <input type="submit" name="action"
-                       value="{{ 'Disable' if item.active else 'Enable' }}"
-                       class="btn {{ 'btn-danger' if item.active else 'btn-success' }}">
-                <input type="hidden" name="item_id" value="{{ item.id }}">
-                <input type="hidden" name="_csrf_token"
-                       value="{{ csrf_token() }}">
-              </form>
-            </td>
-            <td class="compact" align="center">
-              <form action="/admin/item" method="post">
-                <input type="submit" name="action" value="Delete"
-                       class="btn btn-danger">
-                <input type="hidden" name="item_id" value="{{ item.id }}">
-                <input type="hidden" name="_csrf_token"
-                       value="{{ csrf_token() }}">
-              </form>
-            </td>
-            <td class="compact" align="center">
-              <form
-                action="{{ url_for('plot_decisions_project', item_id=item.id) }}"
-                method="get">
-                <input type="submit" name="action" value="Decisions plot"
-                       class="btn btn-danger">
-              </form>
-            </td>
+          <tr>
+            <th scope="col" data-sort-method="number">Id</th>
+            <th scope="col" data-sort-method="caseInsensitiveSort">Team name</th>
+            <th scope="col" data-sort-method="caseInsensitiveSort">Name</th>
+            <th scope="col" data-sort-method="caseInsensitiveSort">
+              Presentation
+              link
+            </th>
+            <th scope="col" data-sort-method="caseInsensitiveSort">Location</th>
+            <th scope="col" data-sort-method="caseInsensitiveSort">Description</th>
+            <th scope="col"
+                class="sort-default"
+                data-sort-method="number"
+                data-sort-order="desc">Mu</th>
+            <th scope="col" data-sort-method="number">Sigma Squared</th>
+            <th scope="col" data-sort-method="number">Votes</th>
+            <th scope="col" data-sort-method="number">Seen</th>
+            <th scope="col" data-sort-method="number" data-sort-order="desc">Skipped</th>
+            <th scope="col"
+                data-sort-method="caseInsensitiveSort"
+                data-sort-order="desc">Prioritize</th>
+            <th scope="col" data-sort-method="caseInsensitiveSort">Active</th>
+            <th scope="col" class="no-sort">Delete</th>
+            <th scope="col" class="no-sort">Plot</th>
           </tr>
-        {% endfor %}
+        </thead>
+        <tbody>
+          {% for item in items %}
+            <tr class=" {{ 'disabled' if not item.active else ('prioritized' if item.prioritized else '') }}">
+              <td>
+                <a href="{{ url_for('item_detail', item_id=item.id) }}" class="colored">{{ item.id }}</a>
+              </td>
+              <td>{{ item.team_name }}</td>
+              <td>{{ item.name }}</td>
+              <td>
+                <a href="{{ item.presentation_link }}" target="_blank">{{ item.presentation_link }}</a>
+              </td>
+              <td>{{ item.location }}</td>
+              <td class="preserve-formatting">
+                <p id="project-{{ item.id }}" class="collapse">{{ item.description }}</p>
+                <a href="#"
+                   class="btn"
+                   data-toggle="collapse"
+                   data-target="#project-{{ item.id }}">show</a>
+              </td>
+              <td>{{ item.mu | round(4) }}</td>
+              <td>{{ item.sigma_sq | round(4) }}</td>
+              <td>{{ item_counts.get(item.id, 0) }}</td>
+              <td>{{ item.viewed | length }}</td>
+              <td>
+                {{ skipped.get(item.id, 0) }}
+              </td>
+              <td class="compact" data-sort="{{ item.prioritized }}" align="center">
+                <form action="/admin/item" method="post">
+                  <input type="submit"
+                         name="action"
+                         value="{{ 'Prioritize' if not item.prioritized else 'Cancel' }}"
+                         class="btn {{ 'btn-success' if not item.prioritized else 'btn-danger' }}">
+                  <input type="hidden" name="item_id" value="{{ item.id }}">
+                  <input type="hidden" name="_csrf_token" value="{{ csrf_token() }}">
+                </form>
+              </td>
+              <td class="compact" data-sort="{{ item.active }}" align="center">
+                <form action="/admin/item" method="post">
+                  <input type="submit"
+                         name="action"
+                         value="{{ 'Disable' if item.active else 'Enable' }}"
+                         class="btn {{ 'btn-danger' if item.active else 'btn-success' }}">
+                  <input type="hidden" name="item_id" value="{{ item.id }}">
+                  <input type="hidden" name="_csrf_token" value="{{ csrf_token() }}">
+                </form>
+              </td>
+              <td class="compact" align="center">
+                <form action="/admin/item" method="post">
+                  <input type="submit" name="action" value="Delete" class="btn btn-danger">
+                  <input type="hidden" name="item_id" value="{{ item.id }}">
+                  <input type="hidden" name="_csrf_token" value="{{ csrf_token() }}">
+                </form>
+              </td>
+              <td class="compact" align="center">
+                <form action="{{ url_for('plot_decisions_project', item_id=item.id) }}"
+                      method="get">
+                  <input type="submit"
+                         name="action"
+                         value="Decisions plot"
+                         class="btn btn-danger">
+                </form>
+              </td>
+            </tr>
+          {% endfor %}
         </tbody>
       </table>
     </div>
   </div>
-
   <div>
     <div class="info col-md-6 col-sm-12">
       <div class="card">
         <div class="card-body">
-          <h5 class="card-title">Add Projects</h5>
+          <h5 class="card-title">
+            Add Projects
+          </h5>
           <div class="card-subtitle mb-2 text-muted">
-            <form action="/admin/item" method="post" id="item_form"
+            <form action="/admin/item"
+                  method="post"
+                  id="item_form"
                   enctype="multipart/form-data">
               <div class="form-group">
-                      <textarea id="projects-data" name="data" form="item_form"
-                                class="form-control" aria-describedby="projectsHelp"
-                                placeholder="Facebook, table 2, social network, 5ca7768baad15300167dced1, Facebook, https://youtube.com;"></textarea>
+                <textarea id="projects-data"
+                          name="data"
+                          form="item_form"
+                          class="form-control"
+                          aria-describedby="projectsHelp"
+                          placeholder="Facebook, table 2, social network, 5ca7768baad15300167dced1, Facebook, https://youtube.com;"></textarea>
                 <small id="projectsHelp" class="form-text text-muted">Add name,
                   location,
                   description, identifier, team_name, presentation_link (CSV
-                  format in this order)</small>
+                format in this order)</small>
               </div>
               <div class="form-group">
                 <div class="upload-container">
-                  <input id="projects-file" class="form-control"
-                         aria-describedby="projectsFileHelp" type="file"
+                  <input id="projects-file"
+                         class="form-control"
+                         aria-describedby="projectsFileHelp"
+                         type="file"
                          name="file"
                          accept=".csv,.xls,.xlsx">
                   <small id="projectsFileHelp" class="field">Or upload a file
-                    here</small>
+                  here</small>
                 </div>
               </div>
-              <input type="submit" name="action" value="Submit"
-                     class="btn btn-primary">
+              <input type="submit" name="action" value="Submit" class="btn btn-primary">
               <input type="hidden" name="_csrf_token" value="{{ csrf_token() }}">
             </form>
           </div>

@@ -1,21 +1,24 @@
 {% extends "layout.html" %}
-{% block title %}Vote{% endblock %}
+{% block title %}
+  Vote
+{% endblock title %}
 {% block content %}
   <div id="accordion" class="pt-3">
     <div class="card">
       <div class="card-header" id="headingOne">
-
         <button class="btn btn-outline-primary btn-block collapsed btn-custom"
-                data-toggle="collapse" data-target="#collapseOne"
-                aria-expanded="false" aria-controls="collapseOne">
+                data-toggle="collapse"
+                data-target="#collapseOne"
+                aria-expanded="false"
+                aria-controls="collapseOne">
           <span class="prepend">Previous</span>
           <span class="value">{{ prev.name }}</span>
           <span class="append">&#9776;</span>
         </button>
-
       </div>
-
-      <div id="collapseOne" class="collapsed collapse" aria-labelledby="headingOne"
+      <div id="collapseOne"
+           class="collapsed collapse"
+           aria-labelledby="headingOne"
            data-parent="#accordion">
         <div class="card-body previous-body">
           {% with item=prev %}
@@ -30,17 +33,19 @@
   </div>
   <div class="card">
     <div class="card-header" id="headingTwo">
-
       <button class="btn btn-outline-primary btn-block btn-custom"
-              data-toggle="collapse" data-target="#collapseTwo"
-              aria-expanded="true" aria-controls="collapseTwo">
+              data-toggle="collapse"
+              data-target="#collapseTwo"
+              aria-expanded="true"
+              aria-controls="collapseTwo">
         <span class="prepend">Current</span>
         <span class="value">{{ next.name }}</span>
         <span class="append">&#9776;</span>
       </button>
-
     </div>
-    <div id="collapseTwo" class="collapse show" aria-labelledby="headingTwo"
+    <div id="collapseTwo"
+         class="collapse show"
+         aria-labelledby="headingTwo"
          data-parent="#accordion">
       <div class="card-body">
         {% with item=next %}
@@ -52,20 +57,22 @@
   <div class="progress-bar">
     <div class="row">
       <div class="col-4 col-sm-4">
-        Time spent<br>
+        Time spent
+        <br>
         <span id="time-spent">-</span>
       </div>
       <div class="col-4 col-sm-4">
-        Projects seen<br>
+        Projects seen
+        <br>
         {{ seen|length }} / {{ items|length }}
       </div>
       <div class="col-4 col-sm-4">
-        Total time left<br>
+        Total time left
+        <br>
         <span id="time-left">-</span>
       </div>
     </div>
   </div>
-
   <div class="info">
     <form action="{{ url_for('vote') }}" method="post">
       <p class="center">Which one is better?</p>
@@ -73,26 +80,24 @@
         <input type="radio" name="action" id="vote-previous-radio" value="Previous">
         <label for="vote-previous-radio">Previous</label>
       </div>
-
       <div id="vote-current" class="radio-button button-right">
         <input type="radio" name="action" id="vote-current-radio" value="Current">
         <label for="vote-current-radio">Current</label>
       </div>
-
       <div id="vote-skip" class="radio-button button-full button-gap">
         <input type="radio" name="action" id="vote-skip-radio" value="Skip" checked>
         <label for="vote-skip-radio">Skip</label>
       </div>
-
-      <input type="submit" name="action" value="Submit" id="vote-submit"
+      <input type="submit"
+             name="action"
+             value="Submit"
+             id="vote-submit"
              class="button-full button-gap">
       <input type="hidden" name="prev_id" value="{{ prev.id }}">
       <input type="hidden" name="next_id" value="{{ next.id }}">
       <input type="hidden" name="_csrf_token" value="{{ csrf_token() }}">
     </form>
-
-    <script
-      src="{{ url_for('static', filename='js/smart-button-toggle.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/smart-button-toggle.js') }}"></script>
   </div>
   <script type="text/javascript">
     const currentProject = '{{ next.id }}';
@@ -104,4 +109,4 @@
 
 
   </script>
-{% endblock %}
+{% endblock content %}

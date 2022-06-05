@@ -13,6 +13,8 @@ run: runserver.py config.yaml
 
 lint:
 	$(RUN) black .
+	$(RUN) djlint gavel/templates --reformat
+	$(RUN) djlint gavel/templates --lint
 
 build: Dockerfile docker-compose.yml
 	docker compose up -d
