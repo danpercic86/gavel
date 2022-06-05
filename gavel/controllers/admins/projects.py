@@ -62,28 +62,53 @@ def admin_projects():
     )
 
 
+@app.route("/admin/projects/<project_id>/update", methods=["POST"])
+@utils.requires_auth
+def update_project(project_id: str):
+    project = Item.by_id(project_id)
+    if not project:
+        return utils.user_error(f"Project {project_id} not found ")
+
+    def tx():
+        if "location" in request.form:
+            project.location = request.form["location"]
+        if "name" in request.form:
+            project.name = request.form["name"]
+        if "description" in request.form:
+            project.description = request.form["description"]
+        if "team_name" in request.form:
+            project.team_name = request.form["team_name"]
+        if "presentation_link" in request.form:
+            project.presentation_link = request.form["presentation_link"]
+        db.session.commit()
+
+    with_retries(tx)
+
+    return redirect(url_for("project_details", project_id=project.id))
+
+
 @app.route("/admin/projects/<project_id>/", methods=["GET"])
 @utils.requires_auth
 def project_details(project_id: str):
-    item = Item.by_id(project_id)
+    project = Item.by_id(project_id)
 
-    if not item:
-        return utils.user_error("Project %s not found " % project_id)
+    if not project:
+        return utils.user_error(f"Project {project_id} not found ")
 
-    assigned = Annotator.query.filter(Annotator.next == item).all()
-    viewed_ids = {i.id for i in item.viewed}
+    assigned = Annotator.query.filter(Annotator.next == project).all()
+    viewed_ids = {i.id for i in project.viewed}
 
     if viewed_ids:
         skipped = Annotator.query.filter(
-            Annotator.ignore.contains(item) & ~Annotator.id.in_(viewed_ids)
+            Annotator.ignore.contains(project) & ~Annotator.id.in_(viewed_ids)
         )
     else:
-        skipped = Annotator.query.filter(Annotator.ignore.contains(item))
+        skipped = Annotator.query.filter(Annotator.ignore.contains(project))
 
     return render_template(
         "admin/projects/detail.html",
         is_admin=True,
-        item=item,
+        item=project,
         assigned=assigned,
         skipped=skipped,
     )
