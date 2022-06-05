@@ -5,8 +5,11 @@
 .gitignore
 .gitlab-ci.yml
 config.template.yaml
+config.yaml
 CONTRIBUTING.md
 DEVELOPMENT.md
 gavel_config.template.env
 Makefile
 run.bat
+.venv
+venv

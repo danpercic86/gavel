@@ -1,4 +1,4 @@
-FROM python:3.10-alpine
+FROM python:3.10-slim
 
 ENV PYTHONFAULTHANDLER=1 \
   PYTHONUNBUFFERED=1 \
@@ -12,31 +12,27 @@ WORKDIR /app
 RUN set -ex
 
 # Set the time zone inside the container
-RUN apk add tzdata --virtual .tzdata \
+RUN apt install tzdata \
     && cp /usr/share/zoneinfo/Europe/Bucharest /etc/localtime \
-    && echo "Europe/Bucharest" > /etc/timezone \
-    && apk del .tzdata
+    && echo "Europe/Bucharest" > /etc/timezone
 
 COPY poetry.lock pyproject.toml ./
 
-RUN apk add curl
+RUN rm /bin/sh && ln -s /bin/bash /bin/sh
+
+RUN apt update
+
+RUN apt -y install curl
 
 RUN curl -sSL https://raw.githubusercontent.com/python-poetry/poetry/master/get-poetry.py | python -
 
 # some packages need to be compiled from source and have build-time dependencies
-RUN apk add --virtual .build-deps \
-        gcc \
-        build-base \
-        musl-dev \
-# these 2 are for postgres & gis
-#        libffi-dev \
-        postgresql-dev \
+RUN apt -y install gcc libpq-dev \
     && source ${HOME}/.poetry/env \
     && pip install --upgrade pip \
     && poetry config virtualenvs.create false \
     && poetry install --no-dev --no-interaction --no-ansi \
-    && pip install gunicorn whitenoise graphviz \
-    && apk del .build-deps
+    && pip install gunicorn whitenoise
 
 # link image with github repo
 LABEL org.opencontainers.image.source=https://github.com/BanatIT/gavel
