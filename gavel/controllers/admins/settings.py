@@ -96,6 +96,7 @@ def _save_and_go_to_dashboard():
 
 def import_projects():
     response = requests.get(settings.IMPORT_URL)
+    print(response.content.decode("utf-8"))
     data = json.loads(response.content.decode("utf-8"))
     if isinstance(data, dict) and "data" in data:
         data = data["data"]

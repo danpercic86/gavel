@@ -1,6 +1,4 @@
 import io
-from datetime import datetime
-from functools import wraps
 
 from flask import (
     redirect,
@@ -10,49 +8,22 @@ from flask import (
     url_for,
     send_file,
 )
-from numpy.random import choice, random, shuffle
+from numpy.random import choice
 
 import gavel.settings as settings
 import gavel.utils as utils
-from gavel import app, crowd_bt
+from gavel import app
 from gavel.constants import SETTING_CLOSED, SETTING_TRUE, ANNOTATOR_ID
-from gavel.models import Setting, Item, Decision, db, with_retries, Annotator
-
-
-def check_open():
-    return Setting.value_of(SETTING_CLOSED) != SETTING_TRUE
-
-
-def check_active_annotator():
-    current = get_current_judge()
-    return current and current.active
-
-
-def check_has_decisions():
-    current = get_current_judge()
-    return current and len(current.decisions) >= 2
-
-
-def requires(predicate, redirect_to):
-    def decorator(f):
-        @wraps(f)
-        def decorated(*args, **kwargs):
-            if not predicate():
-                return redirect(url_for(redirect_to))
-            else:
-                return f(*args, **kwargs)
-
-        return decorated
-
-    return decorator
-
-
-def requires_open(redirect_to):
-    return requires(check_open, redirect_to)
-
-
-def requires_active_annotator(redirect_to):
-    return requires(check_active_annotator, redirect_to)
+from gavel.controllers.judges.common import (
+    get_current_judge,
+    preferred_items,
+    choose_next,
+    requires_open,
+    requires_active_annotator,
+    requires,
+    check_has_decisions,
+)
+from gavel.models import Setting, Item, db, with_retries, Annotator
 
 
 @app.route("/")
@@ -112,44 +83,6 @@ def index():
         max_time_per_project=max_time_per_project,
         jury_end_datetime=jury_end,
     )
-
-
-@app.route("/vote", methods=["POST"])
-@requires_open(redirect_to="index")
-@requires_active_annotator(redirect_to="index")
-def vote():
-    judge = get_current_judge()
-    prev_id = int(request.form["prev_id"])
-    next_id = int(request.form["next_id"])
-
-    if judge.prev.id != prev_id or judge.next.id != next_id:
-        return redirect(url_for("index"))
-
-    if request.form["action"] == "Skip":
-        judge.ignore.append(judge.next)
-    else:
-        # ignore things that were deactivated in the middle of judging
-        if judge.prev.active and judge.next.active:
-            if request.form["action"] == "Previous":
-                perform_vote(judge, next_won=False)
-                decision = Decision(
-                    judge, winner=judge.prev, loser=judge.next
-                )
-            elif request.form["action"] == "Current":
-                perform_vote(judge, next_won=True)
-                decision = Decision(
-                    judge, winner=judge.next, loser=judge.prev
-                )
-            db.session.add(decision)
-
-        judge.next.viewed.append(judge)  # counted as viewed even if deactivated
-        judge.prev = judge.next
-        judge.ignore.append(judge.prev)
-
-    judge.update_next(choose_next(judge))
-    db.session.commit()
-
-    return redirect(url_for("index"))
 
 
 @app.route("/begin", methods=["POST"])
@@ -256,47 +189,6 @@ def welcome_done():
     return redirect(url_for("index"))
 
 
-def get_current_judge() -> Annotator:
-    return Annotator.by_id(session.get(ANNOTATOR_ID, None))
-
-
-def preferred_items(annotator):
-    """
-    Return a list of preferred items for the given annotator to look at next.
-
-    This method uses a variety of strategies to try to select good candidate
-    projects.
-    """
-    ignored_ids = {i.id for i in annotator.ignore}
-    if ignored_ids:
-        available_items = Item.query.filter(
-            (Item.active == True) & (~Item.id.in_(ignored_ids))
-        ).all()
-    else:
-        available_items = Item.query.filter(Item.active == True).all()
-
-    prioritized_items = [i for i in available_items if i.prioritized]
-
-    items = prioritized_items if prioritized_items else available_items
-
-    annotators = Annotator.query.filter(
-        (Annotator.active == True)
-        & (Annotator.next != None)
-        & (Annotator.updated != None)
-    ).all()
-    busy = {
-        i.next.id
-        for i in annotators
-        if (datetime.utcnow() - i.updated).total_seconds() < settings.TIMEOUT * 60
-    }
-    nonbusy = [i for i in items if i.id not in busy]
-    preferred = nonbusy if nonbusy else items
-
-    less_seen = [i for i in preferred if len(i.viewed) < settings.MIN_VIEWS]
-
-    return less_seen if less_seen else preferred
-
-
 def maybe_init_annotator():
     def tx():
         annotator = get_current_judge()
@@ -307,56 +199,3 @@ def maybe_init_annotator():
                 db.session.commit()
 
     with_retries(tx)
-
-
-def choose_next(annotator):
-    items = preferred_items(annotator)
-
-    shuffle(items)  # useful for argmax case as well in the case of ties
-    if items:
-        if random() < crowd_bt.EPSILON:
-            return items[0]
-        else:
-            return crowd_bt.argmax(
-                lambda i: crowd_bt.expected_information_gain(
-                    annotator.alpha,
-                    annotator.beta,
-                    annotator.prev.mu,
-                    annotator.prev.sigma_sq,
-                    i.mu,
-                    i.sigma_sq,
-                ),
-                items,
-            )
-    else:
-        return None
-
-
-def perform_vote(annotator, next_won):
-    if next_won:
-        winner = annotator.next
-        loser = annotator.prev
-    else:
-        winner = annotator.prev
-        loser = annotator.next
-    (
-        u_alpha,
-        u_beta,
-        u_winner_mu,
-        u_winner_sigma_sq,
-        u_loser_mu,
-        u_loser_sigma_sq,
-    ) = crowd_bt.update(
-        annotator.alpha,
-        annotator.beta,
-        winner.mu,
-        winner.sigma_sq,
-        loser.mu,
-        loser.sigma_sq,
-    )
-    annotator.alpha = u_alpha
-    annotator.beta = u_beta
-    winner.mu = u_winner_mu
-    winner.sigma_sq = u_winner_sigma_sq
-    loser.mu = u_loser_mu
-    loser.sigma_sq = u_loser_sigma_sq
