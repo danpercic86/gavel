@@ -2,7 +2,13 @@
 {% block page %}
   <div class="item">
     <div class="info">
-      <h2>Judges</h2>
+      <div class="d-flex justify-content-between">
+        <h2>Judges</h2>
+        <form action="/admin/judges/send-email" method="post">
+          <input type="submit" value="Send emails" class="btn btn-danger"/>
+          <input type="hidden" name="_csrf_token" value="{{ csrf_token() }}"/>
+        </form>
+      </div>
       <table id="table" class="table table-bordered">
         <thead class="thead-dark">
           <tr>

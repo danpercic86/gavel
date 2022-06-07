@@ -98,17 +98,28 @@ def upload_judge():
 
     def tx():
         for row in data:
-            annotator = Annotator(*row)
+            annotator = Annotator(*map(lambda x: x.strip(), row))
             added.append(annotator)
             db.session.add(annotator)
         db.session.commit()
 
     with_retries(tx)
 
-    if not settings.DEBUG:
-        try_send_emails(added)
-    else:
-        print("DEBUG: Not sending emails")
+    # if not settings.DEBUG:
+    #     try_send_emails(added)
+    # else:
+    #     print("DEBUG: Not sending emails")
+
+    return redirect(url_for("admin_judges"))
+
+
+@app.route("/admin/judges/send-email", methods=["POST"])
+@utils.requires_auth
+def email_judges():
+    try:
+        email_invite_links(Annotator.query.filter(Annotator.active).all())
+    except Exception as e:
+        return utils.server_error(str(e))
 
     return redirect(url_for("admin_judges"))
 
@@ -135,7 +146,7 @@ def delete_judge(judge_id: str):
     return redirect(url_for("admin_judges"))
 
 
-@app.route("/admin/judges/<judge_id>/email", methods=["POST"])
+@app.route("/admin/judges/<judge_id>/send-email", methods=["POST"])
 @utils.requires_auth
 def email_judge(judge_id: str):
     try:
@@ -176,10 +187,12 @@ def email_invite_links(annotators: List[Annotator] | Annotator):
     emails = []
     for annotator in annotators:
         link = judge_login_link(annotator)
+        link = f'<a clicktracking=off href="{link}">{link}</a>'
         raw_body = settings.EMAIL_BODY.format(name=annotator.name, link=link)
         body = "\n\n".join(utils.get_paragraphs(raw_body))
         emails.append((annotator.email, settings.EMAIL_SUBJECT, body))
 
+    print(emails)
     if settings.USE_SENDGRID and settings.SENDGRID_API_KEY is not None:
         utils.send_sendgrid_emails(emails)
     else:

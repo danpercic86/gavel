@@ -90,7 +90,7 @@ def trigger_import_projects():
 def register_judge():
     name = request.form["name"]
     email = request.form["email"]
-    description = request.form.get("description", None) or ""
+    description = request.form.get("description", "")
 
     if Annotator.query.filter(Annotator.email == email).first():
         return Response(f"judge {email} already exists", status=409)
@@ -101,3 +101,22 @@ def register_judge():
 
     response = {"loginUrl": judge_login_link(judge)}
     return Response(json.dumps(response), mimetype="application/json")
+
+
+@app.route("/api/register-judges", methods=["POST"])
+@utils.requires_auth
+def register_judges():
+    data = request.data.decode("utf-8")
+    if not data:
+        return Response("no data", status=400)
+
+    for judge in json.loads(data):
+        if Annotator.query.filter(Annotator.email == judge["email"]).first():
+            return Response(f"judge {judge['email']} already exists", status=409)
+
+        annotator = Annotator(judge["name"], judge["email"], judge["description"])
+        db.session.add(annotator)
+
+    db.session.commit()
+
+    return Response(status=204)

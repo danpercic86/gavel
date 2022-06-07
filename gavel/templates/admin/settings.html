@@ -81,6 +81,17 @@
           </td>
         </tr>
         <tr>
+          <td>Wipe votes, skips & ignores</td>
+          <td class="compact">
+            <form action="/admin/settings/wipe-votes" method="post">
+              <input type="submit"
+                     value="Wipe votes, skips & ignores"
+                     class="btn btn-danger"/>
+              <input type="hidden" name="_csrf_token" value="{{ csrf_token() }}"/>
+            </form>
+          </td>
+        </tr>
+        <tr>
           <td>Wipe Data</td>
           <td class="compact">
             <form action="/admin/settings/wipe-data" method="post">

@@ -131,9 +131,10 @@ def send_emails(emails):
 
 def send_sendgrid_emails(emails):
     exceptions = []
-    for e in emails:
-        to_address, subject, body = e
+    for email in emails:
+        to_address, subject, body = email
         response = sendgrid_send_email(to_address, subject, body)
+        print(response)
         if not (
             response.status_code == requests.codes.ok
             or response.status_code == requests.codes.accepted
@@ -152,7 +153,7 @@ def sendgrid_send_email(to_address, subject, body):
         "personalizations": [{"to": [{"email": to_address}], "subject": subject}],
         "from": {"email": settings.EMAIL_FROM},
         "subject": subject,
-        "content": [{"type": "text/plain", "value": body}],
+        "content": [{"type": "text/html", "value": body}],
     }
     headers = {
         "authorization": "Bearer %s" % settings.SENDGRID_API_KEY,

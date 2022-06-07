@@ -52,7 +52,6 @@ def delete_skips():
 @utils.requires_auth
 def import_teams():
     import_projects()
-    db.session.commit()
     return redirect(url_for("admin_projects"))
 
 
@@ -66,6 +65,16 @@ def wipe_data():
     Annotator.query.delete()
     db.session.commit()
     Item.query.delete()
+    return _save_and_go_to_dashboard()
+
+
+@app.route("/admin/settings/wipe-votes/", methods=["POST"])
+@utils.requires_auth
+def wipe_votes():
+    Decision.query.delete()
+    db.session.execute("DELETE FROM ignore")
+    db.session.execute("DELETE FROM view")
+    db.session.commit()
     return _save_and_go_to_dashboard()
 
 

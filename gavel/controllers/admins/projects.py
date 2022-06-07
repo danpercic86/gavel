@@ -130,7 +130,7 @@ def upload_project():
 
     def tx():
         for row in data:
-            db.session.add(Item(*row))
+            db.session.add(Item(*map(lambda x: x.strip(), row)))
         db.session.commit()
 
     with_retries(tx)
@@ -236,7 +236,7 @@ def plot_decisions_project(project_id: str):
 
 def parse_upload_form():
     f = request.files.get("file")
-    data = []
+    data: list[list[str]] = []
     if f and allowed_file(f.filename):
         extension = str(f.filename.rsplit(".", 1)[1].lower())
         if extension == "xlsx" or extension == "xls":
