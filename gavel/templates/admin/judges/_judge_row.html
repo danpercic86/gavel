@@ -14,6 +14,14 @@
   <td data-sort="{{ annotator.prev_id or -1 }}">{{ annotator.prev_id }}</td>
   <td data-sort="{{ annotator.updated | utcdatetime_epoch }}">{{ annotator.updated | utcdatetime_local }}</td>
   <td class="compact">
+    <button type="button"
+            onclick="copyLink{{ annotator.id }}()"
+            class="btn btn-warning">
+      Copy login
+      link
+    </button>
+  </td>
+  <td class="compact">
     <form action="/admin/judges/{{ annotator.id }}/send-email" method="post">
       <input type="submit" value="Send email" class="btn btn-warning"/>
       <input type="hidden" name="_csrf_token" value="{{ csrf_token() }}"/>
@@ -35,3 +43,8 @@
     </form>
   </td>
 </tr>
+<script>
+  async function copyLink{{ annotator.id }}() {
+    await navigator.clipboard.writeText("{{ login_links[annotator.id] }}");
+  }
+</script>

@@ -44,11 +44,15 @@ def admin_judges():
         jury_id = decision.annotator_id
         counts[jury_id] = counts.get(jury_id, 0) + 1
 
+    login_links = {judge.id: judge_login_link(judge) for judge in annotators}
+    print(login_links)
+
     return render_template(
         "admin/judges/index.html",
         is_admin=True,
         annotators=annotators,
         counts=counts,
+        login_links=login_links,
     )
 
 

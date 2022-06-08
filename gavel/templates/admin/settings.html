@@ -37,7 +37,7 @@
           <td>Max time per project / general alert starts</td>
           <td class="compact">
             <form action="/admin/settings/update" method="post">
-              <input type="text" name="value" value="{{ max_time_per_project }}"/>
+              <input type="number" name="value" value="{{ max_time_per_project }}"/>
               <input type="submit" value="Update" class="btn btn-success"/>
               <input type="hidden" name="identifier" value="MAX_TIME_PER_PROJECT"/>
               <input type="hidden" name="_csrf_token" value="{{ csrf_token() }}"/>

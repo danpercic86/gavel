@@ -40,12 +40,12 @@ def index():
     seen = Item.query.filter(Item.viewed.contains(annotator)).all()
     if Setting.value_of(SETTING_CLOSED) == SETTING_TRUE:
         return render_template(
-            "closed.html", content=utils.render_markdown(settings.CLOSED_MESSAGE)
+            "judge/closed.html", content=utils.render_markdown(settings.CLOSED_MESSAGE)
         )
 
     if not annotator.active:
         return render_template(
-            "disabled.html", content=utils.render_markdown(settings.DISABLED_MESSAGE)
+            "judge/disabled.html", content=utils.render_markdown(settings.DISABLED_MESSAGE)
         )
 
     if not annotator.read_welcome:
@@ -55,7 +55,7 @@ def index():
 
     if annotator.next is None:
         return render_template(
-            "wait.html", content=utils.render_markdown(settings.WAIT_MESSAGE)
+            "judge/wait.html", content=utils.render_markdown(settings.WAIT_MESSAGE)
         )
 
     time_per_project = Setting.value_of("TIME_PER_PROJECT")
@@ -127,7 +127,7 @@ def login(secret):
 @requires_active_annotator(redirect_to="index")
 def welcome():
     return render_template(
-        "welcome.html", content=utils.render_markdown(settings.WELCOME_MESSAGE)
+        "judge/welcome.html", content=utils.render_markdown(settings.WELCOME_MESSAGE)
     )
 
 
