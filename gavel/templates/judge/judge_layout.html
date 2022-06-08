@@ -4,8 +4,8 @@
     <a class="navbar-brand" href="/">HackTM</a>
     <button class="navbar-toggler"
             type="button"
-            data-toggle="collapse"
-            data-target="#navbarSupportedContent"
+            data-bs-toggle="collapse"
+            data-bs-target="#navbarSupportedContent"
             aria-controls="navbarSupportedContent"
             aria-expanded="false"
             aria-label="Toggle navigation">
@@ -20,18 +20,14 @@
           <a class="nav-link" href="/welcome">Instructions</a>
         </li>
         <li class="nav-item">
-          <a class="nav-link" onclick="reload()">Reload Page</a>
+          <a class="nav-link" onclick="window.location.reload()">Reload Page</a>
         </li>
       </ul>
     </div>
   </nav>
   {% block page %}
   {% endblock page %}
-  <script type="text/javascript">
-  function reload() {
-    window.location.reload(true);
-  }
-
-
-  </script>
 {% endblock content %}
+{% block end %}
+  <script type="text/javascript" src="{{ url_for('static', filename='js/gavel.js') }}"></script>
+{% endblock end %}

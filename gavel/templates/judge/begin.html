@@ -5,9 +5,7 @@
 {% block page %}
   <section class="front">
     <div class="item">
-      <div class="banner-tight">
-        <h1>This is the first project you see</h1>
-      </div>
+      <h1 class="text-info">This is the first project you see</h1>
       {% with project=item %}
         {% include "judge/_project.html" %}
       {% endwith %}
@@ -39,4 +37,4 @@
       </div>
     </div>
   </div>
-{% endblock title %}
+{% endblock page %}
