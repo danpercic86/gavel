@@ -714,8 +714,8 @@ testing = ["pytest (>=6)", "pytest-checkdocs (>=2.4)", "pytest-flake8", "pytest-
 
 [metadata]
 lock-version = "1.1"
-python-versions = "3.10.2"
-content-hash = "535d4e25bae57241b988bc5379e5db7588336fd28fffae8d722d419c48e2829c"
+python-versions = "~3.10"
+content-hash = "6b1f2b94fce5afd6548e7ad21aa3cb5ecaad5aa0d8674a5a35aed771c7189e22"
 
 [metadata.files]
 amqp = [

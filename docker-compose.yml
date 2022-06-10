@@ -6,7 +6,6 @@ x-gavel-base: &gavel_base
         - gavel_config.env
 
 x-gavel-env: &gavel_env
-    BASE_URL: https://${GAVEL_DOMAIN:?must set the GAVEL_DOMAIN environment variable}/
     REDIS_URL: redis://redis/0
     DATABASE_URL: postgresql://gavel:${DB_PASSWORD:?must set the DB_PASSWORD environment variable}@db/gavel
 

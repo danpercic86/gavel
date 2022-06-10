@@ -32,7 +32,7 @@ RUN apt -y install gcc libpq-dev \
     && pip install --upgrade pip \
     && poetry config virtualenvs.create false \
     && poetry install --no-dev --no-interaction --no-ansi \
-    && pip install gunicorn whitenoise
+    && pip install gunicorn whitenoise Redis
 
 # link image with github repo
 LABEL org.opencontainers.image.source=https://github.com/BanatIT/gavel
