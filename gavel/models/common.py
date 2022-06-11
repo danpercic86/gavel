@@ -21,6 +21,7 @@ def with_retries(tx_func):
         except sqlalchemy.exc.OperationalError as err:
             if not isinstance(err.orig, psycopg2.errors.SerializationFailure):
                 raise
+            print('Retrying transaction due to serialization failure')
             db.session.rollback()
 
         time.sleep(randint(1, 5) / 10)
