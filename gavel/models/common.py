@@ -1,3 +1,6 @@
+import time
+from random import randint
+
 import psycopg2.errors
 import sqlalchemy.exc
 
@@ -19,3 +22,5 @@ def with_retries(tx_func):
             if not isinstance(err.orig, psycopg2.errors.SerializationFailure):
                 raise
             db.session.rollback()
+
+        time.sleep(randint(1, 5) / 10)
