@@ -35,6 +35,12 @@ function calculateTimeLeft() {
     const newStamp = new Date().getTime();
 
     let diff = Math.round((endJuryTime - newStamp) / 1000);
+    if (diff < 0) {
+        $('#time-left').html("Time expired!");
+        $('#time-left').parent('div').addClass('alert-blink');
+        return;
+    }
+
     const {h, m} = getTime(diff);
 
     $('#time-left').html(h + " h : " + m + " m");
