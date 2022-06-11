@@ -50,6 +50,24 @@
     console.log(currentProject, timePerProject, maxTimePerProject, endJuryTime);
     let submitted = false;
 
+    document.getElementsByName('action').forEach(elem => {
+      if (elem.type === 'radio') {
+        elem.checked = false;
+        elem.addEventListener('change', function (event) {
+          if (submitted) {
+            event.stopPropagation()
+            event.preventDefault()
+            console.log('already submitted x2')
+            return false
+          }
+
+          document.getElementById('vote-submit').disabled = false;
+        });
+      }
+    });
+
+    document.getElementById('vote-submit').disabled = true;
+
     document.getElementById('vote-form').onsubmit = function (event) {
       if (submitted) {
         event.preventDefault()
