@@ -74,6 +74,7 @@ def wipe_votes():
     Decision.query.delete()
     db.session.execute("DELETE FROM ignore")
     db.session.execute("DELETE FROM view")
+    db.session.execute("UPDATE annotator SET next_id = null, prev_id = null")
     db.session.commit()
     return _save_and_go_to_dashboard()
 

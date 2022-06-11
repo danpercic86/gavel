@@ -7,7 +7,7 @@ from gavel.controllers.judges.common import (
     requires_open,
     requires_active_annotator,
 )
-from gavel.models import Decision, Annotator
+from gavel.models import Decision, Annotator, with_retries
 
 
 def is_first_or_last_project(judge: Annotator):
@@ -23,25 +23,32 @@ def is_first_or_last_project(judge: Annotator):
 def vote():
     judge = get_current_judge()
 
-    if request.form["action"] == "Skip":
-        return ignore_next_project(judge)
+    def tx():
+        if request.form["action"] == "Skip":
+            return ignore_next_project(judge)
 
-    if is_first_or_last_project(judge):
-        return redirect(url_for("index"))
+        if is_first_or_last_project(judge):
+            return redirect(url_for("index"))
 
-    # ignore things that were deactivated in the middle of judging
-    if projects_are_still_active(judge):
-        if request.form["action"] == "Previous":
-            decision = vote_previous(judge)
-        elif request.form["action"] == "Current":
-            decision = vote_current(judge)
-        else:
-            return utils.user_error("Invalid action")
-        db.session.add(decision)
+        # ignore things that were deactivated in the middle of judging
+        if projects_are_still_active(judge):
+            if request.form["action"] == "Previous":
+                decision = vote_previous(judge)
+            elif request.form["action"] == "Current":
+                decision = vote_current(judge)
+            else:
+                return utils.user_error("Invalid action")
+            db.session.add(decision)
 
-    judge.next.viewed.append(judge)  # counted as viewed even if deactivated
-    judge.prev = judge.next
-    return ignore_previous_project(judge)
+        judge.next.viewed.append(judge)  # counted as viewed even if deactivated
+        judge.prev = judge.next
+        judge.ignore.append(judge.prev)
+        judge.update_next(choose_next(judge))
+        db.session.commit()
+
+    with_retries(tx)
+
+    return redirect(url_for("index"))
 
 
 def projects_are_still_active(judge):
@@ -56,11 +63,6 @@ def vote_previous(judge: Annotator):
 def vote_current(judge: Annotator):
     perform_vote(judge, next_won=True)
     return Decision(judge, winner=judge.next, loser=judge.prev)
-
-
-def ignore_previous_project(judge: Annotator):
-    judge.ignore.append(judge.prev)
-    return save_and_go_next(judge)
 
 
 def ignore_next_project(judge: Annotator):

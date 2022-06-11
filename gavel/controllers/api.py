@@ -112,7 +112,8 @@ def register_judges():
 
     for judge in json.loads(data):
         if Annotator.query.filter(Annotator.email == judge["email"]).first():
-            return Response(f"judge {judge['email']} already exists", status=409)
+            print(f"judge {judge['email']} already exists")
+            continue
 
         annotator = Annotator(judge["name"], judge["email"], judge["description"])
         db.session.add(annotator)

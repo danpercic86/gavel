@@ -7,7 +7,7 @@ class SerializableAlchemy(SQLAlchemy):
     def apply_driver_hacks(self, app, info, options):
         if "isolation_level" not in options:
             # XXX is this slow? are there better ways?
-            options["isolation_level"] = "SERIALIZABLE"
+            options["isolation_level"] = "REPEATABLE READ"
         return super(SerializableAlchemy, self).apply_driver_hacks(app, info, options)
 
 
