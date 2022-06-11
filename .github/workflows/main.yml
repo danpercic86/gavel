@@ -40,4 +40,4 @@ jobs:
                     host: gdscupt.tech
                     username: ${{ secrets.USERNAME }}
                     key: ${{ secrets.SSH_KEY }}
-                    script: echo ${{ secrets.PASSWORD }} | sudo -S /opt/deploy/_deploy.sh /home/docker/gavel
+                    script: echo ${{ secrets.PASSWORD }} | sudo -S /home/docker/deploy/deploy.sh /home/docker/gavel
