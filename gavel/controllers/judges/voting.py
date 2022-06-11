@@ -7,7 +7,8 @@ from gavel.controllers.judges.common import (
     requires_open,
     requires_active_annotator,
 )
-from gavel.models import Decision, Annotator, with_retries
+from gavel.models import Decision, Annotator
+from gavel.models.common import with_retries
 
 
 def is_first_or_last_project(judge: Annotator):
@@ -21,9 +22,9 @@ def is_first_or_last_project(judge: Annotator):
 @requires_open(redirect_to="index")
 @requires_active_annotator(redirect_to="index")
 def vote():
-    judge = get_current_judge()
-
     def tx():
+        judge = get_current_judge()
+
         if request.form["action"] == "Skip":
             return ignore_next_project(judge)
 

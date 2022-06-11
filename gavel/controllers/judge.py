@@ -23,7 +23,8 @@ from gavel.controllers.judges.common import (
     requires,
     check_has_decisions,
 )
-from gavel.models import Setting, Item, db, with_retries, Annotator
+from gavel.models import Setting, Item, db, Annotator
+from gavel.models.common import with_retries
 
 
 @app.route("/")

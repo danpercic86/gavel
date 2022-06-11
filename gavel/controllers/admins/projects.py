@@ -21,9 +21,9 @@ from gavel.models import (
     Item,
     Decision,
     db,
-    with_retries,
     ignore_table,
 )
+from gavel.models.common import with_retries
 
 ALLOWED_EXTENSIONS = {"csv", "xlsx", "xls"}
 FOREIGN_KEY_ERROR = "Projects can't be deleted once they have been voted on by a judge. You can use the 'disable' functionality instead, which has a similar effect, preventing the project from being shown to judges."

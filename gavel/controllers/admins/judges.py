@@ -20,12 +20,12 @@ from gavel.models import (
     Annotator,
     Item,
     db,
-    with_retries,
     ignore_table,
 )
 from gavel.models import (
     Decision,
 )
+from gavel.models.common import with_retries
 
 ALLOWED_EXTENSIONS = {"csv", "xlsx", "xls"}
 FOREIGN_KEY_ERROR = "Judges can't be deleted once they have voted on a project. You can use the 'disable' functionality instead, which has a similar effect, locking out the judge and preventing them from voting on any other projects."

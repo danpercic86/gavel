@@ -17,7 +17,7 @@
     </div>
     <div class="item">
       <div class="info form-vote">
-        <form action="{{ url_for('begin') }}" method="post">
+        <form id="vote-form" action="{{ url_for('begin') }}" method="post">
           <input type="submit"
                  name="action"
                  value="Continue"
@@ -37,4 +37,18 @@
       </div>
     </div>
   </div>
+  <script>
+    let submitted = false;
+
+    document.getElementById('vote-form').addEventListener('submit', function (event) {
+      if (submitted) {
+        event.preventDefault()
+        event.stopPropagation();
+        console.log('already submitted');
+        return false;
+      }
+
+      submitted = true;
+    })
+  </script>
 {% endblock page %}

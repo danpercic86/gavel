@@ -16,7 +16,7 @@
   {% endwith %}
   {% include 'judge/_progress_bar.html' %}
   <div class="info">
-    <form action="{{ url_for('vote') }}" method="post">
+    <form id="vote-form" action="{{ url_for('vote') }}" method="post">
       <p class="center">Which one is better?</p>
       <div id="vote-previous" class="radio-button button-left">
         <input type="radio" name="action" id="vote-previous-radio" value="Previous"/>
@@ -48,5 +48,18 @@
     const endJuryTime = new Date('{{ jury_end_datetime }}');
 
     console.log(currentProject, timePerProject, maxTimePerProject, endJuryTime);
+    let submitted = false;
+
+    document.getElementById('vote-form').onsubmit = function (event) {
+      if (submitted) {
+        event.preventDefault()
+        event.stopPropagation();
+        console.log('already submitted');
+        return false;
+      }
+
+      submitted = true;
+      document.getElementById('vote-submit').disabled = true
+    }
   </script>
 {% endblock page %}
