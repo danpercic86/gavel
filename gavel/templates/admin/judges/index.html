@@ -3,7 +3,7 @@
   <div class="item">
     <div class="info">
       <div class="d-flex justify-content-between">
-        <h2>Judges</h2>
+        <h2>Judges <h6 class="card-subtitle mb-2 text-muted">{{ annotators | length }}</h6></h2>
         <form action="/admin/judges/send-email" method="post">
           <input type="submit" value="Send emails" class="btn btn-danger"/>
           <input type="hidden" name="_csrf_token" value="{{ csrf_token() }}"/>
@@ -11,25 +11,25 @@
       </div>
       <table id="table" class="table table-bordered">
         <thead class="thead-dark">
-          <tr>
-            <th scope="col" class="sort-default" data-sort-method="number">Id</th>
-            <th scope="col" data-sort-method="caseInsensitiveSort">Name</th>
-            <th scope="col" data-sort-method="caseInsensitiveSort">Email</th>
-            <th scope="col" data-sort-method="caseInsensitiveSort">Description</th>
-            <th scope="col" data-sort-method="number">Votes</th>
-            <th scope="col" data-sort-method="number">Next (Id)</th>
-            <th scope="col" data-sort-method="number">Previous (Id)</th>
-            <th scope="col" data-sort-method="number" data-sort-order="desc">Updated</th>
-            <th scope="col" class="no-sort">Login link</th>
-            <th scope="col" class="no-sort">Email</th>
-            <th scope="col" data-sort-method="caseInsensitiveSort">Active</th>
-            <th scope="col" class="no-sort">Delete</th>
-          </tr>
+        <tr>
+          <th scope="col" class="sort-default" data-sort-method="number">Id</th>
+          <th scope="col" data-sort-method="caseInsensitiveSort">Name</th>
+          <th scope="col" data-sort-method="caseInsensitiveSort">Email</th>
+          <th scope="col" data-sort-method="caseInsensitiveSort">Description</th>
+          <th scope="col" data-sort-method="number">Votes</th>
+          <th scope="col" data-sort-method="number">Next (Id)</th>
+          <th scope="col" data-sort-method="number">Previous (Id)</th>
+          <th scope="col" data-sort-method="number" data-sort-order="desc">Updated</th>
+          <th scope="col" class="no-sort">Login link</th>
+          <th scope="col" class="no-sort">Email</th>
+          <th scope="col" data-sort-method="caseInsensitiveSort">Active</th>
+          <th scope="col" class="no-sort">Delete</th>
+        </tr>
         </thead>
         <tbody>
-          {% for annotator in annotators %}
-            {% include 'admin/judges/_judge_row.html' %}
-          {% endfor %}
+        {% for annotator in annotators %}
+          {% include 'admin/judges/_judge_row.html' %}
+        {% endfor %}
         </tbody>
       </table>
     </div>
