@@ -157,7 +157,7 @@ hr {
     background: #FDB632;
     padding: 1px 6px;
     color: #111026;
-    font-weight: 200;
+    //font-weight: 200;
     -webkit-box-decoration-break: clone;
     box-decoration-break: clone;
   }
@@ -203,6 +203,10 @@ hr {
 }
 
 #error-header {
+  background-color: $error-color;
+}
+
+.error-alert {
   background-color: $error-color;
 }
 

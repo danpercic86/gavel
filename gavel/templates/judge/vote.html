@@ -26,6 +26,14 @@
         <input type="radio" name="action" id="vote-current-radio" value="Current"/>
         <label for="vote-current-radio">{{ next.name }} (current)</label>
       </div>
+
+      <div id="skip-alert" style="height: 45px"
+           class="error-alert radio-button button-full button-gap d-none">
+        <p style="width: 100%; text-align: center; height: 45px; line-height: 45px"><b>
+          Please skip only if absolutely necessary.
+        </b></p>
+      </div>
+
       <div id="vote-skip" class="radio-button button-full button-gap">
         <input type="radio" name="action" id="vote-skip-radio" value="Skip" checked/>
         <label for="vote-skip-radio">Skip</label>
@@ -49,6 +57,16 @@
 
     console.log(currentProject, timePerProject, maxTimePerProject, endJuryTime);
     let submitted = false;
+    let wantsToSkip = false;
+
+    document.getElementById('vote-skip-radio').addEventListener('click', function () {
+      wantsToSkip = !wantsToSkip;
+      if (wantsToSkip) {
+        document.getElementById('skip-alert').classList.remove('d-none');
+      } else {
+        document.getElementById('skip-alert').classList.add('d-none');
+      }
+    })
 
     document.getElementsByName('action').forEach(elem => {
       if (elem.type === 'radio') {

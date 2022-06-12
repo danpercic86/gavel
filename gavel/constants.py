@@ -28,7 +28,7 @@ you'll decide whether it's better or worse than the one you looked at
 
 If at any point, you can't find a particular project, you can click the
 'Skip' button and you will be assigned a new project. **Please don't skip
-unless absolutely necessary.**
+unless ABSOLUTELY necessary (i.e. earthquake, fire started, etc).**
 
 Gavel makes it really simple for you to submit votes, but please think hard
 before you vote. **Once you make a decision, you can't take it back.**
