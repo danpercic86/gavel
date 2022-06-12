@@ -4,7 +4,7 @@ from flask import Response, request
 from sqlalchemy import desc
 
 import gavel.utils as utils
-from gavel import app, settings
+from gavel import app
 from gavel.controllers.admins.judges import judge_login_link
 from gavel.controllers.admins.settings import import_projects
 from gavel.models import Item, Annotator, Decision, db
@@ -55,10 +55,10 @@ def decisions_dump():
 @app.route("/api/submissions.json")
 @utils.requires_auth
 def item_json_dump():
-    if not request.args["key"] == settings.API_KEY:
-        return Response(
-            json.dumps({"error": "Invalid api key."}), mimetype="application/json"
-        )
+    # if not request.args["key"] == settings.API_KEY:
+    #     return Response(
+    #         json.dumps({"error": "Invalid api key."}), mimetype="application/json"
+    #     )
 
     items = Item.query.order_by(desc(Item.mu)).all()
     data = []
