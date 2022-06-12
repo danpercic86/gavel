@@ -24,6 +24,8 @@ RUN apt update
 
 RUN apt -y install curl
 
+RUN apt -y install graphviz
+
 RUN curl -sSL https://raw.githubusercontent.com/python-poetry/poetry/master/get-poetry.py | python -
 
 # some packages need to be compiled from source and have build-time dependencies
