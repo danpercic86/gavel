@@ -1,5 +1,4 @@
 RUN := poetry run
-FLASK_ENV := FLASK_APP=runserver:app FLASK_ENV=development FLASK_RUN_HOST=0.0.0.0 FLASK_RUN_PORT=5005
 
 setup: initialize.py config.yaml
 	curl -sSL https://install.python-poetry.org | python3 -
@@ -9,7 +8,7 @@ setup: initialize.py config.yaml
 
 
 run: runserver.py config.yaml
-	$(FLASK_ENV) $(RUN) flask run --extra-files config.yaml --reload
+	$(RUN) flask --app runserver:app run --extra-files config.yaml --reload --host 0.0.0.0 --port 5005 --debugger
 
 lint:
 	$(RUN) black .
