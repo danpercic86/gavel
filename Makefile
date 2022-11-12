@@ -9,7 +9,7 @@ setup: initialize.py
 
 
 run: runserver.py config.yaml
-	$(FLASK_ENV) $(RUN) flask run --extra-files config.yaml --eager-loading
+	$(FLASK_ENV) $(RUN) flask run --extra-files config.yaml --reload
 
 lint:
 	$(RUN) black .
