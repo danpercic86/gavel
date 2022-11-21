@@ -46,7 +46,8 @@ def index():
 
     if not annotator.active:
         return render_template(
-            "judge/disabled.html", content=utils.render_markdown(settings.DISABLED_MESSAGE)
+            "judge/disabled.html",
+            content=utils.render_markdown(settings.DISABLED_MESSAGE),
         )
 
     if not annotator.read_welcome:
